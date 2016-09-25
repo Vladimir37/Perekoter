@@ -12,6 +12,43 @@ func Login(c *gin.Context) {
 
 	config := utility.Read()
 	if (config.Login == login) && (config.Password == password) {
-		//
-	}
+		utility.SetCookie(c, "login", password)
+        c.JSON(200, gin.H{
+            "status": 0,
+        })
+	} else {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
+}
+
+func CheckMiddleware(c *gin.Context) {
+    cookie, err := utility.GetCookie(c, "login")
+    if err != nil {
+        c.Redirect(403, "/")
+    }
+    config := utility.Read()
+    if config.Password == cookie {
+        c.Next()
+    } else {
+        c.Redirect(403, "/")
+    }
+}
+
+func CheckRequest(c *gin.Context)  {
+    cookie, err := utility.GetCookie(c, "login")
+    if err != nil {
+        c.Redirect(403, "/")
+    }
+    config := utility.Read()
+    if config.Password == cookie {
+        c.JSON(200, gin.H{
+            "status": 0,
+        })
+    } else {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
 }

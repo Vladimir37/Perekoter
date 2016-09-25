@@ -9,9 +9,7 @@ import (
 )
 
 func main() {
-	//router := gin.Default()
-	//fmt.Println(models.Models())
-	controllers.Login()
-	models.Start()
+	models.Init()
 	fmt.Println("Connection to the database was created!")
+	//router := gin.Default()
 }
