@@ -12,15 +12,21 @@ import (
 )
 
 func AddThread(c *gin.Context) {
-	numbering, _ := strconv.ParseBool(c.PostForm("numbering"))
-	roman, _ := strconv.ParseBool(c.PostForm("roman"))
-	currentNum, _ := strconv.Atoi(c.PostForm("current_num"))
+	numbering, errNum := strconv.ParseBool(c.PostForm("numbering"))
+	roman, errRoman := strconv.ParseBool(c.PostForm("roman"))
+	currentNum, errNum := strconv.Atoi(c.PostForm("current_num"))
 	title := c.PostForm("title")
-	headerLink, _ := strconv.ParseBool(c.PostForm("header_link"))
+	headerLink, errHeaderLink := strconv.ParseBool(c.PostForm("header_link"))
 	header := c.PostForm("header")
-	boardNum, _ := strconv.Atoi(c.PostForm("board"))
+	boardNum, errBoard := strconv.Atoi(c.PostForm("board"))
 
-	db := models.DB()
+    if (errNum != nil) || (errRoman != nil) || (errNum != nil) || (errHeaderLink != nil) || (errBoard != nil) {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
+
+    db := models.DB()
 	defer db.Close()
 
 	var targetBoard models.Board
@@ -33,7 +39,7 @@ func AddThread(c *gin.Context) {
 
     if (errFile != nil) || (errImg != nil) {
         c.JSON(200, gin.H{
-            "status": 1,
+            "status": 2,
         })
     }
 
@@ -43,7 +49,7 @@ func AddThread(c *gin.Context) {
 
     if errWriting != nil {
         c.JSON(200, gin.H{
-            "status": 2,
+            "status": 3,
         })
     }
 
@@ -57,5 +63,94 @@ func AddThread(c *gin.Context) {
         Header: header,
         Image: imageName,
         Board: targetBoard,
+    })
+
+    c.JSON(200, gin.H{
+        "status": 0,
+    })
+}
+
+func EditThread(c *gin.Context) {
+    threadId, errId := strconv.Atoi(c.PostForm("thread_id"))
+
+    numbering, errNum := strconv.ParseBool(c.PostForm("numbering"))
+    roman, errRoman := strconv.ParseBool(c.PostForm("roman"))
+    currentNum, errNum := strconv.Atoi(c.PostForm("current_num"))
+    title := c.PostForm("title")
+    headerLink, errHeaderLink := strconv.ParseBool(c.PostForm("header_link"))
+    header := c.PostForm("header")
+    boardNum, errBoard := strconv.Atoi(c.PostForm("board"))
+
+    if (errNum != nil) || (errRoman != nil) || (errNum != nil) || (errHeaderLink != nil) || (errBoard != nil) || (errId != nil) {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
+
+    db := models.DB()
+    defer db.Close()
+
+    var targetBoard models.Board
+    db.First(&targetBoard, boardNum)
+
+    var thread models.Thread
+    db.First(&thread, threadId)
+
+    thread.Numbering = numbering
+    thread.Roman = roman
+    thread.CurrentNum = currentNum
+    thread.Title = title
+    thread.HeaderLink = headerLink
+    thread.Header = header
+    thread.Board = targetBoard
+
+    db.Save(thread)
+
+    c.JSON(200, gin.H{
+        "status": 0,
+    })
+}
+
+func UploadImage(c *gin.Context) {
+    threadId, errId := strconv.Atoi(c.PostForm("thread_id"))
+    if errId != nil {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
+
+    imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".png"
+
+    img, _, errImg := c.Request.FormFile("cover")
+    out, errFile := os.Open("./covers/" + imageName)
+
+    if (errFile != nil) || (errImg != nil) {
+        c.JSON(200, gin.H{
+            "status": 2,
+        })
+    }
+
+    defer out.Close()
+
+    _, errWriting := io.Copy(out, img)
+
+    if errWriting != nil {
+        c.JSON(200, gin.H{
+            "status": 3,
+        })
+    }
+
+    db := models.DB()
+    defer db.Close()
+
+    var thread models.Thread
+    db.First(&thread, threadId)
+
+    thread.Image = imageName
+
+    db.Save(thread)
+
+    c.JSON(200, gin.H{
+        "status": 0,
     })
 }
