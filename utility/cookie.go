@@ -1,8 +1,9 @@
 package utility
 
 import (
-	"time"
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,14 +15,14 @@ func SetCookie(c *gin.Context, key string, value string) {
 		Value:   value,
 		Expires: expiration,
 	}
-    http.SetCookie(c.Writer, &cookie)
+	http.SetCookie(c.Writer, &cookie)
 }
 
-func GetCookie(c *gin.Context, key string) (string, string) {
-    cookie, err := c.Request.Cookie(key)
-    if err != nil {
-        return nil, "Error"
-    } else {
-        return cookie, nil
-    }
+func GetCookie(c *gin.Context, key string) (string, error) {
+	cookie, err := c.Request.Cookie(key)
+	if err != nil {
+		return "", errors.New("No cookie")
+	} else {
+		return cookie.Value, nil
+	}
 }
