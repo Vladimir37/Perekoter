@@ -104,7 +104,7 @@ func EditThread(c *gin.Context) {
     thread.Header = header
     thread.Board = targetBoard
 
-    db.Save(thread)
+    db.Save(&thread)
 
     c.JSON(200, gin.H{
         "status": 0,
@@ -148,9 +148,33 @@ func UploadImage(c *gin.Context) {
 
     thread.Image = imageName
 
-    db.Save(thread)
+    db.Save(&thread)
 
     c.JSON(200, gin.H{
         "status": 0,
     })
+}
+
+func DeleteThread(c *gin.Context) {
+    threadId, errId := strconv.Atoi(c.PostForm("thread_id"))
+    if errId != nil {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
+
+    db := models.DB()
+    defer db.Close()
+
+    var thread models.Thread
+    db.First(&thread, threadId)
+
+    errFile := os.Remove("./covers/" + thread.Image)
+    if errFile != nil {
+        c.JSON(200, gin.H{
+            "status": 1,
+        })
+    }
+
+    db.Delete(&thread)
 }
