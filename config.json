@@ -3,5 +3,6 @@
     "Password": "Pass",
     "Period": 20,
     "Passcode": "qwe",
-    "Port": "8000"
+    "Port": "8000",
+    "Base": "https://2ch.hk/"
 }

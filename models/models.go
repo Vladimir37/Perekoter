@@ -34,9 +34,11 @@ type Thread struct {
 	Numbering  bool
 	Roman      bool
 	CurrentNum int
+    CurrentThread int
 	Title      string
 	HeaderLink bool
 	Header     string
 	Image      string
 	Board      Board
+    Active bool
 }
