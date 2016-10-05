@@ -9,15 +9,7 @@ type Config struct {
 	Base     string
 }
 
-type PostJSON struct {
-	comment string
-}
-
-type ThreadsJSON struct {
-	posts []PostJSON
-}
-
 type ThreadJSON struct {
-	Board   string
-	threads ThreadsJSON
+	Board       string
+	Posts_count int
 }

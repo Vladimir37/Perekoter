@@ -13,6 +13,6 @@ func Cycle() {
 
 	for i := 0; i < len(threads); i++ {
 		db.Model(&threads[i]).Related(&threads[i].Board)
-		CheckThread(threads[i])
+		go CheckThread(threads[i])
 	}
 }
