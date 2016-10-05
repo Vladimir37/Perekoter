@@ -6,5 +6,18 @@ type Config struct {
 	Period   int
 	Passcode string
 	Port     string
-    Base     string
+	Base     string
+}
+
+type PostJSON struct {
+	comment string
+}
+
+type ThreadsJSON struct {
+	posts []PostJSON
+}
+
+type ThreadJSON struct {
+	Board   string
+	threads ThreadsJSON
 }

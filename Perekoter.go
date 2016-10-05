@@ -2,6 +2,7 @@ package main
 
 import (
 	"Perekoter/models"
+	"Perekoter/utility"
 	"fmt"
 	"os"
 	//"github.com/gin-gonic/gin"
@@ -12,6 +13,9 @@ func main() {
 	models.Init()
 	fmt.Println("Connection to the database was created!")
 	os.Mkdir("./covers", 0777)
+
+	utility.Cycle()
+
 	// router := gin.Default()
 
 	// router.Run(":8080")

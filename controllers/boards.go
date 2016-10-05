@@ -35,7 +35,7 @@ func GetBoard(c *gin.Context) {
 	defer db.Close()
 
     var board models.Board
-    db.First(board, num)
+    db.First(&board, num)
 
     c.JSON(200, g.H{
         status: 0,

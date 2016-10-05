@@ -106,6 +106,7 @@ func AddThread(c *gin.Context) {
         Header: header,
         Image: imageName,
         Board: targetBoard,
+        BoardID: targetBoard.id,
         Active: true,
     })
 
@@ -156,6 +157,7 @@ func EditThread(c *gin.Context) {
     thread.HeaderLink = headerLink
     thread.Header = header
     thread.Board = targetBoard
+    thread.BoardID = targetBoard.id
     thread.Active = active
 
     db.Save(&thread)

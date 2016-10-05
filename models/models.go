@@ -11,7 +11,7 @@ func Init() {
 		panic("Failed to connect database")
 	}
 	db.AutoMigrate(&Board{}, &Thread{})
-	defer db.Close()
+	db.Close()
 }
 
 func DB() *gorm.DB {
@@ -31,14 +31,15 @@ type Board struct {
 
 type Thread struct {
 	gorm.Model
-	Numbering  bool
-	Roman      bool
-	CurrentNum int
-    CurrentThread int
-	Title      string
-	HeaderLink bool
-	Header     string
-	Image      string
-	Board      Board
-    Active bool
+	Numbering     bool
+	Roman         bool
+	CurrentNum    int
+	CurrentThread int
+	Title         string
+	HeaderLink    bool
+	Header        string
+	Image         string
+	Board         Board
+	BoardID       int
+	Active        bool
 }
