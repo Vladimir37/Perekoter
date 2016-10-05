@@ -10,15 +10,14 @@ func Perekot(thread models.Thread) {
 	db := models.DB()
 	defer db.Close()
 
-	config := Read()
-	path := config.Base + "/makaba/posting.fcgi"
+	path := Config.Get().Base + "/makaba/posting.fcgi"
 
 	postForm := url.Values{
 		"json":    {"1"},
 		"task":    {"post"},
 		"board":   {thread.Board.Addr},
 		"thread":  {"0"},
-		"name":    {config.Botname},
+		"name":    {Config.Get().Botname},
 		"subject": {"title"},
 		"comment": {"text"},
 	}

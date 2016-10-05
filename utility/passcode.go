@@ -11,12 +11,11 @@ type Passcode struct {
 }
 
 func (c *Passcode) PasscodeAuth() {
-	config := Read()
-	path := config.Base + "/makaba/posting.fcgi"
+	path := Config.Get().Base + "/makaba/posting.fcgi"
 
 	postForm := url.Values{
 		"task":     {"auth"},
-		"usercode": {config.Passcode},
+		"usercode": {Config.Get().Passcode},
 	}
 
 	response, err := http.PostForm(path, postForm)

@@ -1,6 +1,6 @@
 package utility
 
-type Config struct {
+type ConfigStruct struct {
 	Login    string
 	Password string
 	Period   int

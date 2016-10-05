@@ -13,6 +13,7 @@ func main() {
 	models.Init()
 	fmt.Println("Connection to the database was created!")
 	os.Mkdir("./covers", 0777)
+	utility.ConfigOperator.Read()
 
 	utility.Cycle()
 

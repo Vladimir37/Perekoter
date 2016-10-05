@@ -13,8 +13,7 @@ import
 )
 
 func CheckThread(thread models.Thread) bool {
-	config := Read()
-	path := config.Base + thread.Board.Addr + "/res/" + strconv.Itoa(thread.CurrentThread) + ".json"
+	path := Config.Get().Base + thread.Board.Addr + "/res/" + strconv.Itoa(thread.CurrentThread) + ".json"
 
 	response, errSend := http.Get(path)
 	if errSend != nil {
