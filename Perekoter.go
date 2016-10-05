@@ -16,6 +16,8 @@ func main() {
 
 	utility.Cycle()
 
+	utility.CurrentUsercode.PasscodeAuth()
+
 	// router := gin.Default()
 
 	// router.Run(":8080")

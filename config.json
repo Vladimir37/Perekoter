@@ -4,5 +4,6 @@
     "Period": 20,
     "Passcode": "qwe",
     "Port": "8000",
-    "Base": "https://2ch.hk/"
+    "Base": "https://2ch.hk/",
+    "Botname": "Anon"
 }

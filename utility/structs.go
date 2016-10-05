@@ -7,6 +7,7 @@ type Config struct {
 	Passcode string
 	Port     string
 	Base     string
+	Botname  string
 }
 
 type ThreadJSON struct {
