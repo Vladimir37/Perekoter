@@ -1,9 +1,6 @@
 package utility
 
-import
-//"net/http"
-
-(
+import (
 	"Perekoter/models"
 	"encoding/json"
 	"fmt"
