@@ -2,7 +2,6 @@ package utility
 
 import (
 	"Perekoter/models"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -49,7 +48,8 @@ func generatePost(thread models.Thread) {
 	if thread.HeaderLink {
 		response, errSend := http.Get(thread.Header)
 		if errSend != nil {
-			fmt.Println()
+			threadID := strconv.Itoa(int(thread.ID))
+			NewError("Failed to get the post header (thread " + threadID + ")")
 		}
 	} else {
 		post = thread.Header

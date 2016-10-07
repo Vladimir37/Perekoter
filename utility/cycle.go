@@ -7,7 +7,7 @@ func Cycle() {
 	defer db.Close()
 
 	var threads []models.Thread
-	db.Find(&threads, &models.Thread{
+	db.Find(&threads, models.Thread{
 		Active: true,
 	})
 

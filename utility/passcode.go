@@ -20,6 +20,7 @@ func (c *Passcode) PasscodeAuth() {
 
 	response, err := http.PostForm(path, postForm)
 	if err != nil {
+		NewError("Failed to send passcode request")
 		c.Error = true
 	}
 

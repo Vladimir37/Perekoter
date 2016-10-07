@@ -46,6 +46,6 @@ type Thread struct {
 
 type Error struct {
 	gorm.Model
-	text   string
-	active bool
+	Text   string
+	Active bool
 }
