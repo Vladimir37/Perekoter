@@ -2,6 +2,8 @@ package utility
 
 import (
 	"Perekoter/models"
+	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -9,11 +11,20 @@ import (
 	"github.com/StefanSchroeder/Golang-Roman"
 )
 
-func Perekot(thread models.Thread) {
+func Perekot(thread models.Thread) error {
 	db := models.DB()
 	defer db.Close()
 
 	path := Config.Get().Base + "/makaba/posting.fcgi"
+
+	title, errTitle := createTitle(thread)
+	post, errPost := generatePost(thread)
+
+	if (errTitle != nil) || (errPost != nil) {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to create thread " + threadID)
+		return errors.New("Not created")
+	}
 
 	postForm := url.Values{
 		"json":    {"1"},
@@ -21,14 +32,16 @@ func Perekot(thread models.Thread) {
 		"board":   {thread.Board.Addr},
 		"thread":  {"0"},
 		"name":    {Config.Get().Botname},
-		"subject": {createTitle(thread)},
-		"comment": {"text"},
+		"subject": {title},
+		"comment": {post},
 	}
 
 	http.PostForm(path, postForm)
+
+	return nil
 }
 
-func createTitle(thread models.Thread) string {
+func createTitle(thread models.Thread) (string, error) {
 	title := thread.Title
 	currentNum := thread.CurrentNum + 1
 
@@ -40,18 +53,32 @@ func createTitle(thread models.Thread) string {
 		}
 	}
 
-	return title
+	return title, nil
 }
 
-func generatePost(thread models.Thread) {
+func generatePost(thread models.Thread) (string, error) {
 	var post string
 	if thread.HeaderLink {
 		response, errSend := http.Get(thread.Header)
 		if errSend != nil {
 			threadID := strconv.Itoa(int(thread.ID))
 			NewError("Failed to get the post header (thread " + threadID + ")")
+			return "", errors.New("Not created")
 		}
+
+		headerResponse, errSave := ioutil.ReadAll(response.Body)
+		defer response.Body.Close()
+
+		if errSave != nil {
+			threadID := strconv.Itoa(int(thread.ID))
+			NewError("Failed to read the post header (thread " + threadID + ")")
+			return "", errors.New("Not created")
+		}
+
+		post = string(headerResponse)
 	} else {
 		post = thread.Header
 	}
+
+	return post, nil
 }

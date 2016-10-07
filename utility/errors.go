@@ -1,8 +1,6 @@
 package utility
 
-import (
-	"Perekoter/models"
-)
+import "Perekoter/models"
 
 func NewError(text string) {
 	db := models.DB()

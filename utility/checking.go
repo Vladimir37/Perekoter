@@ -18,6 +18,7 @@ func CheckThread(thread models.Thread) bool {
 		return false
 	}
 
+	defer response.Body.Close()
 	threadResponse, errSave := ioutil.ReadAll(response.Body)
 
 	if errSave != nil {
@@ -37,6 +38,9 @@ func CheckThread(thread models.Thread) bool {
 	if responseJSON.Posts_count >= thread.Board.Bumplimit {
 		go Perekot(thread)
 	}
+
+	//Test
+	Perekot(thread)
 
 	return true
 }
