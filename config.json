@@ -5,5 +5,7 @@
     "Passcode": "qwe",
     "Port": "8000",
     "Base": "https://2ch.hk/",
-    "Botname": "Anon"
+    "Botname": "Anon",
+    "Notification": true,
+    "NotificationText": "Perekot to >>"
 }

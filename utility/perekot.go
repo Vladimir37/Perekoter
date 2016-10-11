@@ -15,7 +15,8 @@ func Perekot(thread models.Thread) error {
 	db := models.DB()
 	defer db.Close()
 
-	path := Config.Get().Base + "/makaba/posting.fcgi"
+	urlPath := Config.Get().Base + "/makaba/posting.fcgi"
+	imgPath := "./covers/" + thread.Image
 
 	title, errTitle := createTitle(thread)
 	post, errPost := generatePost(thread)
@@ -36,7 +37,7 @@ func Perekot(thread models.Thread) error {
 		"comment": {post},
 	}
 
-	http.PostForm(path, postForm)
+	http.PostForm(urlPath, postForm)
 
 	return nil
 }
@@ -81,4 +82,30 @@ func generatePost(thread models.Thread) (string, error) {
 	}
 
 	return post, nil
+}
+
+func generateNotification(thread models.Thread) string {
+	notification := Config.Get().NotificationText + strconv.Itoa(thread.CurrentThread)
+	return notification
+}
+
+func notification(thread models.Thread, oldNum int) {
+	path := Config.Get().Base + "/makaba/posting.fcgi"
+	notification := generateNotification(thread)
+
+	postForm := url.Values{
+		"json":    {"1"},
+		"task":    {"post"},
+		"board":   {thread.Board.Addr},
+		"thread":  {strconv.Itoa(oldNum)},
+		"name":    {Config.Get().Botname},
+		"comment": {notification},
+	}
+
+	response, err := http.PostForm(path, postForm)
+
+	if err != nil {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to create notification (thread " + threadID + ")")
+	}
 }
