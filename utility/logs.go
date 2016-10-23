@@ -55,3 +55,22 @@ func GetActiveErrorsCount() int {
 
 	return count
 }
+
+func NewHistoryPoint(text string) {
+	db := models.DB()
+	defer db.Close()
+
+	db.Create(&models.HistoryPoint{
+		Text: text,
+	})
+}
+
+func GetAllHistoryPoints() []models.HistoryPoint {
+	db := models.DB()
+	defer db.Close()
+
+	var historyPoints []models.HistoryPoint
+	db.Find(&historyPoints)
+
+	return historyPoints
+}

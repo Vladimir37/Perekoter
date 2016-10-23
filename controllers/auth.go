@@ -13,6 +13,7 @@ func Login(c *gin.Context) {
 	config := utility.Config.Get()
 	if (config.Login == login) && (config.Password == password) {
 		utility.SetCookie(c, "login", password)
+		go utility.NewHistoryPoint("User was logged")
 		c.JSON(200, gin.H{
 			"status": 0,
 		})

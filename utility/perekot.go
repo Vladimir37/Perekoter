@@ -3,6 +3,7 @@ package utility
 import (
 	"Perekoter/models"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,7 +17,7 @@ func Perekot(thread models.Thread) error {
 	defer db.Close()
 
 	urlPath := Config.Get().Base + "/makaba/posting.fcgi"
-	imgPath := "./covers/" + thread.Image
+	//imgPath := "./covers/" + thread.Image
 
 	title, errTitle := createTitle(thread)
 	post, errPost := generatePost(thread)
@@ -108,4 +109,6 @@ func notification(thread models.Thread, oldNum int) {
 		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to create notification (thread " + threadID + ")")
 	}
+
+	fmt.Println(response)
 }

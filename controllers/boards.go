@@ -4,43 +4,44 @@ import (
 	"strconv"
 
 	"Perekoter/models"
+	"Perekoter/utility"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetAllBoards(c *gin.Context) {
-    var boards []models.Board
+	var boards []models.Board
 
-    db := models.DB()
+	db := models.DB()
 	defer db.Close()
 
-    db.Find(&boards)
+	db.Find(&boards)
 
-    c.JSON(200, gin.H{
-        status: 0,
-        body: boards,
-    })
+	c.JSON(200, gin.H{
+		"status": 0,
+		"body":   boards,
+	})
 }
 
 func GetBoard(c *gin.Context) {
-    num, err := strconv.Atoi(c.PostForm("num"))
+	num, err := strconv.Atoi(c.PostForm("num"))
 
-    if err != nil {
-        c.JSON(200, g.H{
-            status: 1
-        })
-    }
+	if err != nil {
+		c.JSON(200, gin.H{
+			"status": 1,
+		})
+	}
 
-    db := models.DB()
+	db := models.DB()
 	defer db.Close()
 
-    var board models.Board
-    db.First(&board, num)
+	var board models.Board
+	db.First(&board, num)
 
-    c.JSON(200, g.H{
-        status: 0,
-        body: board,
-    })
+	c.JSON(200, gin.H{
+		"status": 0,
+		"body":   board,
+	})
 }
 
 func AddBoard(c *gin.Context) {
@@ -62,6 +63,8 @@ func AddBoard(c *gin.Context) {
 		Name:      name,
 		Bumplimit: bumplimit,
 	})
+
+	go utility.NewHistoryPoint("Board \"" + name + "\" was added")
 
 	c.JSON(200, gin.H{
 		"status": 0,
@@ -92,6 +95,8 @@ func EditBoard(c *gin.Context) {
 
 	db.Save(&board)
 
+	go utility.NewHistoryPoint("Board \"" + name + "\" was edited")
+
 	c.JSON(200, gin.H{
 		"status": 0,
 	})
@@ -110,6 +115,8 @@ func DeleteBoard(c *gin.Context) {
 
 	var board models.Board
 	db.First(&board, id)
+
+	go utility.NewHistoryPoint("Board \"" + board.Name + "\" was deleted")
 
 	db.Delete(&board)
 

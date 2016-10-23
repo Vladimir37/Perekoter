@@ -10,11 +10,11 @@ import (
 
 func GetSettings(c *gin.Context) {
 	config := utility.Config.Get()
-	config.Login = nil
-	config.Password = nil
+	config.Login = ""
+	config.Password = ""
 	c.JSON(200, gin.H{
-		status: 0,
-		body:   config,
+		"status": 0,
+		"body":   config,
 	})
 }
 
@@ -26,15 +26,15 @@ func SetSetting(c *gin.Context) {
 	base := c.PostForm("login")
 
 	if errPeriod != nil {
-		c.JSON(200, g.H{
-			status: 1,
+		c.JSON(200, gin.H{
+			"status": 1,
 		})
 	}
 
-	config := utility.Config.Read()
+	config := utility.Config.Get()
 	if (login != config.Login) || (password != config.Password) {
-		c.JSON(200, g.H{
-			status: 2,
+		c.JSON(200, gin.H{
+			"status": 2,
 		})
 	}
 
@@ -42,15 +42,16 @@ func SetSetting(c *gin.Context) {
 	config.Passcode = passcode
 	config.Base = base
 
-	result := utility.Config.Write(config)
+	err := utility.Config.Write(config)
 
-	if result {
-		c.JSON(200, g.H{
-			status: 0,
+	if err != nil {
+		c.JSON(200, gin.H{
+			"status": 3,
 		})
 	} else {
-		c.JSON(200, g.H{
-			status: 3,
+		go utility.NewHistoryPoint("Settings was edited")
+		c.JSON(200, gin.H{
+			"status": 0,
 		})
 	}
 }
@@ -61,25 +62,26 @@ func SetUser(c *gin.Context) {
 	new_login := c.PostForm("new_login")
 	new_password := c.PostForm("new_password")
 
-	config := utility.Config.Read()
+	config := utility.Config.Get()
 	if (old_login != config.Login) || (old_password != config.Password) {
-		c.JSON(200, g.H{
-			status: 2,
+		c.JSON(200, gin.H{
+			"status": 2,
 		})
 	}
 
 	config.Login = new_login
 	config.Password = new_password
 
-	result := utility.Config.Write(config)
+	err := utility.Config.Write(config)
 
-	if result {
-		c.JSON(200, g.H{
-			status: 0,
+	if err != nil {
+		c.JSON(200, gin.H{
+			"status": 3,
 		})
 	} else {
-		c.JSON(200, g.H{
-			status: 3,
+		go utility.NewHistoryPoint("User was edited")
+		c.JSON(200, gin.H{
+			"status": 0,
 		})
 	}
 }

@@ -2,7 +2,6 @@ package utility
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 )
 
@@ -20,18 +19,20 @@ func (c *ConfigOperator) Read() {
 	c.Config = config
 }
 
-func (c *ConfigOperator) Write(data ConfigStruct) {
+func (c *ConfigOperator) Write(data ConfigStruct) error {
 	newConfig, errFormat := json.Marshal(data)
 	if errFormat != nil {
 		NewError("Failing to formate new config")
-		fmt.Println(errFormat)
+		return errFormat
 	}
 
 	errWriting := ioutil.WriteFile("./config", newConfig, 0777)
 	if errWriting == nil {
 		NewError("Failing to write new config")
+		return errWriting
 	} else {
 		c.Config = data
+		return nil
 	}
 }
 
