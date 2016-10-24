@@ -33,6 +33,7 @@ func GetThread(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
@@ -57,14 +58,15 @@ func AddThread(c *gin.Context) {
 	header := c.PostForm("header")
 	boardNum, errBoard := strconv.Atoi(c.PostForm("board"))
 
-	correctData := (errNum != nil) || (errRoman != nil) || (errNum != nil) || (errHeaderLink != nil) || (errBoard != nil)
+	incorrectData := (errNum != nil) || (errRoman != nil) || (errNum != nil) || (errHeaderLink != nil) || (errBoard != nil)
 
-	if correctData {
+	if incorrectData {
 		go utility.NewError("Failed to create thread - incorrect data")
 		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not created - incorect data")
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	if errThread != nil {
@@ -88,6 +90,7 @@ func AddThread(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
+		return
 	}
 
 	defer out.Close()
@@ -100,6 +103,7 @@ func AddThread(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 3,
 		})
+		return
 	}
 
 	db.Create(&models.Thread{
@@ -144,6 +148,7 @@ func EditThread(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	if errThread != nil {
@@ -185,6 +190,7 @@ func UploadImage(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
@@ -204,6 +210,7 @@ func UploadImage(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
+		return
 	}
 
 	defer out.Close()
@@ -216,6 +223,7 @@ func UploadImage(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 3,
 		})
+		return
 	}
 
 	thread.Image = imageName
@@ -235,6 +243,7 @@ func DeleteThread(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
@@ -250,6 +259,7 @@ func DeleteThread(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	go utility.NewHistoryPoint("Thread \"" + thread.Title + "\" was deleted")

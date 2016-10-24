@@ -29,6 +29,7 @@ func SetSetting(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	config := utility.Config.Get()
@@ -36,6 +37,7 @@ func SetSetting(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
+		return
 	}
 
 	config.Period = period
@@ -45,6 +47,7 @@ func SetSetting(c *gin.Context) {
 	err := utility.Config.Write(config)
 
 	if err != nil {
+		go utility.NewError("Failed to write to config")
 		c.JSON(200, gin.H{
 			"status": 3,
 		})
@@ -57,24 +60,26 @@ func SetSetting(c *gin.Context) {
 }
 
 func SetUser(c *gin.Context) {
-	old_login := c.PostForm("old_login")
-	old_password := c.PostForm("old_password")
-	new_login := c.PostForm("new_login")
-	new_password := c.PostForm("new_password")
+	oldLogin := c.PostForm("old_login")
+	oldPassword := c.PostForm("old_password")
+	newLogin := c.PostForm("new_login")
+	newPassword := c.PostForm("new_password")
 
 	config := utility.Config.Get()
-	if (old_login != config.Login) || (old_password != config.Password) {
+	if (oldLogin != config.Login) || (oldPassword != config.Password) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
+		return
 	}
 
-	config.Login = new_login
-	config.Password = new_password
+	config.Login = newLogin
+	config.Password = newPassword
 
 	err := utility.Config.Write(config)
 
 	if err != nil {
+		go utility.NewError("Failed to write to config")
 		c.JSON(200, gin.H{
 			"status": 3,
 		})

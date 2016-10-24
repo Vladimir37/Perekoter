@@ -30,6 +30,7 @@ func GetBoard(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
@@ -53,6 +54,7 @@ func AddBoard(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
@@ -81,6 +83,7 @@ func EditBoard(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
@@ -108,6 +111,7 @@ func DeleteBoard(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": 1,
 		})
+		return
 	}
 
 	db := models.DB()
