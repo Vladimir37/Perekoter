@@ -16,3 +16,10 @@ type ThreadJSON struct {
 	Board       string
 	Posts_count int
 }
+
+type PostResponse struct {
+	Error  int
+	Reason string
+	Status string
+	Num    int
+}

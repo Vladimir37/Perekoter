@@ -2,6 +2,7 @@ package utility
 
 import (
 	"Perekoter/models"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -18,6 +19,8 @@ func Perekot(thread models.Thread) error {
 
 	urlPath := Config.Get().Base + "/makaba/posting.fcgi"
 	//imgPath := "./covers/" + thread.Image
+
+	//TODO - загрузка и отправка изображения
 
 	title, errTitle := createTitle(thread)
 	post, errPost := generatePost(thread)
@@ -38,7 +41,38 @@ func Perekot(thread models.Thread) error {
 		"comment": {post},
 	}
 
-	http.PostForm(urlPath, postForm)
+	response, errSend := http.PostForm(urlPath, postForm)
+
+	if errSend != nil {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to send Perekot (thread " + threadID + ")")
+		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ")")
+		return errors.New("Perekot not sended")
+	}
+
+	defer response.Body.Close()
+	postResponse, errSave := ioutil.ReadAll(response.Body)
+	if errSave != nil {
+		NewError("Failed to create notification (thread " + thread.Title + ")")
+		NewHistoryPoint("Failed to create notification (thread " + thread.Title + ")")
+		return errors.New("Perekot not created")
+	}
+
+	var responseJSON PostResponse
+	errFormate := json.Unmarshal(postResponse, &responseJSON)
+	if errFormate != nil {
+		NewError("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
+		NewHistoryPoint("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
+		return errors.New("Perekot response not formatted")
+	}
+
+	if responseJSON.Status != "OK" {
+		NewError("Failed to create notification (thread " + thread.Title + ")")
+		NewHistoryPoint("Failed to create Perekot (thread " + thread.Title + ")")
+	} else {
+		NewHistoryPoint("Perekot " + thread.Title + "was created")
+		// TODO - Запоминание нового треда
+	}
 
 	return nil
 }
@@ -103,12 +137,39 @@ func notification(thread models.Thread, oldNum int) {
 		"comment": {notification},
 	}
 
-	response, err := http.PostForm(path, postForm)
+	response, errSend := http.PostForm(path, postForm)
 
-	if err != nil {
+	if errSend != nil {
 		threadID := strconv.Itoa(int(thread.ID))
-		NewError("Failed to create notification (thread " + threadID + ")")
+		NewError("Failed to send notification (thread " + threadID + ")")
+		NewHistoryPoint("Failed to send notification (thread " + threadID + ")")
+		return
 	}
 
-	fmt.Println(response)
+	defer response.Body.Close()
+	postResponse, errSave := ioutil.ReadAll(response.Body)
+	if errSave != nil {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to create notification (thread " + threadID + ")")
+		NewHistoryPoint("Failed to create notification (thread " + threadID + ")")
+		return
+	}
+
+	var responseJSON PostResponse
+	errFormate := json.Unmarshal(postResponse, &responseJSON)
+	if errFormate != nil {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to convert server response to JSON (notification in thread " + threadID + ")")
+		NewHistoryPoint("Failed to convert server response to JSON (notification in thread " + threadID + ")")
+		return
+	}
+
+	if responseJSON.Status != "OK" {
+		NewError("Failed to create notification (thread " + thread.Title + ")")
+		NewHistoryPoint("Failed to create notification (thread " + thread.Title + ")")
+	} else {
+		NewHistoryPoint("Notification in thread " + thread.Title + "was created")
+	}
+
+	fmt.Println(response.Body)
 }
