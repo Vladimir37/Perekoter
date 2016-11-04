@@ -1,0 +1,29 @@
+{
+  "scripts": {
+    "scripts": "gulp scripts-dev",
+    "styles": "gulp styles-dev",
+    "all-dev": "gulp all-dev",
+    "all-prod": "gulp all-prod"
+  },
+  "dependencies": {
+    "axios": "^0.15.2",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.8.1",
+    "redux": "^3.6.0"
+  },
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-less": "^3.1.0",
+    "gulp-webpack": "^1.5.0",
+    "webpack": "^1.13.2"
+  }
+}

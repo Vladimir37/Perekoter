@@ -24,6 +24,13 @@ func Login(c *gin.Context) {
 	}
 }
 
+func Logout(c *gin.Context) {
+	utility.SetCookie(c, "login", "")
+	c.JSON(200, gin.H{
+		"status": 0,
+	})
+}
+
 func CheckMiddleware(c *gin.Context) {
 	cookie, err := utility.GetCookie(c, "login")
 	if err != nil {

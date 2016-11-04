@@ -22,7 +22,6 @@ func SetSetting(c *gin.Context) {
 	login := c.PostForm("login")
 	password := c.PostForm("password")
 	period, errPeriod := strconv.Atoi(c.PostForm("period"))
-	passcode := c.PostForm("passcode")
 	base := c.PostForm("login")
 
 	if errPeriod != nil {
@@ -41,7 +40,6 @@ func SetSetting(c *gin.Context) {
 	}
 
 	config.Period = period
-	config.Passcode = passcode
 	config.Base = base
 
 	err := utility.Config.Write(config)
@@ -77,6 +75,37 @@ func SetUser(c *gin.Context) {
 	config.Password = newPassword
 
 	err := utility.Config.Write(config)
+
+	if err != nil {
+		go utility.NewError("Failed to write to config")
+		c.JSON(200, gin.H{
+			"status": 3,
+		})
+	} else {
+		go utility.NewHistoryPoint("User was edited")
+		c.JSON(200, gin.H{
+			"status": 0,
+		})
+	}
+}
+
+func ChangePasscode(c *gin.Context) {
+	login := c.PostForm("login")
+	password := c.PostForm("password")
+	passcode := c.PostForm("passcode")
+
+	config := utility.Config.Get()
+	if (login != config.Login) || (password != config.Password) {
+		c.JSON(200, gin.H{
+			"status": 2,
+		})
+		return
+	}
+
+	config.Passcode = passcode
+	err := utility.Config.Write(config)
+
+	// TODO - проверка и активация нового пасскода
 
 	if err != nil {
 		go utility.NewError("Failed to write to config")

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"Perekoter/core"
 	"Perekoter/models"
 	"Perekoter/utility"
 	"fmt"
 	"os"
-	//"github.com/gin-gonic/gin"
 	//"github.com/aubm/interval"
 )
 
@@ -14,12 +14,12 @@ func main() {
 	fmt.Println("Connection to the database was created!")
 	os.Mkdir("./covers", 0777)
 	utility.Config.Read()
-
-	utility.Cycle()
+	config := utility.Config.Get()
 
 	utility.CurrentUsercode.PasscodeAuth()
+	utility.Cycle()
 
-	// router := gin.Default()
+	router := core.GetRouter()
 
-	// router.Run(":8080")
+	router.Run(":" + config.Port)
 }
