@@ -1,25 +1,35 @@
 package utility
 
+import (
+	"bytes"
+	"fmt"
+	"net/http"
+	"net/url"
+)
+
 type Passcode struct {
 	Get   string
 	Error bool
 }
 
-func (c *Passcode) PasscodeAuth() {
-	// path := Config.Get().Base + "/makaba/posting.fcgi"
+func (c *Passcode) PasscodeAuth() bool {
+	path := Config.Get().Base + "makaba/makaba.fcgi"
 
-	// postForm := url.Values{
-	// 	"task":     {"auth"},
-	// 	"usercode": {Config.Get().Passcode},
-	// }
+	postForm := url.Values{
+		"task":     {"auth"},
+		"usercode": {Config.Get().Passcode},
+	}
 
-	// response, err := http.PostForm(path, postForm)
-	// if err != nil {
-	// 	NewError("Failed to send passcode request")
-	// 	c.Error = true
-	// }
+	request, errReq := http.NewRequest("POST", path, bytes.NewBufferString(postForm.Encode()))
 
-	// usercode := response.Header["Set-Cookie"]
+	response, errRes := http.DefaultTransport.RoundTrip(request)
+
+	if errReq != nil || errRes != nil {
+		c.Error = true
+	}
+
+	fmt.Println(response.Header["Set-Cookie"])
+	return true
 }
 
 var CurrentUsercode Passcode = Passcode{

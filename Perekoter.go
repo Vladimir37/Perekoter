@@ -17,6 +17,7 @@ func main() {
 	config := utility.Config.Get()
 
 	utility.CurrentUsercode.PasscodeAuth()
+	// TODO через интервал
 	utility.Cycle()
 
 	router := core.GetRouter()
