@@ -2,14 +2,14 @@ package utility
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type Passcode struct {
-	Get   string
-	Error bool
+	Usercode string
+	Error    bool
 }
 
 func (c *Passcode) PasscodeAuth() bool {
@@ -26,13 +26,24 @@ func (c *Passcode) PasscodeAuth() bool {
 
 	if errReq != nil || errRes != nil {
 		c.Error = true
+		NewError("Failed to passcode request")
+		return false
 	}
 
-	fmt.Println(response.Header["Set-Cookie"])
+	setCookie := response.Header["Set-Cookie"]
+	if len(setCookie) == 0 {
+		c.Error = true
+		NewError("Incorrect password")
+		return false
+	}
+	setCookie = strings.Split(setCookie[0], ";")
+	setCookie = strings.Split(setCookie[0], "=")
+
+	c.Usercode = setCookie[0]
 	return true
 }
 
 var CurrentUsercode Passcode = Passcode{
-	Get:   "",
-	Error: false,
+	Usercode: "",
+	Error:    false,
 }
