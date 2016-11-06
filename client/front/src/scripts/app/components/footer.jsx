@@ -4,7 +4,9 @@ export class Footer extends React.Component {
     render() {
         return (
             <footer>
-                <p>Footer</p>
+                <div className="copyright">
+                    Powered by <a href="https://github.com/Vladimir37/Perekoter/">Perekoter</a>
+                </div>
             </footer>
         );
     }

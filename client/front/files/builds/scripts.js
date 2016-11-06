@@ -27151,7 +27151,7 @@
 /* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -27182,15 +27182,57 @@
 	    }
 
 	    _createClass(Header, [{
-	        key: 'render',
+	        key: "render",
 	        value: function render() {
 	            return React.createElement(
-	                'header',
+	                "header",
 	                null,
 	                React.createElement(
-	                    'h1',
-	                    null,
-	                    'Main title'
+	                    "nav",
+	                    { className: "navbar navbar-inverse" },
+	                    React.createElement(
+	                        "div",
+	                        { className: "container-fluid" },
+	                        React.createElement(
+	                            "div",
+	                            { className: "navbar-header" },
+	                            React.createElement(
+	                                "a",
+	                                { className: "navbar-brand", href: "/" },
+	                                "Perekoter"
+	                            )
+	                        ),
+	                        React.createElement(
+	                            "div",
+	                            { className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1" },
+	                            React.createElement(
+	                                "ul",
+	                                { className: "nav navbar-nav" },
+	                                React.createElement(
+	                                    "li",
+	                                    null,
+	                                    React.createElement(
+	                                        "a",
+	                                        { href: "/issue" },
+	                                        "\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0442\u0440\u0435\u0434"
+	                                    )
+	                                )
+	                            ),
+	                            React.createElement(
+	                                "ul",
+	                                { className: "nav navbar-nav navbar-right" },
+	                                React.createElement(
+	                                    "li",
+	                                    null,
+	                                    React.createElement(
+	                                        "a",
+	                                        { href: "#" },
+	                                        "\u0412\u0445\u043E\u0434"
+	                                    )
+	                                )
+	                            )
+	                        )
+	                    )
 	                )
 	            );
 	        }
@@ -27203,7 +27245,7 @@
 /* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -27234,15 +27276,20 @@
 	    }
 
 	    _createClass(Footer, [{
-	        key: 'render',
+	        key: "render",
 	        value: function render() {
 	            return React.createElement(
-	                'footer',
+	                "footer",
 	                null,
 	                React.createElement(
-	                    'p',
-	                    null,
-	                    'Footer'
+	                    "div",
+	                    { className: "copyright" },
+	                    "Powered by ",
+	                    React.createElement(
+	                        "a",
+	                        { href: "https://github.com/Vladimir37/Perekoter/" },
+	                        "Perekoter"
+	                    )
 	                )
 	            );
 	        }
