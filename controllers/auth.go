@@ -7,12 +7,12 @@ import (
 )
 
 func Login(c *gin.Context) {
-	login := c.PostForm("login")
-	password := c.PostForm("password")
+	var response utility.LoginResponse
+	c.Bind(&response)
 
 	config := utility.Config.Get()
-	if (config.Login == login) && (config.Password == password) {
-		utility.SetCookie(c, "login", password)
+	if (config.Login == response.Login) && (config.Password == response.Password) {
+		utility.SetCookie(c, "login", response.Password)
 		go utility.NewHistoryPoint("User was logged")
 		c.JSON(200, gin.H{
 			"status": 0,
