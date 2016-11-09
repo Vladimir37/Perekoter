@@ -27192,14 +27192,22 @@
 
 	        _this.openLoginModal = _this.openLoginModal.bind(_this);
 	        _this.closeLoginModal = _this.closeLoginModal.bind(_this);
+	        _this.openIssueModal = _this.openIssueModal.bind(_this);
+	        _this.closeIssueModal = _this.closeIssueModal.bind(_this);
 	        _this.changeForm = _this.changeForm.bind(_this);
 	        _this.sendLogin = _this.sendLogin.bind(_this);
+	        _this.sendIssue = _this.sendIssue.bind(_this);
 
 	        _this.state = {
-	            showModal: false,
-	            error: null,
+	            showModalLogin: false,
+	            showModalIssue: false,
+	            errorLogin: null,
+	            errorIssue: null,
 	            login: '',
-	            password: ''
+	            password: '',
+	            title: '',
+	            link: '',
+	            comment: ''
 	        };
 	        return _this;
 	    }
@@ -27208,14 +27216,28 @@
 	        key: 'openLoginModal',
 	        value: function openLoginModal() {
 	            this.setState({
-	                showModal: true
+	                showModalLogin: true
 	            });
 	        }
 	    }, {
 	        key: 'closeLoginModal',
 	        value: function closeLoginModal() {
 	            this.setState({
-	                showModal: false
+	                showModalLogin: false
+	            });
+	        }
+	    }, {
+	        key: 'openIssueModal',
+	        value: function openIssueModal() {
+	            this.setState({
+	                showModalIssue: true
+	            });
+	        }
+	    }, {
+	        key: 'closeIssueModal',
+	        value: function closeIssueModal() {
+	            this.setState({
+	                showModalIssue: false
 	            });
 	        }
 	    }, {
@@ -27234,16 +27256,14 @@
 
 	            if (!this.state.login || !this.state.password) {
 	                this.setState({
-	                    error: 'Не все поля заполнены'
+	                    errorLogin: 'Не все поля заполнены'
 	                });
 	                return false;
 	            } else {
 	                this.setState({
-	                    error: null
+	                    errorLogin: null
 	                });
 	            }
-
-	            console.log(this.state);
 
 	            _axios2.default.post("/api/auth/login", this.state).then(function (resolve) {
 	                resolve = resolve.data;
@@ -27251,7 +27271,7 @@
 	                    window.location.pathname = "/cabinet";
 	                } else {
 	                    _this3.setState({
-	                        error: "Неверные данные пользователя"
+	                        errorLogin: "Неверные данные пользователя"
 	                    });
 	                }
 	            }).catch(function (err) {
@@ -27261,14 +27281,27 @@
 	            });
 	        }
 	    }, {
+	        key: 'sendIssue',
+	        value: function sendIssue() {
+	            //
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var error;
-	            if (this.state.error) {
-	                error = React.createElement(
+	            var errorLogin;
+	            var errorIssue;
+	            if (this.state.errorLogin) {
+	                errorLogin = React.createElement(
 	                    _reactBootstrap.Alert,
 	                    { bsStyle: 'danger' },
-	                    this.state.error
+	                    this.state.errorLogin
+	                );
+	            }
+	            if (this.state.errorIssue) {
+	                errorIssue = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorIssue
 	                );
 	            }
 
@@ -27300,7 +27333,7 @@
 	                            null,
 	                            React.createElement(
 	                                _reactBootstrap.NavItem,
-	                                { href: '/issue' },
+	                                { href: '#', onClick: this.openIssueModal },
 	                                '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0442\u0440\u0435\u0434'
 	                            )
 	                        ),
@@ -27317,7 +27350,7 @@
 	                ),
 	                React.createElement(
 	                    _reactBootstrap.Modal,
-	                    { show: this.state.showModal, onHide: this.closeLoginModal },
+	                    { show: this.state.showModalLogin, onHide: this.closeLoginModal },
 	                    React.createElement(
 	                        _reactBootstrap.Modal.Header,
 	                        { closeButton: true },
@@ -27330,7 +27363,7 @@
 	                    React.createElement(
 	                        _reactBootstrap.Modal.Body,
 	                        null,
-	                        error,
+	                        errorLogin,
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
 	                            value: this.state.login,
@@ -27356,6 +27389,59 @@
 	                        React.createElement(
 	                            _reactBootstrap.Button,
 	                            { bsStyle: 'primary', onClick: this.closeLoginModal },
+	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                        )
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal,
+	                    { show: this.state.showModalIssue, onHide: this.closeIssueModal },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Header,
+	                        { closeButton: true },
+	                        React.createElement(
+	                            _reactBootstrap.Modal.Title,
+	                            null,
+	                            '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0442\u0440\u0435\u0434'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Body,
+	                        null,
+	                        errorIssue,
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.title,
+	                            placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0442\u0440\u0435\u0434\u0430',
+	                            onChange: this.changeForm("title")
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.link,
+	                            placeholder: '\u0421\u0441\u044B\u043B\u043A\u0430 \u043D\u0430 \u0442\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+	                            onChange: this.changeForm("link")
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            componentClass: 'textarea',
+	                            className: 'header-textarea',
+	                            value: this.state.comment,
+	                            placeholder: '\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 - \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0448\u0430\u043F\u043A\u0438, \u0432\u0430\u0436\u043D\u043E\u0441\u0442\u044C \u0442\u0440\u0435\u0434\u0430, \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u0438 \u043B\u044E\u0431\u0430\u044F \u0434\u0440\u0443\u0433\u0430\u044F \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+	                            onChange: this.changeForm("comment")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Footer,
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'success', onClick: this.sendIssue },
+	                            '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C'
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', onClick: this.closeIssueModal },
 	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
 	                        )
 	                    )
@@ -47650,7 +47736,7 @@
 	                    "Powered by ",
 	                    React.createElement(
 	                        "a",
-	                        { href: "https://github.com/Vladimir37/Perekoter/" },
+	                        { href: "https://github.com/Vladimir37/Perekoter/", target: "_blank" },
 	                        "Perekoter"
 	                    )
 	                )

@@ -48,7 +48,7 @@ type Issue struct {
 	gorm.Model
 	Title string
 	Text string
-	Example string
+	Link string
 	Active bool
 }
 

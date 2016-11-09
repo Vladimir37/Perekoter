@@ -16,6 +16,10 @@ footer .copyright a {
 header {
   width: 960px;
 }
+.header-textarea {
+  height: 300px;
+  resize: none;
+}
 #root {
   width: 980px;
   margin: 0 auto;
