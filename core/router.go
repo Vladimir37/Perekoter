@@ -34,9 +34,9 @@ func getApiRouter(baseRouter *gin.Engine) {
 	{
 		auth := api.Group("/auth")
 		{
+			auth.GET("/check", controllers.CheckRequest)
 			auth.POST("/login", controllers.Login)
 			auth.POST("/logout", controllers.Logout)
-			auth.GET("/check", controllers.CheckRequest)
 		}
 
 		boards := api.Group("/boards")
@@ -64,6 +64,14 @@ func getApiRouter(baseRouter *gin.Engine) {
 			settings.POST("/set_settings", controllers.SetSetting)
 			settings.POST("/set_user", controllers.SetUser)
 			settings.POST("/change_passcode", controllers.ChangePasscode)
+		}
+
+		issues := api.Group("/issues")
+		{
+			issues.GET("/get_all_issues", controllers.GetAllIssues)
+			issues.GET("/get_issue", controllers.GetIssue)
+			issues.POST("/send_issue", controllers.SendIssue)
+			issues.POST("/close_issue", controllers.CloseIssue)
 		}
 	}
 }

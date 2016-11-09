@@ -8,26 +8,46 @@ export class Header extends React.Component {
 
         this.openLoginModal = this.openLoginModal.bind(this);
         this.closeLoginModal = this.closeLoginModal.bind(this);
+        this.openIssueModal = this.openIssueModal.bind(this);
+        this.closeIssueModal = this.closeIssueModal.bind(this);
         this.changeForm = this.changeForm.bind(this);
         this.sendLogin = this.sendLogin.bind(this);
+        this.sendIssue = this.sendIssue.bind(this);
 
         this.state = {
-            showModal: false,
-            error: null,
+            showModalLogin: false,
+            showModalIssue: false,
+            errorLogin: null,
+            errorIssue: null,
             login: '',
-            password: ''
+            password: '',
+            title: '',
+            link: '',
+            comment: ''
         };
     }
 
     openLoginModal() {
         this.setState({
-            showModal: true
+            showModalLogin: true
         });
     }
 
     closeLoginModal() {
         this.setState({
-            showModal: false
+            showModalLogin: false
+        });
+    }
+
+    openIssueModal() {
+        this.setState({
+            showModalIssue: true
+        });
+    }
+
+    closeIssueModal() {
+        this.setState({
+            showModalIssue: false
         });
     }
 
@@ -42,12 +62,12 @@ export class Header extends React.Component {
     sendLogin() {
         if (!this.state.login || !this.state.password) {
             this.setState({
-                error: 'Не все поля заполнены'
+                errorLogin: 'Не все поля заполнены'
             });
             return false;
         } else {
             this.setState({
-                error: null
+                errorLogin: null
             });
         }
 
@@ -58,7 +78,7 @@ export class Header extends React.Component {
                     window.location.pathname = "/cabinet";
                 } else {
                     this.setState({
-                        error: "Неверные данные пользователя"
+                        errorLogin: "Неверные данные пользователя"
                     });
                 }
             })
@@ -69,10 +89,18 @@ export class Header extends React.Component {
             });
     }
 
+    sendIssue() {
+        //
+    }
+
     render() {
-        var error;
-        if (this.state.error) {
-            error = <Alert bsStyle="danger">{this.state.error}</Alert>;
+        var errorLogin;
+        var errorIssue;
+        if (this.state.errorLogin) {
+            errorLogin = <Alert bsStyle="danger">{this.state.errorLogin}</Alert>;
+        }
+        if (this.state.errorIssue) {
+            errorIssue = <Alert bsStyle="danger">{this.state.errorIssue}</Alert>;
         }
 
         return (
@@ -86,19 +114,19 @@ export class Header extends React.Component {
                     </Navbar.Header>
                     <Navbar.Collapse>
                         <Nav>
-                            <NavItem href="/issue">Предложить тред</NavItem>
+                            <NavItem href="#" onClick={this.openIssueModal}>Предложить тред</NavItem>
                         </Nav>
                         <Nav pullRight>
                             <NavItem href="#" onClick={this.openLoginModal}>Вход</NavItem>
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>
-                <Modal show={this.state.showModal} onHide={this.closeLoginModal}>
+                <Modal show={this.state.showModalLogin} onHide={this.closeLoginModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Вход</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {error}
+                        {errorLogin}
                         <FormControl
                             type="text"
                             value={this.state.login}
@@ -116,6 +144,39 @@ export class Header extends React.Component {
                     <Modal.Footer>
                         <Button bsStyle="success" onClick={this.sendLogin}>Войти</Button>
                         <Button bsStyle="primary" onClick={this.closeLoginModal}>Закрыть</Button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showModalIssue} onHide={this.closeIssueModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Предложить тред</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {errorIssue}
+                        <FormControl
+                            type="text"
+                            value={this.state.title}
+                            placeholder="Название треда"
+                            onChange={this.changeForm("title")}
+                        />
+                        <br/>
+                        <FormControl
+                            type="text"
+                            value={this.state.link}
+                            placeholder="Ссылка на текущий тред (необязательно)"
+                            onChange={this.changeForm("link")}
+                        />
+                        <br/>
+                        <FormControl
+                            componentClass="textarea"
+                            className="header-textarea"
+                            value={this.state.comment}
+                            placeholder="Комментарий - источник шапки, важность треда, источник изображений и любая другая информация (необязательно)"
+                            onChange={this.changeForm("comment")}
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button bsStyle="success" onClick={this.sendIssue}>Отправить</Button>
+                        <Button bsStyle="primary" onClick={this.closeIssueModal}>Закрыть</Button>
                     </Modal.Footer>
                 </Modal>
             </header>
