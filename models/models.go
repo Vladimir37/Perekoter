@@ -10,7 +10,7 @@ func Init() {
 	if err != nil {
 		panic("Failed to connect database")
 	}
-	db.AutoMigrate(&Board{}, &Thread{}, &Error{}, &HistoryPoint{})
+	db.AutoMigrate(&Board{}, &Thread{}, &Issue{}, &Error{}, &HistoryPoint{})
 	db.Close()
 }
 
@@ -42,6 +42,14 @@ type Thread struct {
 	Board         Board
 	BoardID       uint
 	Active        bool
+}
+
+type Issue struct {
+	gorm.Model
+	Title string
+	Text string
+	Example string
+	Active bool
 }
 
 type Error struct {
