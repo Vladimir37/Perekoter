@@ -54,7 +54,7 @@ export class Header extends React.Component {
         Axios.post("/api/auth/login", this.state)
             .then((resolve) => {
                 resolve = resolve.data;
-                if (resolve.data == 0) {
+                if (resolve.data.status == 0) {
                     window.location.pathname = "/cabinet";
                 } else {
                     this.setState({
