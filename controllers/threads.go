@@ -49,35 +49,14 @@ func GetThread(c *gin.Context) {
 }
 
 func AddThread(c *gin.Context) {
-	numbering, errNum := strconv.ParseBool(c.PostForm("numbering"))
-	roman, errRoman := strconv.ParseBool(c.PostForm("roman"))
-	currentNum, errNum := strconv.Atoi(c.PostForm("current_num"))
-	currentThread, errThread := strconv.Atoi(c.PostForm("current_thread"))
-	title := c.PostForm("title")
-	headerLink, errHeaderLink := strconv.ParseBool(c.PostForm("header_link"))
-	header := c.PostForm("header")
-	boardNum, errBoard := strconv.Atoi(c.PostForm("board"))
-
-	incorrectData := (errNum != nil) || (errRoman != nil) || (errNum != nil) || (errHeaderLink != nil) || (errBoard != nil)
-
-	if incorrectData {
-		go utility.NewError("Failed to create thread - incorrect data")
-		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not created - incorect data")
-		c.JSON(200, gin.H{
-			"status": 1,
-		})
-		return
-	}
-
-	if errThread != nil {
-		currentThread = 0
-	}
+	var request utility.ThreadRequest
+	c.Bind(&request)
 
 	db := models.DB()
 	defer db.Close()
 
 	var targetBoard models.Board
-	db.First(&targetBoard, boardNum)
+	db.First(&targetBoard, request.BoardNum)
 
 	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".png"
 
@@ -86,7 +65,7 @@ func AddThread(c *gin.Context) {
 
 	if (errFile != nil) || (errImg != nil) {
 		go utility.NewError("Failed to create thread - image not opened")
-		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not created - image not opened")
+		go utility.NewHistoryPoint("ERROR: Thread \"" + request.Title + "\" was not created - image not opened")
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
@@ -99,7 +78,7 @@ func AddThread(c *gin.Context) {
 
 	if errWriting != nil {
 		go utility.NewError("Failed to creating thread - image not created")
-		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not created - image not created")
+		go utility.NewHistoryPoint("ERROR: Thread \"" + request.Title + "\" was not created - image not created")
 		c.JSON(200, gin.H{
 			"status": 3,
 		})
@@ -107,20 +86,20 @@ func AddThread(c *gin.Context) {
 	}
 
 	db.Create(&models.Thread{
-		Numbering:     numbering,
-		Roman:         roman,
-		CurrentNum:    currentNum,
-		CurrentThread: currentThread,
-		Title:         title,
-		HeaderLink:    headerLink,
-		Header:        header,
+		Numbering:     request.Numbering,
+		Roman:         request.Roman,
+		CurrentNum:    request.CurrentNum,
+		CurrentThread: request.CurrentThread,
+		Title:         request.Title,
+		HeaderLink:    request.HeaderLink,
+		Header:        request.Header,
 		Image:         imageName,
 		Board:         targetBoard,
 		BoardID:       targetBoard.ID,
 		Active:        true,
 	})
 
-	go utility.NewHistoryPoint("Thread \"" + title + "\" was created")
+	go utility.NewHistoryPoint("Thread \"" + request.Title + "\" was created")
 
 	c.JSON(200, gin.H{
 		"status": 0,
@@ -128,56 +107,32 @@ func AddThread(c *gin.Context) {
 }
 
 func EditThread(c *gin.Context) {
-	threadId, errId := strconv.Atoi(c.PostForm("thread_id"))
-
-	numbering, errNum := strconv.ParseBool(c.PostForm("numbering"))
-	roman, errRoman := strconv.ParseBool(c.PostForm("roman"))
-	active, errActive := strconv.ParseBool(c.PostForm("active"))
-	currentNum, errNum := strconv.Atoi(c.PostForm("current_num"))
-	currentThread, errThread := strconv.Atoi(c.PostForm("current_thread"))
-	title := c.PostForm("title")
-	headerLink, errHeaderLink := strconv.ParseBool(c.PostForm("header_link"))
-	header := c.PostForm("header")
-	boardNum, errBoard := strconv.Atoi(c.PostForm("board"))
-
-	correctData := (errNum != nil) || (errRoman != nil) || (errNum != nil) || (errHeaderLink != nil) || (errBoard != nil) || (errId != nil) || (errActive != nil)
-
-	if correctData {
-		go utility.NewError("Failed to edit thread - incorrect data")
-		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not edited - incorrect data")
-		c.JSON(200, gin.H{
-			"status": 1,
-		})
-		return
-	}
-
-	if errThread != nil {
-		currentThread = 0
-	}
+	var request utility.ThreadRequest
+	c.Bind(&request)
 
 	db := models.DB()
 	defer db.Close()
 
 	var targetBoard models.Board
-	db.First(&targetBoard, boardNum)
+	db.First(&targetBoard, request.BoardNum)
 
 	var thread models.Thread
-	db.First(&thread, threadId)
+	db.First(&thread, request.ID)
 
-	thread.Numbering = numbering
-	thread.Roman = roman
-	thread.CurrentNum = currentNum
-	thread.CurrentThread = currentThread
-	thread.Title = title
-	thread.HeaderLink = headerLink
-	thread.Header = header
+	thread.Numbering = request.Numbering
+	thread.Roman = request.Roman
+	thread.CurrentNum = request.CurrentNum
+	thread.CurrentThread = request.CurrentThread
+	thread.Title = request.Title
+	thread.HeaderLink = request.HeaderLink
+	thread.Header = request.Header
 	thread.Board = targetBoard
 	thread.BoardID = targetBoard.ID
-	thread.Active = active
+	thread.Active = request.Active
 
 	db.Save(&thread)
 
-	go utility.NewHistoryPoint("Thread \"" + title + "\" was created")
+	go utility.NewHistoryPoint("Thread \"" + request.Title + "\" was created")
 
 	c.JSON(200, gin.H{
 		"status": 0,
@@ -185,19 +140,14 @@ func EditThread(c *gin.Context) {
 }
 
 func UploadImage(c *gin.Context) {
-	threadId, errId := strconv.Atoi(c.PostForm("thread_id"))
-	if errId != nil {
-		c.JSON(200, gin.H{
-			"status": 1,
-		})
-		return
-	}
+	var request utility.NumRequest
+	c.Bind(&request)
 
 	db := models.DB()
 	defer db.Close()
 
 	var thread models.Thread
-	db.First(&thread, threadId)
+	db.First(&thread, request.Num)
 
 	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".png"
 
@@ -238,19 +188,14 @@ func UploadImage(c *gin.Context) {
 }
 
 func DeleteThread(c *gin.Context) {
-	threadId, errId := strconv.Atoi(c.PostForm("thread_id"))
-	if errId != nil {
-		c.JSON(200, gin.H{
-			"status": 1,
-		})
-		return
-	}
+	var request utility.NumRequest
+	c.Bind(&request)
 
 	db := models.DB()
 	defer db.Close()
 
 	var thread models.Thread
-	db.First(&thread, threadId)
+	db.First(&thread, request.Num)
 
 	errFile := os.Remove("./covers/" + thread.Image)
 	if errFile != nil {

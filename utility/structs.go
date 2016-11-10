@@ -47,7 +47,7 @@ type ThreadRequest struct {
 	Numbering     bool   `json:"numbering" binding:"required"`
 	Roman         bool   `json:"roman" binding:"required"`
 	CurrentNum    int    `json:"current_num" binding:"required"`
-	CurrentThread int    `json:"current_thread" binding:"required"`
+	CurrentThread int    `json:"current_thread"`
 	Title         string `json:"title" binding:"required"`
 	HeaderLink    bool   `json:"header_link" binding:"required"`
 	Header        string `json:"header" binding:"required"`
@@ -76,4 +76,10 @@ type ConfigRequest struct {
 	Botname          string `json:"botname" binding:"required"`
 	Notification     bool   `json:"notification" binding:"required"`
 	NotificationText string `json:"notification_text" binding:"required"`
+}
+
+type IssueRequest struct {
+	Title string `json:"title" binding:"required"`
+	Text  string `json:"text" binding:"required"`
+	Link  string `json:"link" binding:"required"`
 }
