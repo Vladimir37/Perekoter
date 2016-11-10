@@ -24,6 +24,8 @@ type PostResponse struct {
 	Num    int
 }
 
+// Request structures
+
 type NumRequest struct {
 	Num int `json:"num" binding:"required"`
 }
@@ -51,4 +53,27 @@ type ThreadRequest struct {
 	Header        string `json:"header" binding:"required"`
 	BoardNum      int    `json:"board_num" binding:"required"`
 	Active        bool   `json:"active" binding:"required"`
+}
+
+type UserChangingRequest struct {
+	OldLogin    string `json:"old_login" binding:"required"`
+	NewLogin    string `json:"new_login" binding:"required"`
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
+
+type PasscodeChangingRequest struct {
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Passcode string `json:"passcode" binding:"required"`
+}
+
+type ConfigRequest struct {
+	Login            string `json:"login" binding:"required"`
+	Password         string `json:"password" binding:"required"`
+	Period           int    `json:"period" binding:"required"`
+	Base             string `json:"base" binding:"required"`
+	Botname          string `json:"botname" binding:"required"`
+	Notification     bool   `json:"notification" binding:"required"`
+	NotificationText string `json:"notification_text" binding:"required"`
 }

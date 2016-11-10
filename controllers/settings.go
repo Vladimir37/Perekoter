@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"strconv"
-
 	"Perekoter/utility"
 
 	"github.com/gin-gonic/gin"
@@ -19,28 +17,22 @@ func GetSettings(c *gin.Context) {
 }
 
 func SetSetting(c *gin.Context) {
-	login := c.PostForm("login")
-	password := c.PostForm("password")
-	period, errPeriod := strconv.Atoi(c.PostForm("period"))
-	base := c.PostForm("login")
-
-	if errPeriod != nil {
-		c.JSON(200, gin.H{
-			"status": 1,
-		})
-		return
-	}
+	var request utility.ConfigRequest
+	c.Bind(&request)
 
 	config := utility.Config.Get()
-	if (login != config.Login) || (password != config.Password) {
+	if (request.Login != config.Login) || (request.Password != config.Password) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
 		return
 	}
 
-	config.Period = period
-	config.Base = base
+	config.Period = request.Period
+	config.Base = request.Base
+	config.Botname = request.Botname
+	config.Notification = request.Notification
+	config.NotificationText = request.NotificationText
 
 	err := utility.Config.Write(config)
 
@@ -58,21 +50,19 @@ func SetSetting(c *gin.Context) {
 }
 
 func SetUser(c *gin.Context) {
-	oldLogin := c.PostForm("old_login")
-	oldPassword := c.PostForm("old_password")
-	newLogin := c.PostForm("new_login")
-	newPassword := c.PostForm("new_password")
+	var request utility.UserChangingRequest
+	c.Bind(&request)
 
 	config := utility.Config.Get()
-	if (oldLogin != config.Login) || (oldPassword != config.Password) {
+	if (request.OldLogin != config.Login) || (request.OldPassword != config.Password) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
 		return
 	}
 
-	config.Login = newLogin
-	config.Password = newPassword
+	config.Login = request.NewLogin
+	config.Password = request.NewPassword
 
 	err := utility.Config.Write(config)
 
@@ -90,19 +80,18 @@ func SetUser(c *gin.Context) {
 }
 
 func ChangePasscode(c *gin.Context) {
-	login := c.PostForm("login")
-	password := c.PostForm("password")
-	passcode := c.PostForm("passcode")
+	var request utility.PasscodeChangingRequest
+	c.Bind(&request)
 
 	config := utility.Config.Get()
-	if (login != config.Login) || (password != config.Password) {
+	if (request.Login != config.Login) || (request.Password != config.Password) {
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
 		return
 	}
 
-	config.Passcode = passcode
+	config.Passcode = request.Passcode
 	err := utility.Config.Write(config)
 
 	// TODO - проверка и активация нового пасскода
