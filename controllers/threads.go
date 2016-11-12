@@ -40,7 +40,7 @@ func GetThread(c *gin.Context) {
 	defer db.Close()
 
 	var thread models.Thread
-	db.First(thread, num)
+	db.First(&thread, num)
 
 	c.JSON(200, gin.H{
 		"status": 0,
