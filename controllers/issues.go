@@ -3,6 +3,7 @@ package controllers
 import (
 	"Perekoter/models"
 	"Perekoter/utility"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -51,7 +52,7 @@ func SendIssue(c *gin.Context) {
 		Active: true,
 	})
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status": 0,
 	})
 }

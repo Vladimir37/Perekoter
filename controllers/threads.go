@@ -27,20 +27,14 @@ func GetAllThreads(c *gin.Context) {
 }
 
 func GetThread(c *gin.Context) {
-	num, err := strconv.Atoi(c.PostForm("num"))
-
-	if err != nil {
-		c.JSON(200, gin.H{
-			"status": 1,
-		})
-		return
-	}
+	var request utility.NumRequest
+	c.Bind(&request)
 
 	db := models.DB()
 	defer db.Close()
 
 	var thread models.Thread
-	db.First(&thread, num)
+	db.First(&thread, request.Num)
 
 	c.JSON(200, gin.H{
 		"status": 0,

@@ -80,6 +80,6 @@ type ConfigRequest struct {
 
 type IssueRequest struct {
 	Title string `json:"title" binding:"required"`
-	Text  string `json:"text" binding:"required"`
-	Link  string `json:"link" binding:"required"`
+	Text  string `json:"comment"`
+	Link  string `json:"link"`
 }

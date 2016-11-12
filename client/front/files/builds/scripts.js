@@ -27203,6 +27203,7 @@
 	            showModalIssue: false,
 	            errorLogin: null,
 	            errorIssue: null,
+	            issueSended: false,
 	            login: '',
 	            password: '',
 	            title: '',
@@ -27267,7 +27268,7 @@
 
 	            _axios2.default.post("/api/auth/login", this.state).then(function (resolve) {
 	                resolve = resolve.data;
-	                if (resolve.data == 0) {
+	                if (resolve.status == 0) {
 	                    window.location.pathname = "/cabinet";
 	                } else {
 	                    _this3.setState({
@@ -27276,20 +27277,48 @@
 	                }
 	            }).catch(function (err) {
 	                _this3.setState({
-	                    error: "Ошибка сервера"
+	                    errorLogin: "Ошибка сервера"
 	                });
 	            });
 	        }
 	    }, {
 	        key: 'sendIssue',
 	        value: function sendIssue() {
-	            //
+	            var _this4 = this;
+
+	            if (!this.state.title) {
+	                this.setState({
+	                    errorIssue: 'Не все поля заполнены'
+	                });
+	                return false;
+	            } else {
+	                this.setState({
+	                    errorIssue: null
+	                });
+	            }
+
+	            _axios2.default.post("/api/issues/send_issue", this.state).then(function (resolve) {
+	                resolve = resolve.data;
+	                if (resolve.status == 0) {
+	                    _this4.setState({
+	                        issueSended: true
+	                    });
+	                } else {
+	                    _this4.setState({
+	                        errorIssue: "Неверные данные пользователя"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this4.setState({
+	                    errorIssue: "Ошибка сервера"
+	                });
+	            });
 	        }
 	    }, {
-	        key: 'render',
-	        value: function render() {
+	        key: 'generateLoginModal',
+	        value: function generateLoginModal() {
 	            var errorLogin;
-	            var errorIssue;
+
 	            if (this.state.errorLogin) {
 	                errorLogin = React.createElement(
 	                    _reactBootstrap.Alert,
@@ -27297,6 +27326,60 @@
 	                    this.state.errorLogin
 	                );
 	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showModalLogin, onHide: this.closeLoginModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0412\u0445\u043E\u0434'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorLogin,
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.login,
+	                        placeholder: 'Login',
+	                        onChange: this.changeForm("login")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'password',
+	                        value: this.state.password,
+	                        placeholder: 'Password',
+	                        onChange: this.changeForm("password")
+	                    })
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success', onClick: this.sendLogin },
+	                        '\u0412\u043E\u0439\u0442\u0438'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeLoginModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'generateIssueModal',
+	        value: function generateIssueModal() {
+	            var errorIssue;
+	            var modalBody;
+	            var modalFooter;
+
 	            if (this.state.errorIssue) {
 	                errorIssue = React.createElement(
 	                    _reactBootstrap.Alert,
@@ -27305,6 +27388,83 @@
 	                );
 	            }
 
+	            if (this.state.issueSended) {
+	                modalBody = React.createElement(
+	                    'span',
+	                    { className: 'header-issue-success' },
+	                    '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E! \u041E\u043D\u043E \u0431\u0443\u0434\u0435\u0442 \u0440\u0430\u0441\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E \u0432 \u0431\u043B\u0438\u0436\u0430\u0439\u0448\u0435\u0435 \u0432\u0440\u0435\u043C\u044F.'
+	                );
+	                modalFooter = '';
+	            } else {
+	                modalBody = React.createElement(
+	                    'section',
+	                    null,
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.title,
+	                        placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0442\u0440\u0435\u0434\u0430',
+	                        onChange: this.changeForm("title")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.link,
+	                        placeholder: '\u0421\u0441\u044B\u043B\u043A\u0430 \u043D\u0430 \u0442\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+	                        onChange: this.changeForm("link")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        componentClass: 'textarea',
+	                        className: 'header-textarea',
+	                        value: this.state.comment,
+	                        placeholder: '\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 - \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0448\u0430\u043F\u043A\u0438, \u0432\u0430\u0436\u043D\u043E\u0441\u0442\u044C \u0442\u0440\u0435\u0434\u0430, \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u0438 \u043B\u044E\u0431\u0430\u044F \u0434\u0440\u0443\u0433\u0430\u044F \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+	                        onChange: this.changeForm("comment")
+	                    })
+	                );
+	                modalFooter = React.createElement(
+	                    'section',
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success', onClick: this.sendIssue },
+	                        '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeIssueModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                );
+	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showModalIssue, onHide: this.closeIssueModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0442\u0440\u0435\u0434'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorIssue,
+	                    modalBody
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    modalFooter
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
 	            return React.createElement(
 	                'header',
 	                null,
@@ -27348,104 +27508,8 @@
 	                        )
 	                    )
 	                ),
-	                React.createElement(
-	                    _reactBootstrap.Modal,
-	                    { show: this.state.showModalLogin, onHide: this.closeLoginModal },
-	                    React.createElement(
-	                        _reactBootstrap.Modal.Header,
-	                        { closeButton: true },
-	                        React.createElement(
-	                            _reactBootstrap.Modal.Title,
-	                            null,
-	                            '\u0412\u0445\u043E\u0434'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        _reactBootstrap.Modal.Body,
-	                        null,
-	                        errorLogin,
-	                        React.createElement(_reactBootstrap.FormControl, {
-	                            type: 'text',
-	                            value: this.state.login,
-	                            placeholder: 'Login',
-	                            onChange: this.changeForm("login")
-	                        }),
-	                        React.createElement('br', null),
-	                        React.createElement(_reactBootstrap.FormControl, {
-	                            type: 'password',
-	                            value: this.state.password,
-	                            placeholder: 'Password',
-	                            onChange: this.changeForm("password")
-	                        })
-	                    ),
-	                    React.createElement(
-	                        _reactBootstrap.Modal.Footer,
-	                        null,
-	                        React.createElement(
-	                            _reactBootstrap.Button,
-	                            { bsStyle: 'success', onClick: this.sendLogin },
-	                            '\u0412\u043E\u0439\u0442\u0438'
-	                        ),
-	                        React.createElement(
-	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', onClick: this.closeLoginModal },
-	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
-	                        )
-	                    )
-	                ),
-	                React.createElement(
-	                    _reactBootstrap.Modal,
-	                    { show: this.state.showModalIssue, onHide: this.closeIssueModal },
-	                    React.createElement(
-	                        _reactBootstrap.Modal.Header,
-	                        { closeButton: true },
-	                        React.createElement(
-	                            _reactBootstrap.Modal.Title,
-	                            null,
-	                            '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0442\u0440\u0435\u0434'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        _reactBootstrap.Modal.Body,
-	                        null,
-	                        errorIssue,
-	                        React.createElement(_reactBootstrap.FormControl, {
-	                            type: 'text',
-	                            value: this.state.title,
-	                            placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0442\u0440\u0435\u0434\u0430',
-	                            onChange: this.changeForm("title")
-	                        }),
-	                        React.createElement('br', null),
-	                        React.createElement(_reactBootstrap.FormControl, {
-	                            type: 'text',
-	                            value: this.state.link,
-	                            placeholder: '\u0421\u0441\u044B\u043B\u043A\u0430 \u043D\u0430 \u0442\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
-	                            onChange: this.changeForm("link")
-	                        }),
-	                        React.createElement('br', null),
-	                        React.createElement(_reactBootstrap.FormControl, {
-	                            componentClass: 'textarea',
-	                            className: 'header-textarea',
-	                            value: this.state.comment,
-	                            placeholder: '\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 - \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0448\u0430\u043F\u043A\u0438, \u0432\u0430\u0436\u043D\u043E\u0441\u0442\u044C \u0442\u0440\u0435\u0434\u0430, \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u0438 \u043B\u044E\u0431\u0430\u044F \u0434\u0440\u0443\u0433\u0430\u044F \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
-	                            onChange: this.changeForm("comment")
-	                        })
-	                    ),
-	                    React.createElement(
-	                        _reactBootstrap.Modal.Footer,
-	                        null,
-	                        React.createElement(
-	                            _reactBootstrap.Button,
-	                            { bsStyle: 'success', onClick: this.sendIssue },
-	                            '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C'
-	                        ),
-	                        React.createElement(
-	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', onClick: this.closeIssueModal },
-	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
-	                        )
-	                    )
-	                )
+	                this.generateLoginModal(),
+	                this.generateIssueModal()
 	            );
 	        }
 	    }]);
