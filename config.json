@@ -7,5 +7,6 @@
     "Base": "https://2ch.hk/",
     "Botname": "Anon",
     "Notification": true,
-    "NotificationText": "Perekot to >>"
+    "NotificationText": "Perekot to >>",
+    "SecretKey": "SecretKeyKeyKeyK"
 }

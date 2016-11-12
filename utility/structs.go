@@ -10,6 +10,7 @@ type ConfigStruct struct {
 	Botname          string
 	Notification     bool
 	NotificationText string
+	SecretKey        string
 }
 
 type ThreadJSON struct {
@@ -76,6 +77,7 @@ type ConfigRequest struct {
 	Botname          string `json:"botname" binding:"required"`
 	Notification     bool   `json:"notification" binding:"required"`
 	NotificationText string `json:"notification_text" binding:"required"`
+	SecretKey        string `json:"secret_key" binding:"required"`
 }
 
 type IssueRequest struct {

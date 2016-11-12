@@ -28,11 +28,19 @@ func SetSetting(c *gin.Context) {
 		return
 	}
 
+	if len(request.SecretKey) != 16 && len(request.SecretKey) != 24 && len(request.SecretKey) != 32 {
+		go utility.NewError("Failed to write to config")
+		c.JSON(200, gin.H{
+			"status": 4,
+		})
+	}
+
 	config.Period = request.Period
 	config.Base = request.Base
 	config.Botname = request.Botname
 	config.Notification = request.Notification
 	config.NotificationText = request.NotificationText
+	config.SecretKey = request.SecretKey
 
 	err := utility.Config.Write(config)
 

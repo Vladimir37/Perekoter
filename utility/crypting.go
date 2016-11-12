@@ -4,7 +4,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"errors"
 )
 
 var iv = []byte{35, 46, 57, 24, 85, 35, 24, 74, 87, 35, 88, 98, 66, 32, 14, 05}
@@ -16,7 +15,7 @@ func encodeBase64(b []byte) string {
 func decodeBase64(s string) ([]byte, error) {
 	data, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
-		return []byte{}, errors.New("Error")
+		return []byte{}, err
 	}
 	return data, nil
 }
@@ -24,7 +23,7 @@ func decodeBase64(s string) ([]byte, error) {
 func Encrypt(key, text string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
-		return "", errors.New("Error")
+		return "", err
 	}
 	plaintext := []byte(text)
 	cfb := cipher.NewCFBEncrypter(block, iv)
@@ -36,11 +35,11 @@ func Encrypt(key, text string) (string, error) {
 func Decrypt(key, text string) (string, error) {
 	block, errAes := aes.NewCipher([]byte(key))
 	if errAes != nil {
-		return "", errors.New("Error")
+		return "", errAes
 	}
 	ciphertext, errDecode := decodeBase64(text)
 	if errDecode != nil {
-		return "", errors.New("Error")
+		return "", errDecode
 	}
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	plaintext := make([]byte, len(ciphertext))
