@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Navbar, Nav, NavItem, Modal, FormControl, Button, Alert} from 'react-bootstrap';
+import {Navbar, Nav, NavItem, Modal, FormControl, Button, Alert, Badge} from 'react-bootstrap';
 import Axios from 'axios';
 
 export class Header extends React.Component {
@@ -12,20 +12,32 @@ export class Header extends React.Component {
         this.closeIssueModal = this.closeIssueModal.bind(this);
         this.changeForm = this.changeForm.bind(this);
         this.sendLogin = this.sendLogin.bind(this);
+        this.sendLogout = this.sendLogout.bind(this);
         this.sendIssue = this.sendIssue.bind(this);
+        this.generateMenuItems = this.generateMenuItems.bind(this);
+        this.goToLink = this.goToLink.bind(this);
 
         this.state = {
             showModalLogin: false,
             showModalIssue: false,
             errorLogin: null,
             errorIssue: null,
+            errorAuth: null,
             issueSended: false,
+            logged: false,
+            loggedCheck: false,
+            errorsNum: 0,
+            issuesNum: 0,
             login: '',
             password: '',
             title: '',
             link: '',
             comment: ''
         };
+    }
+
+    goToLink(e) {
+        window.location.pathname = e.target.getAttribute('href');
     }
 
     openLoginModal() {
@@ -73,9 +85,9 @@ export class Header extends React.Component {
         }
 
         Axios.post("/api/auth/login", this.state)
-            .then((resolve) => {
-                resolve = resolve.data;
-                if (resolve.status == 0) {
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
                     window.location.pathname = "/cabinet";
                 } else {
                     this.setState({
@@ -86,6 +98,21 @@ export class Header extends React.Component {
             .catch((err) => {
                 this.setState({
                     errorLogin: "Ошибка сервера"
+                });
+            });
+    }
+
+    sendLogout() {
+        Axios.post("/api/auth/logout")
+            .then((response) => {
+                response = response.data;
+                this.setState({
+                    logged: false
+                });
+            })
+            .catch((err) => {
+                this.setState({
+                    errorAuth: "Ошибка сервера"
                 });
             });
     }
@@ -103,9 +130,9 @@ export class Header extends React.Component {
         }
 
         Axios.post("/api/issues/send_issue", this.state)
-            .then((resolve) => {
-                resolve = resolve.data;
-                if (resolve.status == 0) {
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
                     this.setState({
                         issueSended: true
                     });
@@ -214,7 +241,72 @@ export class Header extends React.Component {
             </Modal>;
     }
 
+    generateMenuItems() {
+        if (!this.state.logged) {
+            return <Nav pullRight>
+                <NavItem href="#" onClick={this.openLoginModal}>Вход</NavItem>
+            </Nav>;
+        } else {
+            return <Nav pullRight>
+                <NavItem onClick={this.goToLink} href="/issues">Предложения  <Badge>{this.state.issuesNum}</Badge></NavItem>
+                <NavItem onClick={this.goToLink} href="/errors">Ошибки  <Badge>{this.state.errorsNum}</Badge></NavItem>
+                <NavItem onClick={this.sendLogout} href="#">Выход</NavItem>
+            </Nav>;
+        }
+    }
+
+    checkUser() {
+        Axios.get("/api/auth/check")
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        logged: true,
+                        loggedCheck: true
+                    });
+                    this.checkAdminData();
+                } else {
+                    this.setState({
+                        errorAuth: "Ошибка сервера",
+                        loggedCheck: true
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorAuth: "Ошибка сервера",
+                    loggedCheck: true
+                });
+            });
+    }
+
+    checkAdminData() {
+        Axios.get("/api/auth/admin")
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorsNum: response.body.Errors,
+                        issuesNum: response.body.Issues
+                    });
+                } else {
+                    this.setState({
+                        errorAuth: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorAuth: "Ошибка сервера"
+                });
+            });
+    }
+
     render() {
+        if (!this.state.loggedCheck) {
+            this.checkUser();
+        }
+
         return (
             <header>
                 <Navbar inverse collapseOnSelect>
@@ -228,9 +320,7 @@ export class Header extends React.Component {
                         <Nav>
                             <NavItem href="#" onClick={this.openIssueModal}>Предложить тред</NavItem>
                         </Nav>
-                        <Nav pullRight>
-                            <NavItem href="#" onClick={this.openLoginModal}>Вход</NavItem>
-                        </Nav>
+                        {this.generateMenuItems()}
                     </Navbar.Collapse>
                 </Navbar>
                 {this.generateLoginModal()}

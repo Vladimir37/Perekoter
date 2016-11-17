@@ -35,6 +35,7 @@ func getApiRouter(baseRouter *gin.Engine) {
 		auth := api.Group("/auth")
 		{
 			auth.GET("/check", controllers.CheckRequest)
+			auth.GET("/admin", controllers.AdminData)
 			auth.POST("/login", controllers.Login)
 			auth.POST("/logout", controllers.Logout)
 		}

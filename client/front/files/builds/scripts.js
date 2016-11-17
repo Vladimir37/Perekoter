@@ -27196,14 +27196,22 @@
 	        _this.closeIssueModal = _this.closeIssueModal.bind(_this);
 	        _this.changeForm = _this.changeForm.bind(_this);
 	        _this.sendLogin = _this.sendLogin.bind(_this);
+	        _this.sendLogout = _this.sendLogout.bind(_this);
 	        _this.sendIssue = _this.sendIssue.bind(_this);
+	        _this.generateMenuItems = _this.generateMenuItems.bind(_this);
+	        _this.goToLink = _this.goToLink.bind(_this);
 
 	        _this.state = {
 	            showModalLogin: false,
 	            showModalIssue: false,
 	            errorLogin: null,
 	            errorIssue: null,
+	            errorAuth: null,
 	            issueSended: false,
+	            logged: false,
+	            loggedCheck: false,
+	            errorsNum: 0,
+	            issuesNum: 0,
 	            login: '',
 	            password: '',
 	            title: '',
@@ -27214,6 +27222,11 @@
 	    }
 
 	    _createClass(Header, [{
+	        key: 'goToLink',
+	        value: function goToLink(e) {
+	            window.location.pathname = e.target.getAttribute('href');
+	        }
+	    }, {
 	        key: 'openLoginModal',
 	        value: function openLoginModal() {
 	            this.setState({
@@ -27266,9 +27279,9 @@
 	                });
 	            }
 
-	            _axios2.default.post("/api/auth/login", this.state).then(function (resolve) {
-	                resolve = resolve.data;
-	                if (resolve.status == 0) {
+	            _axios2.default.post("/api/auth/login", this.state).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
 	                    window.location.pathname = "/cabinet";
 	                } else {
 	                    _this3.setState({
@@ -27282,9 +27295,25 @@
 	            });
 	        }
 	    }, {
+	        key: 'sendLogout',
+	        value: function sendLogout() {
+	            var _this4 = this;
+
+	            _axios2.default.post("/api/auth/logout").then(function (response) {
+	                response = response.data;
+	                _this4.setState({
+	                    logged: false
+	                });
+	            }).catch(function (err) {
+	                _this4.setState({
+	                    errorAuth: "Ошибка сервера"
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'sendIssue',
 	        value: function sendIssue() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            if (!this.state.title) {
 	                this.setState({
@@ -27297,19 +27326,19 @@
 	                });
 	            }
 
-	            _axios2.default.post("/api/issues/send_issue", this.state).then(function (resolve) {
-	                resolve = resolve.data;
-	                if (resolve.status == 0) {
-	                    _this4.setState({
+	            _axios2.default.post("/api/issues/send_issue", this.state).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this5.setState({
 	                        issueSended: true
 	                    });
 	                } else {
-	                    _this4.setState({
+	                    _this5.setState({
 	                        errorIssue: "Неверные данные пользователя"
 	                    });
 	                }
 	            }).catch(function (err) {
-	                _this4.setState({
+	                _this5.setState({
 	                    errorIssue: "Ошибка сервера"
 	                });
 	            });
@@ -27463,8 +27492,106 @@
 	            );
 	        }
 	    }, {
+	        key: 'generateMenuItems',
+	        value: function generateMenuItems() {
+	            if (!this.state.logged) {
+	                return React.createElement(
+	                    _reactBootstrap.Nav,
+	                    { pullRight: true },
+	                    React.createElement(
+	                        _reactBootstrap.NavItem,
+	                        { href: '#', onClick: this.openLoginModal },
+	                        '\u0412\u0445\u043E\u0434'
+	                    )
+	                );
+	            } else {
+	                return React.createElement(
+	                    _reactBootstrap.Nav,
+	                    { pullRight: true },
+	                    React.createElement(
+	                        _reactBootstrap.NavItem,
+	                        { onClick: this.goToLink, href: '/issues' },
+	                        '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F  ',
+	                        React.createElement(
+	                            _reactBootstrap.Badge,
+	                            null,
+	                            this.state.issuesNum
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.NavItem,
+	                        { onClick: this.goToLink, href: '/errors' },
+	                        '\u041E\u0448\u0438\u0431\u043A\u0438  ',
+	                        React.createElement(
+	                            _reactBootstrap.Badge,
+	                            null,
+	                            this.state.errorsNum
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.NavItem,
+	                        { onClick: this.sendLogout, href: '#' },
+	                        '\u0412\u044B\u0445\u043E\u0434'
+	                    )
+	                );
+	            }
+	        }
+	    }, {
+	        key: 'checkUser',
+	        value: function checkUser() {
+	            var _this6 = this;
+
+	            _axios2.default.get("/api/auth/check").then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this6.setState({
+	                        logged: true,
+	                        loggedCheck: true
+	                    });
+	                    _this6.checkAdminData();
+	                } else {
+	                    _this6.setState({
+	                        errorAuth: "Ошибка сервера",
+	                        loggedCheck: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this6.setState({
+	                    errorAuth: "Ошибка сервера",
+	                    loggedCheck: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'checkAdminData',
+	        value: function checkAdminData() {
+	            var _this7 = this;
+
+	            _axios2.default.get("/api/auth/admin").then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this7.setState({
+	                        errorsNum: response.body.Errors,
+	                        issuesNum: response.body.Issues
+	                    });
+	                } else {
+	                    _this7.setState({
+	                        errorAuth: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this7.setState({
+	                    errorAuth: "Ошибка сервера"
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            if (!this.state.loggedCheck) {
+	                this.checkUser();
+	            }
+
 	            return React.createElement(
 	                'header',
 	                null,
@@ -27497,15 +27624,7 @@
 	                                '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0438\u0442\u044C \u0442\u0440\u0435\u0434'
 	                            )
 	                        ),
-	                        React.createElement(
-	                            _reactBootstrap.Nav,
-	                            { pullRight: true },
-	                            React.createElement(
-	                                _reactBootstrap.NavItem,
-	                                { href: '#', onClick: this.openLoginModal },
-	                                '\u0412\u0445\u043E\u0434'
-	                            )
-	                        )
+	                        this.generateMenuItems()
 	                    )
 	                ),
 	                this.generateLoginModal(),

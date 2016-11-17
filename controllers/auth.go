@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"Perekoter/utility"
+	"Perekoter/models"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -82,4 +83,29 @@ func CheckRequest(c *gin.Context) {
 			"status": 1,
 		})
 	}
+}
+
+func AdminData(c *gin.Context) {
+	db := models.DB()
+	defer db.Close()
+
+	var errors int
+	db.Model(&models.Error{}).Where(models.Error{
+		Active: true,
+	}).Count(&errors)
+
+	var issues int
+	db.Model(&models.Issue{}).Where(models.Issue{
+		Active: true,
+	}).Count(&issues)
+
+	response := map[string]int{
+		"Errors": errors,
+		"Issues": issues,
+	}
+
+	c.JSON(200, gin.H{
+		"status": 0,
+		"body": response,
+	})
 }
