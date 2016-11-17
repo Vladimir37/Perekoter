@@ -88,7 +88,7 @@ export class Header extends React.Component {
             .then((response) => {
                 response = response.data;
                 if (response.status == 0) {
-                    window.location.pathname = "/cabinet";
+                    window.location.pathname = "/control";
                 } else {
                     this.setState({
                         errorLogin: "Неверные данные пользователя"

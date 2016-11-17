@@ -58,7 +58,9 @@
 
 	var _main = __webpack_require__(235);
 
-	var _ = __webpack_require__(515);
+	var _control = __webpack_require__(515);
+
+	var _ = __webpack_require__(516);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -66,6 +68,7 @@
 	    _reactRouter.Router,
 	    { history: _reactRouter.browserHistory },
 	    React.createElement(_reactRouter.Route, { path: '/', component: _main.Main }),
+	    React.createElement(_reactRouter.Route, { path: '/control', component: _control.Control }),
 	    React.createElement(_reactRouter.Route, { path: '*', component: _.NotFound })
 	), document.getElementById('root'));
 
@@ -27282,7 +27285,7 @@
 	            _axios2.default.post("/api/auth/login", this.state).then(function (response) {
 	                response = response.data;
 	                if (response.status == 0) {
-	                    window.location.pathname = "/cabinet";
+	                    window.location.pathname = "/control";
 	                } else {
 	                    _this3.setState({
 	                        errorLogin: "Неверные данные пользователя"
@@ -47932,6 +47935,104 @@
 
 /***/ },
 /* 515 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Control = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Control = exports.Control = function (_React$Component) {
+	    _inherits(Control, _React$Component);
+
+	    function Control() {
+	        _classCallCheck(this, Control);
+
+	        return _possibleConstructorReturn(this, (Control.__proto__ || Object.getPrototypeOf(Control)).apply(this, arguments));
+	    }
+
+	    _createClass(Control, [{
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            return React.createElement(
+	                'main',
+	                null,
+	                React.createElement(
+	                    _reactBootstrap.ListGroup,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.ListGroupItem,
+	                        { href: '/boards' },
+	                        '\u0414\u043E\u0441\u043A\u0438'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.ListGroupItem,
+	                        { href: '/threads' },
+	                        '\u0422\u0440\u0435\u0434\u044B'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.ListGroupItem,
+	                        { href: '/errors' },
+	                        '\u041E\u0448\u0438\u0431\u043A\u0438'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.ListGroupItem,
+	                        { href: '/issues' },
+	                        '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.ListGroupItem,
+	                        { href: '/history' },
+	                        '\u0418\u0441\u0442\u043E\u0440\u0438\u044F'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.ListGroupItem,
+	                        { href: '/settings' },
+	                        '\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                this.generatePage(),
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return Control;
+	}(React.Component);
+
+/***/ },
+/* 516 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

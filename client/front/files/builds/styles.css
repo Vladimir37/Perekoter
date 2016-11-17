@@ -20,8 +20,11 @@ header {
   height: 300px;
   resize: none;
 }
+main {
+  width: 960px;
+}
 #root {
-  width: 980px;
+  width: 960px;
   margin: 0 auto;
 }
 /*!

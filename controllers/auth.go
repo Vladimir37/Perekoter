@@ -3,7 +3,6 @@ package controllers
 import (
 	"Perekoter/utility"
 	"Perekoter/models"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +18,7 @@ func Login(c *gin.Context) {
 		if err != nil {
 			go utility.NewHistoryPoint("Encription error")
 			go utility.NewError("Failed to encrypt password")
-			fmt.Println(err)
+			
 			c.JSON(200, gin.H{
 				"status": 2,
 			})
@@ -52,13 +51,20 @@ func CheckMiddleware(c *gin.Context) {
 	code, errCode := utility.Decrypt(config.SecretKey, cookie)
 
 	if errCookie != nil || errCode != nil {
-		c.Redirect(403, "/")
+		c.JSON(403, gin.H{
+			"status": 10,
+		})
+		c.AbortWithStatus(403)
+		return
 	}
 
 	if config.Password == code {
 		c.Next()
 	} else {
-		c.Redirect(403, "/")
+		c.JSON(403, gin.H{
+			"status": 10,
+		})
+		c.AbortWithStatus(403)
 	}
 }
 
