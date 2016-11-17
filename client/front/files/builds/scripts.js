@@ -60,7 +60,7 @@
 
 	var _control = __webpack_require__(515);
 
-	var _ = __webpack_require__(516);
+	var _ = __webpack_require__(517);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -47950,11 +47950,13 @@
 
 	var React = _interopRequireWildcard(_react);
 
+	var _reactBootstrap = __webpack_require__(237);
+
 	var _header = __webpack_require__(236);
 
 	var _footer = __webpack_require__(514);
 
-	var _reactBootstrap = __webpack_require__(237);
+	var _checkUser = __webpack_require__(516);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -47967,10 +47969,19 @@
 	var Control = exports.Control = function (_React$Component) {
 	    _inherits(Control, _React$Component);
 
-	    function Control() {
+	    function Control(props) {
 	        _classCallCheck(this, Control);
 
-	        return _possibleConstructorReturn(this, (Control.__proto__ || Object.getPrototypeOf(Control)).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, (Control.__proto__ || Object.getPrototypeOf(Control)).call(this, props));
+
+	        _this.state = {
+	            loaded: false,
+	            page: null
+	        };
+
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        return _this;
 	    }
 
 	    _createClass(Control, [{
@@ -48016,13 +48027,34 @@
 	            );
 	        }
 	    }, {
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this2 = this;
+
+	            (0, _checkUser.checkUser)(this.generatePage).then(function (page) {
+	                _this2.setState({
+	                    loaded: true,
+	                    page: page
+	                });
+	            }).catch(function (page) {
+	                _this2.setState({
+	                    loaded: true,
+	                    page: page
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            }
+
 	            return React.createElement(
 	                'div',
 	                null,
 	                React.createElement(_header.Header, null),
-	                this.generatePage(),
+	                this.state.page,
 	                React.createElement(_footer.Footer, null)
 	            );
 	        }
@@ -48033,6 +48065,59 @@
 
 /***/ },
 /* 516 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.checkUser = checkUser;
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function checkUser(pageGenerator) {
+	    return _axios2.default.get("/api/auth/check").then(function (response) {
+	        response = response.data;
+	        if (response.status == 0) {
+	            return pageGenerator();
+	        } else {
+	            return forbiddenGenerator();
+	        }
+	    }).catch(function (err) {
+	        return forbiddenGenerator();
+	    });
+
+	    function forbiddenGenerator() {
+	        return React.createElement(
+	            'main',
+	            null,
+	            React.createElement(
+	                'h1',
+	                null,
+	                'Error 403'
+	            ),
+	            React.createElement(
+	                'h2',
+	                null,
+	                'You are not logged'
+	            )
+	        );
+	    }
+	}
+
+/***/ },
+/* 517 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
