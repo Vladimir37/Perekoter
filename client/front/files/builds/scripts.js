@@ -60,7 +60,9 @@
 
 	var _control = __webpack_require__(515);
 
-	var _ = __webpack_require__(517);
+	var _errors = __webpack_require__(517);
+
+	var _ = __webpack_require__(518);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -69,6 +71,7 @@
 	    { history: _reactRouter.browserHistory },
 	    React.createElement(_reactRouter.Route, { path: '/', component: _main.Main }),
 	    React.createElement(_reactRouter.Route, { path: '/control', component: _control.Control }),
+	    React.createElement(_reactRouter.Route, { path: '/errors', component: _errors.Errors }),
 	    React.createElement(_reactRouter.Route, { path: '*', component: _.NotFound })
 	), document.getElementById('root'));
 
@@ -48118,6 +48121,186 @@
 
 /***/ },
 /* 517 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Errors = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Errors = exports.Errors = function (_React$Component) {
+	    _inherits(Errors, _React$Component);
+
+	    function Errors(props) {
+	        _classCallCheck(this, Errors);
+
+	        var _this = _possibleConstructorReturn(this, (Errors.__proto__ || Object.getPrototypeOf(Errors)).call(this, props));
+
+	        _this.state = {
+	            category: 0,
+	            allErrors: [],
+	            newErrors: [],
+	            oldErrors: [],
+	            errorsLoaded: false,
+	            loaded: false,
+	            page: null
+	        };
+
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(Errors, [{
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            return React.createElement(
+	                'main',
+	                null,
+	                React.createElement(
+	                    _reactBootstrap.ButtonGroup,
+	                    { justified: true },
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { href: '#' },
+	                        '\u041D\u043E\u0432\u044B\u0435'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { href: '#' },
+	                        '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043D\u044B\u0435'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { href: '#' },
+	                        '\u0412\u0441\u0435'
+	                    )
+	                ),
+	                React.createElement(
+	                    Table,
+	                    { striped: true, bordered: true, condensed: true, hover: true },
+	                    React.createElement(
+	                        'thead',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '#'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0422\u0435\u043A\u0441\u0442'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u0430'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                'Username'
+	                            )
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                null,
+	                                '1'
+	                            ),
+	                            React.createElement(
+	                                'td',
+	                                null,
+	                                'Mark'
+	                            ),
+	                            React.createElement(
+	                                'td',
+	                                null,
+	                                'Otto'
+	                            ),
+	                            React.createElement(
+	                                'td',
+	                                null,
+	                                '@mdo'
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this2 = this;
+
+	            (0, _checkUser.checkUser)(this.generatePage).then(function (page) {
+	                _this2.setState({
+	                    loaded: true,
+	                    page: page
+	                });
+	            }).catch(function (page) {
+	                _this2.setState({
+	                    loaded: true,
+	                    page: page
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            }
+
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                this.state.page,
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return Errors;
+	}(React.Component);
+
+/***/ },
+/* 518 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
