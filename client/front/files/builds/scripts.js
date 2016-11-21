@@ -48154,11 +48154,17 @@
 
 	var _reactBootstrap = __webpack_require__(237);
 
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
 	var _header = __webpack_require__(236);
 
 	var _footer = __webpack_require__(514);
 
 	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -48179,14 +48185,15 @@
 	        _this.state = {
 	            category: 0,
 	            allErrors: [],
-	            newErrors: [],
-	            oldErrors: [],
 	            errorsLoaded: false,
+	            error: null,
 	            loaded: false,
 	            logged: false
 	        };
 
 	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.loadErrors = _this.loadErrors.bind(_this);
+	        _this.closeError = _this.closeError.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        _this.changeCategory = _this.changeCategory.bind(_this);
 	        _this.checkCategory = _this.checkCategory.bind(_this);
@@ -48210,9 +48217,35 @@
 	            return this.state.category == category;
 	        }
 	    }, {
+	        key: 'closeError',
+	        value: function closeError(num) {
+	            var _this3 = this;
+
+	            return function () {
+	                _axios2.default.post('/api/errors/close_error', {
+	                    num: num
+	                }).then(function (response) {
+	                    response = response.data;
+	                    console.log(response);
+	                    if (response.status == 0) {
+	                        response.body = response.body.reverse();
+	                        _this3.loadErrors();
+	                    } else {
+	                        _this3.setState({
+	                            error: "Ошибка сервера"
+	                        });
+	                    }
+	                }).catch(function (err) {
+	                    _this3.setState({
+	                        error: "Ошибка сервера"
+	                    });
+	                });
+	            };
+	        }
+	    }, {
 	        key: 'loadPage',
 	        value: function loadPage() {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            (0, _checkUser.checkUser)().then(function (response) {
 	                var logged = false;
@@ -48220,22 +48253,114 @@
 	                    logged = true;
 	                }
 
-	                _this3.setState({
+	                _this4.setState({
 	                    loaded: true,
 	                    logged: logged
 	                });
 	            }).catch(function (page) {
-	                _this3.setState({
+	                _this4.setState({
 	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'loadErrors',
+	        value: function loadErrors() {
+	            var _this5 = this;
+
+	            _axios2.default.get('/api/errors/get_all_errors').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this5.setState({
+	                        allErrors: response.body,
+	                        errorsLoaded: true
+	                    });
+	                } else {
+	                    _this5.setState({
+	                        error: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this5.setState({
+	                    error: "Ошибка сервера"
 	                });
 	            });
 	        }
 	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
+	            var _this6 = this;
+
+	            var errorPanel;
+	            if (this.state.error) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.error
+	                );
+	            }
+
+	            if (!this.state.errorsLoaded) {
+	                this.loadErrors();
+	            }
+
+	            var errors;
+
+	            if (this.state.category == 0) {
+	                errors = this.state.allErrors.filter(function (error) {
+	                    return error.Active;
+	                });
+	            } else if (this.state.category == 1) {
+	                errors = this.state.allErrors.filter(function (error) {
+	                    return !error.Active;
+	                });
+	            } else {
+	                errors = this.state.allErrors;
+	            }
+
+	            errors = errors.map(function (error) {
+	                var date = new Date(error.CreatedAt);
+	                date = date.getHours() + ':' + date.getMinutes() + ' ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear();
+	                return React.createElement(
+	                    'tr',
+	                    { key: error.ID },
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        error.ID
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        error.Text
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        date
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        error.Active ? "✓" : "✗"
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', bsSize: 'small', onClick: _this6.closeError(error.ID) },
+	                            '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
+	                        )
+	                    )
+	                );
+	            });
+
 	            return React.createElement(
 	                'main',
 	                null,
+	                errorPanel,
 	                React.createElement(
 	                    _reactBootstrap.ButtonGroup,
 	                    { justified: true },
@@ -48277,7 +48402,12 @@
 	                            React.createElement(
 	                                'th',
 	                                null,
-	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u0430'
+	                                '\u0414\u0430\u0442\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u044F'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C'
 	                            ),
 	                            React.createElement('th', null)
 	                        )
@@ -48285,34 +48415,7 @@
 	                    React.createElement(
 	                        'tbody',
 	                        null,
-	                        React.createElement(
-	                            'tr',
-	                            null,
-	                            React.createElement(
-	                                'td',
-	                                null,
-	                                '1'
-	                            ),
-	                            React.createElement(
-	                                'td',
-	                                null,
-	                                'Mark'
-	                            ),
-	                            React.createElement(
-	                                'td',
-	                                null,
-	                                'Otto'
-	                            ),
-	                            React.createElement(
-	                                'td',
-	                                null,
-	                                React.createElement(
-	                                    _reactBootstrap.Button,
-	                                    { bsStyle: 'primary', bsSize: 'xsmall' },
-	                                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
-	                                )
-	                            )
-	                        )
+	                        errors
 	                    )
 	                )
 	            );

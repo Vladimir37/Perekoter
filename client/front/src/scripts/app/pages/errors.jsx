@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ButtonGroup, Button, Table} from 'react-bootstrap';
+import {ButtonGroup, Button, Table, Alert} from 'react-bootstrap';
 import Axios from 'axios';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
@@ -13,14 +13,15 @@ export class Errors extends React.Component {
         this.state = {
             category: 0,
             allErrors: [],
-            newErrors: [],
-            oldErrors: [],
-            errorsLoaded: false, 
+            errorsLoaded: false,
+            error: null,
             loaded: false,
             logged: false
         };
 
         this.loadPage = this.loadPage.bind(this);
+        this.loadErrors = this.loadErrors.bind(this);
+        this.closeError = this.closeError.bind(this);
         this.generatePage = this.generatePage.bind(this);
         this.changeCategory = this.changeCategory.bind(this);
         this.checkCategory = this.checkCategory.bind(this);
@@ -36,6 +37,29 @@ export class Errors extends React.Component {
 
     checkCategory(category) {
         return this.state.category == category;
+    }
+
+    closeError(num) {
+        return () => {
+            Axios.post('/api/errors/close_error', {
+                num
+            }).then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    response.body = response.body.reverse();
+                    this.loadErrors();
+                } else {
+                    this.setState({
+                        error: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    error: "Ошибка сервера"
+                });
+            });
+        }
     }
 
     loadPage() {
@@ -57,11 +81,66 @@ export class Errors extends React.Component {
     }
 
     loadErrors() {
-        Axios.get('/api/')
+        Axios.get('/api/errors/get_all_errors')
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    response.body = response.body.reverse();
+                    this.setState({
+                        allErrors: response.body,
+                        errorsLoaded: true
+                    });
+                } else {
+                    this.setState({
+                        error: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    error: "Ошибка сервера"
+                });
+            });
     }
 
     generatePage() {
+        var errorPanel;
+        if (this.state.error) {
+            errorPanel = <Alert bsStyle="danger">{this.state.error}</Alert>;
+        }
+
+        if (!this.state.errorsLoaded) {
+            this.loadErrors();
+        }
+
+        var errors;
+
+        if (this.state.category == 0) {
+            errors = this.state.allErrors.filter(function (error) {
+                return error.Active;
+            });
+        } else if (this.state.category == 1) {
+            errors = this.state.allErrors.filter(function (error) {
+                return !error.Active;
+            });
+        } else {
+            errors = this.state.allErrors;
+        }
+
+        errors = errors.map((error) => {
+            var date = new Date(error.CreatedAt);
+            date = (date.getHours()) + ':' + (date.getMinutes()) + ' ' + (date.getDate()) + '-' + (date.getMonth() + 1) + '-' + (date.getFullYear());
+            return <tr key={error.ID}>
+                <td>{error.ID}</td>
+                <td>{error.Text}</td>
+                <td>{date}</td>
+                <td>{error.Active ? "✓" : "✗"}</td>
+                <td><Button bsStyle="primary" bsSize="small" onClick={this.closeError(error.ID)}>Просмотрено</Button></td>
+            </tr>;
+        });
+
         return <main>
+            {errorPanel}
             <ButtonGroup justified>
                 <Button href="#" active={this.checkCategory(0)} onClick={this.changeCategory(0)}>Новые</Button>
                 <Button href="#" active={this.checkCategory(1)} onClick={this.changeCategory(1)}>Просмотренные</Button>
@@ -72,17 +151,13 @@ export class Errors extends React.Component {
                 <tr>
                     <th>#</th>
                     <th>Текст</th>
-                    <th>Активна</th>
+                    <th>Дата создания</th>
+                    <th>Активность</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td><Button bsStyle="primary" bsSize="xsmall">Просмотрено</Button></td>
-                    </tr>
+                    {errors}
                 </tbody>
             </Table>
         </main>;
