@@ -70,9 +70,14 @@ func getApiRouter(baseRouter *gin.Engine) {
 		issues := api.Group("/issues")
 		{
 			issues.GET("/get_all_issues", controllers.GetAllIssues)
-			issues.GET("/get_issue", controllers.GetIssue)
 			issues.POST("/send_issue", controllers.SendIssue)
 			issues.POST("/close_issue", controllers.CloseIssue)
+		}
+
+		errors := api.Group("/errors") 
+		{
+			errors.GET("/get_all_errors", controllers.GetAllErrors)
+			errors.POST("/close_error", controllers.CloseError)
 		}
 	}
 }

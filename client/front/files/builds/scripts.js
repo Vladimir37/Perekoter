@@ -47997,12 +47997,17 @@
 	        value: function loadPage() {
 	            var _this2 = this;
 
-	            (0, _checkUser.checkUser)(this.generatePage).then(function (response) {
+	            (0, _checkUser.checkUser)().then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
 	                _this2.setState({
 	                    loaded: true,
-	                    logged: true
+	                    logged: logged
 	                });
-	            }).catch(function (response) {
+	            }).catch(function (page) {
 	                _this2.setState({
 	                    loaded: true
 	                });
@@ -48100,7 +48105,7 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	function checkUser(pageGenerator) {
+	function checkUser() {
 	    return _axios2.default.get("/api/auth/check").then(function (response) {
 	        response = response.data;
 	        if (response.status == 0) {
@@ -48209,7 +48214,7 @@
 	        value: function loadPage() {
 	            var _this3 = this;
 
-	            (0, _checkUser.checkUser)(this.generatePage).then(function (response) {
+	            (0, _checkUser.checkUser)().then(function (response) {
 	                var logged = false;
 	                if (response) {
 	                    logged = true;

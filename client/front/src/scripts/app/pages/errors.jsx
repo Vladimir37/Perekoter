@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {ButtonGroup, Button, Table} from 'react-bootstrap';
+import Axios from 'axios';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
 import {checkUser, forbiddenGenerator} from '../utility/checkUser.jsx';
@@ -53,6 +54,10 @@ export class Errors extends React.Component {
                 loaded: true
             });
         });
+    }
+
+    loadErrors() {
+        Axios.get('/api/')
     }
 
     generatePage() {
