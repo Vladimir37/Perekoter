@@ -250,6 +250,7 @@ export class Header extends React.Component {
             return <Nav pullRight>
                 <NavItem onClick={this.goToLink} href="/issues">Предложения  <Badge>{this.state.issuesNum}</Badge></NavItem>
                 <NavItem onClick={this.goToLink} href="/errors">Ошибки  <Badge>{this.state.errorsNum}</Badge></NavItem>
+                <NavItem onClick={this.goToLink} href="/control">Управление</NavItem>
                 <NavItem onClick={this.sendLogout} href="#">Выход</NavItem>
             </Nav>;
         }

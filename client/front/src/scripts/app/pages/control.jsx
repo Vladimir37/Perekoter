@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {ListGroup, ListGroupItem} from 'react-bootstrap';
+import {ListGroup, ListGroupItem, Button} from 'react-bootstrap';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
-import {checkUser} from '../utility/checkUser.jsx';
+import {checkUser, forbiddenGenerator} from '../utility/checkUser.jsx';
 
 
 export class Control extends React.Component {
@@ -11,11 +11,30 @@ export class Control extends React.Component {
 
         this.state = {
             loaded: false,
-            page: null
+            logged: false
         };
 
-        this.generatePage = this.generatePage.bind(this);
         this.loadPage = this.loadPage.bind(this);
+        this.generatePage = this.generatePage.bind(this);
+    }
+
+
+    loadPage() {
+        checkUser().then((response) => {
+            var logged = false;
+            if (response) {
+                logged = true;
+            }
+
+            this.setState({
+                loaded: true,
+                logged
+            });
+        }).catch((page) => {
+            this.setState({
+                loaded: true
+            });
+        });
     }
 
     generatePage() {
@@ -30,30 +49,22 @@ export class Control extends React.Component {
             </ListGroup>
         </main>;
     }
-
-    loadPage() {
-        checkUser(this.generatePage).then((page) => {
-            this.setState({
-                loaded: true,
-                page
-            });
-        }).catch((page) => {
-            this.setState({
-                loaded: true,
-                page
-            });
-        });
-    }
     
     render() {
+        var page;
+
         if (!this.state.loaded) {
             this.loadPage();
+        } else if (!this.state.logged) {
+            page = forbiddenGenerator();
+        } else {
+            page = this.generatePage();
         }
         
         return (
             <div>
                 <Header/>
-                {this.state.page}
+                {page}
                 <Footer/>
             </div>
         );

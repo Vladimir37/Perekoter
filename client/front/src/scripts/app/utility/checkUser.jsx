@@ -1,24 +1,24 @@
 import * as React from 'react';
 import Axios from 'axios';
 
-export function checkUser(pageGenerator) {
+export function checkUser() {
     return Axios.get("/api/auth/check")
         .then((response) => {
             response = response.data;
             if (response.status == 0) {
-                return pageGenerator();
+                return true;
             } else {
-                return forbiddenGenerator();
+                return false;
             }
         })
         .catch((err) => {
-            return forbiddenGenerator();
+            return false;
         });
+}
 
-    function forbiddenGenerator() {
-        return <main>
-            <h1>Error 403</h1>
-            <h2>You are not logged</h2>
-        </main>
-    }
+export function forbiddenGenerator() {
+    return <main>
+        <h1>Error 403</h1>
+        <h2>You are not logged</h2>
+    </main>
 }

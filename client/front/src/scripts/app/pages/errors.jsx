@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {ButtonGroup, Button} from 'react-bootstrap';
+import {ButtonGroup, Button, Table} from 'react-bootstrap';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
-import {checkUser} from '../utility/checkUser.jsx';
+import {checkUser, forbiddenGenerator} from '../utility/checkUser.jsx';
 
 
 export class Errors extends React.Component {
@@ -16,19 +16,51 @@ export class Errors extends React.Component {
             oldErrors: [],
             errorsLoaded: false, 
             loaded: false,
-            page: null
+            logged: false
         };
 
-        this.generatePage = this.generatePage.bind(this);
         this.loadPage = this.loadPage.bind(this);
+        this.generatePage = this.generatePage.bind(this);
+        this.changeCategory = this.changeCategory.bind(this);
+        this.checkCategory = this.checkCategory.bind(this);
+    }
+
+    changeCategory(category) {
+        return () => {
+            this.setState({
+                category
+            });
+        }
+    }
+
+    checkCategory(category) {
+        return this.state.category == category;
+    }
+
+    loadPage() {
+        checkUser().then((response) => {
+            var logged = false;
+            if (response) {
+                logged = true;
+            }
+
+            this.setState({
+                loaded: true,
+                logged
+            });
+        }).catch((page) => {
+            this.setState({
+                loaded: true
+            });
+        });
     }
 
     generatePage() {
         return <main>
             <ButtonGroup justified>
-                <Button href="#">Новые</Button>
-                <Button href="#">Просмотренные</Button>
-                <Button href="#">Все</Button>
+                <Button href="#" active={this.checkCategory(0)} onClick={this.changeCategory(0)}>Новые</Button>
+                <Button href="#" active={this.checkCategory(1)} onClick={this.changeCategory(1)}>Просмотренные</Button>
+                <Button href="#" active={this.checkCategory(2)} onClick={this.changeCategory(2)}>Все</Button>
             </ButtonGroup>
             <Table striped bordered condensed hover>
                 <thead>
@@ -36,7 +68,7 @@ export class Errors extends React.Component {
                     <th>#</th>
                     <th>Текст</th>
                     <th>Активна</th>
-                    <th>Username</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -44,36 +76,28 @@ export class Errors extends React.Component {
                         <td>1</td>
                         <td>Mark</td>
                         <td>Otto</td>
-                        <td>@mdo</td>
+                        <td><Button bsStyle="primary" bsSize="xsmall">Просмотрено</Button></td>
                     </tr>
                 </tbody>
             </Table>
         </main>;
     }
-
-    loadPage() {
-        checkUser(this.generatePage).then((page) => {
-            this.setState({
-                loaded: true,
-                page
-            });
-        }).catch((page) => {
-            this.setState({
-                loaded: true,
-                page
-            });
-        });
-    }
     
     render() {
+        var page;
+
         if (!this.state.loaded) {
             this.loadPage();
+        } else if (!this.state.logged) {
+            page = forbiddenGenerator();
+        } else {
+            page = this.generatePage();
         }
         
         return (
             <div>
                 <Header/>
-                {this.state.page}
+                {page}
                 <Footer/>
             </div>
         );

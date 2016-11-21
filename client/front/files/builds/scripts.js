@@ -27536,6 +27536,11 @@
 	                    ),
 	                    React.createElement(
 	                        _reactBootstrap.NavItem,
+	                        { onClick: this.goToLink, href: '/control' },
+	                        '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.NavItem,
 	                        { onClick: this.sendLogout, href: '#' },
 	                        '\u0412\u044B\u0445\u043E\u0434'
 	                    )
@@ -47979,15 +47984,31 @@
 
 	        _this.state = {
 	            loaded: false,
-	            page: null
+	            logged: false
 	        };
 
-	        _this.generatePage = _this.generatePage.bind(_this);
 	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
 	    }
 
 	    _createClass(Control, [{
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this2 = this;
+
+	            (0, _checkUser.checkUser)(this.generatePage).then(function (response) {
+	                _this2.setState({
+	                    loaded: true,
+	                    logged: true
+	                });
+	            }).catch(function (response) {
+	                _this2.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
 	            return React.createElement(
@@ -48030,34 +48051,23 @@
 	            );
 	        }
 	    }, {
-	        key: 'loadPage',
-	        value: function loadPage() {
-	            var _this2 = this;
-
-	            (0, _checkUser.checkUser)(this.generatePage).then(function (page) {
-	                _this2.setState({
-	                    loaded: true,
-	                    page: page
-	                });
-	            }).catch(function (page) {
-	                _this2.setState({
-	                    loaded: true,
-	                    page: page
-	                });
-	            });
-	        }
-	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var page;
+
 	            if (!this.state.loaded) {
 	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
 	            }
 
 	            return React.createElement(
 	                'div',
 	                null,
 	                React.createElement(_header.Header, null),
-	                this.state.page,
+	                page,
 	                React.createElement(_footer.Footer, null)
 	            );
 	        }
@@ -48076,6 +48086,7 @@
 	    value: true
 	});
 	exports.checkUser = checkUser;
+	exports.forbiddenGenerator = forbiddenGenerator;
 
 	var _react = __webpack_require__(1);
 
@@ -48093,30 +48104,30 @@
 	    return _axios2.default.get("/api/auth/check").then(function (response) {
 	        response = response.data;
 	        if (response.status == 0) {
-	            return pageGenerator();
+	            return true;
 	        } else {
-	            return forbiddenGenerator();
+	            return false;
 	        }
 	    }).catch(function (err) {
-	        return forbiddenGenerator();
+	        return false;
 	    });
+	}
 
-	    function forbiddenGenerator() {
-	        return React.createElement(
-	            'main',
+	function forbiddenGenerator() {
+	    return React.createElement(
+	        'main',
+	        null,
+	        React.createElement(
+	            'h1',
 	            null,
-	            React.createElement(
-	                'h1',
-	                null,
-	                'Error 403'
-	            ),
-	            React.createElement(
-	                'h2',
-	                null,
-	                'You are not logged'
-	            )
-	        );
-	    }
+	            'Error 403'
+	        ),
+	        React.createElement(
+	            'h2',
+	            null,
+	            'You are not logged'
+	        )
+	    );
 	}
 
 /***/ },
@@ -48167,15 +48178,54 @@
 	            oldErrors: [],
 	            errorsLoaded: false,
 	            loaded: false,
-	            page: null
+	            logged: false
 	        };
 
-	        _this.generatePage = _this.generatePage.bind(_this);
 	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        _this.changeCategory = _this.changeCategory.bind(_this);
+	        _this.checkCategory = _this.checkCategory.bind(_this);
 	        return _this;
 	    }
 
 	    _createClass(Errors, [{
+	        key: 'changeCategory',
+	        value: function changeCategory(category) {
+	            var _this2 = this;
+
+	            return function () {
+	                _this2.setState({
+	                    category: category
+	                });
+	            };
+	        }
+	    }, {
+	        key: 'checkCategory',
+	        value: function checkCategory(category) {
+	            return this.state.category == category;
+	        }
+	    }, {
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this3 = this;
+
+	            (0, _checkUser.checkUser)(this.generatePage).then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
+	                _this3.setState({
+	                    loaded: true,
+	                    logged: logged
+	                });
+	            }).catch(function (page) {
+	                _this3.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
 	            return React.createElement(
@@ -48186,22 +48236,22 @@
 	                    { justified: true },
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { href: '#' },
+	                        { href: '#', active: this.checkCategory(0), onClick: this.changeCategory(0) },
 	                        '\u041D\u043E\u0432\u044B\u0435'
 	                    ),
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { href: '#' },
+	                        { href: '#', active: this.checkCategory(1), onClick: this.changeCategory(1) },
 	                        '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043D\u044B\u0435'
 	                    ),
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { href: '#' },
+	                        { href: '#', active: this.checkCategory(2), onClick: this.changeCategory(2) },
 	                        '\u0412\u0441\u0435'
 	                    )
 	                ),
 	                React.createElement(
-	                    Table,
+	                    _reactBootstrap.Table,
 	                    { striped: true, bordered: true, condensed: true, hover: true },
 	                    React.createElement(
 	                        'thead',
@@ -48224,11 +48274,7 @@
 	                                null,
 	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u0430'
 	                            ),
-	                            React.createElement(
-	                                'th',
-	                                null,
-	                                'Username'
-	                            )
+	                            React.createElement('th', null)
 	                        )
 	                    ),
 	                    React.createElement(
@@ -48255,7 +48301,11 @@
 	                            React.createElement(
 	                                'td',
 	                                null,
-	                                '@mdo'
+	                                React.createElement(
+	                                    _reactBootstrap.Button,
+	                                    { bsStyle: 'primary', bsSize: 'xsmall' },
+	                                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
+	                                )
 	                            )
 	                        )
 	                    )
@@ -48263,34 +48313,23 @@
 	            );
 	        }
 	    }, {
-	        key: 'loadPage',
-	        value: function loadPage() {
-	            var _this2 = this;
-
-	            (0, _checkUser.checkUser)(this.generatePage).then(function (page) {
-	                _this2.setState({
-	                    loaded: true,
-	                    page: page
-	                });
-	            }).catch(function (page) {
-	                _this2.setState({
-	                    loaded: true,
-	                    page: page
-	                });
-	            });
-	        }
-	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var page;
+
 	            if (!this.state.loaded) {
 	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
 	            }
 
 	            return React.createElement(
 	                'div',
 	                null,
 	                React.createElement(_header.Header, null),
-	                this.state.page,
+	                page,
 	                React.createElement(_footer.Footer, null)
 	            );
 	        }
