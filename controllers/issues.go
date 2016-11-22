@@ -8,22 +8,12 @@ import (
 )
 
 func GetAllIssues(c *gin.Context) {
-	var request utility.NumRequest
-	c.Bind(&request)
-
-	active := true
 	var issues []models.Issue
 
 	db := models.DB()
 	defer db.Close()
 
-	if request.Num == 1 {
-		active = false
-	}
-
-	db.Find(&issues, &models.Issue{
-		Active: active,
-	})
+	db.Find(&issues)
 
 	c.JSON(200, gin.H{
 		"status": 0,

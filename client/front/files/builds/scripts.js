@@ -62,7 +62,9 @@
 
 	var _errors = __webpack_require__(517);
 
-	var _ = __webpack_require__(518);
+	var _issues = __webpack_require__(518);
+
+	var _ = __webpack_require__(519);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -72,6 +74,7 @@
 	    React.createElement(_reactRouter.Route, { path: '/', component: _main.Main }),
 	    React.createElement(_reactRouter.Route, { path: '/control', component: _control.Control }),
 	    React.createElement(_reactRouter.Route, { path: '/errors', component: _errors.Errors }),
+	    React.createElement(_reactRouter.Route, { path: '/issues', component: _issues.Issues }),
 	    React.createElement(_reactRouter.Route, { path: '*', component: _.NotFound })
 	), document.getElementById('root'));
 
@@ -48276,12 +48279,14 @@
 	                    });
 	                } else {
 	                    _this5.setState({
-	                        error: "Ошибка сервера"
+	                        error: "Ошибка сервера",
+	                        errorsLoaded: true
 	                    });
 	                }
 	            }).catch(function (err) {
 	                _this5.setState({
-	                    error: "Ошибка сервера"
+	                    error: "Ошибка сервера",
+	                    errorsLoaded: true
 	                });
 	            });
 	        }
@@ -48448,6 +48453,397 @@
 
 /***/ },
 /* 518 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Issues = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Issues = exports.Issues = function (_React$Component) {
+	    _inherits(Issues, _React$Component);
+
+	    function Issues(props) {
+	        _classCallCheck(this, Issues);
+
+	        var _this = _possibleConstructorReturn(this, (Issues.__proto__ || Object.getPrototypeOf(Issues)).call(this, props));
+
+	        _this.state = {
+	            category: 0,
+	            allIssues: [],
+	            issuesLoaded: false,
+	            showModal: false,
+	            currentIssue: {},
+	            currentData: new Date(),
+	            error: null,
+	            loaded: false,
+	            logged: false
+	        };
+
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        _this.loadIssues = _this.loadIssues.bind(_this);
+	        _this.openModal = _this.openModal.bind(_this);
+	        _this.closeModal = _this.closeModal.bind(_this);
+	        _this.closeIssue = _this.closeIssue.bind(_this);
+	        _this.changeCategory = _this.changeCategory.bind(_this);
+	        _this.checkCategory = _this.checkCategory.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(Issues, [{
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this2 = this;
+
+	            (0, _checkUser.checkUser)().then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
+	                _this2.setState({
+	                    loaded: true,
+	                    logged: logged
+	                });
+	            }).catch(function (page) {
+	                _this2.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'changeCategory',
+	        value: function changeCategory(category) {
+	            var _this3 = this;
+
+	            return function () {
+	                _this3.setState({
+	                    category: category
+	                });
+	            };
+	        }
+	    }, {
+	        key: 'checkCategory',
+	        value: function checkCategory(category) {
+	            return this.state.category == category;
+	        }
+	    }, {
+	        key: 'loadIssues',
+	        value: function loadIssues() {
+	            var _this4 = this;
+
+	            _axios2.default.get('/api/issues/get_all_issues').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this4.setState({
+	                        allIssues: response.body,
+	                        issuesLoaded: true
+	                    });
+	                } else {
+	                    _this4.setState({
+	                        error: "Ошибка сервера",
+	                        issuesLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this4.setState({
+	                    error: "Ошибка сервера",
+	                    issuesLoaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'openModal',
+	        value: function openModal(issue, date) {
+	            var _this5 = this;
+
+	            return function () {
+	                _this5.setState({
+	                    showModal: true,
+	                    currentIssue: issue,
+	                    currentDate: date
+	                });
+	            };
+	        }
+	    }, {
+	        key: 'closeModal',
+	        value: function closeModal() {
+	            this.setState({
+	                showModal: false
+	            });
+	        }
+	    }, {
+	        key: 'closeIssue',
+	        value: function closeIssue(num) {
+	            var _this6 = this;
+
+	            return function () {
+	                _axios2.default.post('/api/issues/close_issue', {
+	                    num: num
+	                }).then(function (response) {
+	                    response = response.data;
+	                    if (response.status == 0) {
+	                        _this6.closeModal();
+	                        _this6.loadIssues();
+	                    } else {
+	                        _this6.setState({
+	                            error: "Ошибка сервера"
+	                        });
+	                    }
+	                }).catch(function (err) {
+	                    _this6.setState({
+	                        error: "Ошибка сервера"
+	                    });
+	                });
+	            };
+	        }
+	    }, {
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            var _this7 = this;
+
+	            var errorPanel;
+	            if (this.state.error) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.error
+	                );
+	            }
+
+	            if (!this.state.issuesLoaded) {
+	                this.loadIssues();
+	            }
+
+	            var issues;
+
+	            if (this.state.category == 0) {
+	                issues = this.state.allIssues.filter(function (error) {
+	                    return error.Active;
+	                });
+	            } else if (this.state.category == 1) {
+	                issues = this.state.allIssues.filter(function (error) {
+	                    return !error.Active;
+	                });
+	            } else {
+	                issues = this.state.allIssues;
+	            }
+
+	            issues = issues.map(function (issue) {
+	                var date = new Date(issue.CreatedAt);
+	                date = date.getHours() + ':' + date.getMinutes() + ' ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear();
+	                var activity_pic = issue.Active ? "✗" : "✓";
+	                var close_button = issue.Active ? React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', bsSize: 'small', onClick: _this7.openModal(issue, date) },
+	                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C'
+	                ) : '';
+	                return React.createElement(
+	                    'tr',
+	                    { key: issue.ID },
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        issue.ID
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        issue.Title
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        date
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        activity_pic
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        close_button
+	                    )
+	                );
+	            });
+
+	            return React.createElement(
+	                'main',
+	                null,
+	                errorPanel,
+	                React.createElement(
+	                    _reactBootstrap.ButtonGroup,
+	                    { justified: true },
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { href: '#', active: this.checkCategory(0), onClick: this.changeCategory(0) },
+	                        '\u041D\u043E\u0432\u044B\u0435'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { href: '#', active: this.checkCategory(1), onClick: this.changeCategory(1) },
+	                        '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043D\u044B\u0435'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { href: '#', active: this.checkCategory(2), onClick: this.changeCategory(2) },
+	                        '\u0412\u0441\u0435'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Table,
+	                    { striped: true, bordered: true, condensed: true, hover: true },
+	                    React.createElement(
+	                        'thead',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '#'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0414\u0430\u0442\u0430 \u043E\u0442\u043F\u0440\u0430\u0432\u043A\u0438'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
+	                            ),
+	                            React.createElement('th', null)
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        issues
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal,
+	                    { show: this.state.showModal, onHide: this.closeModal },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Header,
+	                        { closeButton: true },
+	                        React.createElement(
+	                            _reactBootstrap.Modal.Title,
+	                            null,
+	                            '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Body,
+	                        null,
+	                        React.createElement(
+	                            'h2',
+	                            null,
+	                            this.state.currentIssue.Title
+	                        ),
+	                        React.createElement(
+	                            'div',
+	                            { className: 'modal-date' },
+	                            this.state.currentDate
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            this.state.currentIssue.Text
+	                        ),
+	                        React.createElement(
+	                            'a',
+	                            { href: this.state.currentIssue.Link, target: '_blank' },
+	                            this.state.currentIssue.Link
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Footer,
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'success', onClick: this.closeIssue(this.state.currentIssue.ID) },
+	                            '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C'
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', onClick: this.closeModal },
+	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                        )
+	                    )
+	                ),
+	                ';'
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var page;
+
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
+	            }
+
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                page,
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return Issues;
+	}(React.Component);
+
+/***/ },
+/* 519 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

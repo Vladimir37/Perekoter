@@ -20,6 +20,11 @@ header {
   height: 300px;
   resize: none;
 }
+.modal-date {
+  margin: 10px 0;
+  font-size: 14px;
+  color: grey;
+}
 main {
   width: 960px;
 }

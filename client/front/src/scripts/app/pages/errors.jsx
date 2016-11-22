@@ -91,13 +91,15 @@ export class Errors extends React.Component {
                     });
                 } else {
                     this.setState({
-                        error: "Ошибка сервера"
+                        error: "Ошибка сервера",
+                        errorsLoaded: true
                     });
                 }
             })
             .catch((err) => {
                 this.setState({
-                    error: "Ошибка сервера"
+                    error: "Ошибка сервера",
+                        errorsLoaded: true
                 });
             });
     }
