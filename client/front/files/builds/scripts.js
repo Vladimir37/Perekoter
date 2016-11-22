@@ -48226,9 +48226,7 @@
 	                    num: num
 	                }).then(function (response) {
 	                    response = response.data;
-	                    console.log(response);
 	                    if (response.status == 0) {
-	                        response.body = response.body.reverse();
 	                        _this3.loadErrors();
 	                    } else {
 	                        _this3.setState({
@@ -48322,6 +48320,12 @@
 	            errors = errors.map(function (error) {
 	                var date = new Date(error.CreatedAt);
 	                date = date.getHours() + ':' + date.getMinutes() + ' ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear();
+	                var activity_pic = error.Active ? "✗" : "✓";
+	                var close_button = error.Active ? React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', bsSize: 'small', onClick: _this6.closeError(error.ID) },
+	                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
+	                ) : '';
 	                return React.createElement(
 	                    'tr',
 	                    { key: error.ID },
@@ -48343,16 +48347,12 @@
 	                    React.createElement(
 	                        'td',
 	                        null,
-	                        error.Active ? "✓" : "✗"
+	                        activity_pic
 	                    ),
 	                    React.createElement(
 	                        'td',
 	                        null,
-	                        React.createElement(
-	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'small', onClick: _this6.closeError(error.ID) },
-	                            '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
-	                        )
+	                        close_button
 	                    )
 	                );
 	            });
@@ -48407,7 +48407,7 @@
 	                            React.createElement(
 	                                'th',
 	                                null,
-	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C'
+	                                '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
 	                            ),
 	                            React.createElement('th', null)
 	                        )

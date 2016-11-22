@@ -46,7 +46,6 @@ export class Errors extends React.Component {
             }).then((response) => {
                 response = response.data;
                 if (response.status == 0) {
-                    response.body = response.body.reverse();
                     this.loadErrors();
                 } else {
                     this.setState({
@@ -130,12 +129,14 @@ export class Errors extends React.Component {
         errors = errors.map((error) => {
             var date = new Date(error.CreatedAt);
             date = (date.getHours()) + ':' + (date.getMinutes()) + ' ' + (date.getDate()) + '-' + (date.getMonth() + 1) + '-' + (date.getFullYear());
+            let activity_pic = error.Active ? "✗" : "✓";
+            let close_button = error.Active ? <Button bsStyle="primary" bsSize="small" onClick={this.closeError(error.ID)}>Просмотрено</Button> : '';
             return <tr key={error.ID}>
                 <td>{error.ID}</td>
                 <td>{error.Text}</td>
                 <td>{date}</td>
-                <td>{error.Active ? "✓" : "✗"}</td>
-                <td><Button bsStyle="primary" bsSize="small" onClick={this.closeError(error.ID)}>Просмотрено</Button></td>
+                <td>{activity_pic}</td>
+                <td>{close_button}</td>
             </tr>;
         });
 
@@ -152,7 +153,7 @@ export class Errors extends React.Component {
                     <th>#</th>
                     <th>Текст</th>
                     <th>Дата создания</th>
-                    <th>Активность</th>
+                    <th>Просмотрено</th>
                     <th></th>
                 </tr>
                 </thead>
