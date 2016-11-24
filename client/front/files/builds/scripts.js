@@ -66,7 +66,9 @@
 
 	var _history = __webpack_require__(519);
 
-	var _ = __webpack_require__(520);
+	var _settings = __webpack_require__(520);
+
+	var _ = __webpack_require__(521);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -78,6 +80,7 @@
 	    React.createElement(_reactRouter.Route, { path: '/errors', component: _errors.Errors }),
 	    React.createElement(_reactRouter.Route, { path: '/issues', component: _issues.Issues }),
 	    React.createElement(_reactRouter.Route, { path: '/history', component: _history.History }),
+	    React.createElement(_reactRouter.Route, { path: '/settings', component: _settings.Settings }),
 	    React.createElement(_reactRouter.Route, { path: '*', component: _.NotFound })
 	), document.getElementById('root'));
 
@@ -49079,6 +49082,243 @@
 
 /***/ },
 /* 520 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Settings = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Settings = exports.Settings = function (_React$Component) {
+	    _inherits(Settings, _React$Component);
+
+	    function Settings(props) {
+	        _classCallCheck(this, Settings);
+
+	        var _this = _possibleConstructorReturn(this, (Settings.__proto__ || Object.getPrototypeOf(Settings)).call(this, props));
+
+	        _this.state = {
+	            loaded: false,
+	            logged: false
+	        };
+
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(Settings, [{
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this2 = this;
+
+	            (0, _checkUser.checkUser)().then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
+	                _this2.setState({
+	                    loaded: true,
+	                    logged: logged
+	                });
+	            }).catch(function (page) {
+	                _this2.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            return React.createElement(
+	                'main',
+	                null,
+	                React.createElement(
+	                    'article',
+	                    { className: 'settings' },
+	                    React.createElement(
+	                        _reactBootstrap.Table,
+	                        { striped: true, bordered: true, condensed: true, hover: true },
+	                        React.createElement(
+	                            'tbody',
+	                            null,
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0427\u0430\u0441\u0442\u043E\u0442\u0430 \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438 (\u0432 \u043C\u0438\u043D\u0443\u0442\u0430\u0445)'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0410\u0434\u0440\u0435\u0441'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0418\u043C\u044F \u0431\u043E\u0442\u0430 (\u0434\u043E\u043F\u0443\u0441\u043A\u0430\u0435\u0442\u0441\u044F \u0442\u0440\u0438\u043F\u043A\u043E\u0434)'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0423\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F \u0432 \u0442\u043E\u043D\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0422\u0435\u043A\u0441\u0442 \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F (\u043F\u043E\u0441\u043B\u0435 \u0442\u0435\u043A\u0441\u0442\u0430 \u0438\u0434\u0451\u0442 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430 \u0431\u0435\u0437 ">>")'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0421\u0435\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043A\u043B\u044E\u0447 (\u0434\u043B\u044F \u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u0438\u044F)'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                )
+	                            )
+	                        )
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Grid,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Row,
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Col,
+	                            { md: 3 },
+	                            React.createElement(
+	                                _reactBootstrap.Button,
+	                                { bsStyle: 'primary' },
+	                                '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435'
+	                            )
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Col,
+	                            { md: 3 },
+	                            React.createElement(
+	                                _reactBootstrap.Button,
+	                                { bsStyle: 'primary' },
+	                                '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u044E\u0437\u0435\u0440\u0430'
+	                            )
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Col,
+	                            { md: 3 },
+	                            React.createElement(
+	                                _reactBootstrap.Button,
+	                                { bsStyle: 'primary' },
+	                                '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u0430\u0441\u0441\u043A\u043E\u0434'
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var page;
+
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
+	            }
+
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                page,
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return Settings;
+	}(React.Component);
+
+/***/ },
+/* 521 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
