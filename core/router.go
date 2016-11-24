@@ -79,5 +79,10 @@ func getApiRouter(baseRouter *gin.Engine) {
 			errors.GET("/get_all_errors", controllers.GetAllErrors)
 			errors.POST("/close_error", controllers.CloseError)
 		}
+
+		history := api.Group("/history")
+		{
+			history.GET("/get_all_history", controllers.GetAllHistory)
+		}
 	}
 }

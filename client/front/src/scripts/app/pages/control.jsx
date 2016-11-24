@@ -18,7 +18,6 @@ export class Control extends React.Component {
         this.generatePage = this.generatePage.bind(this);
     }
 
-
     loadPage() {
         checkUser().then((response) => {
             var logged = false;

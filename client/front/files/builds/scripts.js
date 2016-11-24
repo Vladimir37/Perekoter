@@ -64,7 +64,9 @@
 
 	var _issues = __webpack_require__(518);
 
-	var _ = __webpack_require__(519);
+	var _history = __webpack_require__(519);
+
+	var _ = __webpack_require__(520);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -75,6 +77,7 @@
 	    React.createElement(_reactRouter.Route, { path: '/control', component: _control.Control }),
 	    React.createElement(_reactRouter.Route, { path: '/errors', component: _errors.Errors }),
 	    React.createElement(_reactRouter.Route, { path: '/issues', component: _issues.Issues }),
+	    React.createElement(_reactRouter.Route, { path: '/history', component: _history.History }),
 	    React.createElement(_reactRouter.Route, { path: '*', component: _.NotFound })
 	), document.getElementById('root'));
 
@@ -48812,8 +48815,7 @@
 	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
 	                        )
 	                    )
-	                ),
-	                ';'
+	                )
 	            );
 	        }
 	    }, {
@@ -48844,6 +48846,239 @@
 
 /***/ },
 /* 519 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.History = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var History = exports.History = function (_React$Component) {
+	    _inherits(History, _React$Component);
+
+	    function History(props) {
+	        _classCallCheck(this, History);
+
+	        var _this = _possibleConstructorReturn(this, (History.__proto__ || Object.getPrototypeOf(History)).call(this, props));
+
+	        _this.state = {
+	            history: [],
+	            totalLength: 0,
+	            currentLength: 10,
+	            historyLoaded: false,
+	            error: false,
+	            loaded: false,
+	            logged: false
+	        };
+
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.loadHistory = _this.loadHistory.bind(_this);
+	        _this.morePoints = _this.morePoints.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(History, [{
+	        key: 'loadHistory',
+	        value: function loadHistory() {
+	            var _this2 = this;
+
+	            _axios2.default.get('/api/history/get_all_history').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this2.setState({
+	                        history: response.body,
+	                        totalLength: response.body.length,
+	                        historyLoaded: true
+	                    });
+	                } else {
+	                    _this2.setState({
+	                        error: "Ошибка сервера",
+	                        historyLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this2.setState({
+	                    error: "Ошибка сервера",
+	                    historyLoaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this3 = this;
+
+	            (0, _checkUser.checkUser)().then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
+	                _this3.setState({
+	                    loaded: true,
+	                    logged: logged
+	                });
+	            }).catch(function (page) {
+	                _this3.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'morePoints',
+	        value: function morePoints() {
+	            this.setState({
+	                currentLength: this.state.currentLength + 10
+	            });
+	        }
+	    }, {
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            var errorPanel;
+	            var moreButton;
+	            if (this.state.error) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.error
+	                );
+	            }
+
+	            if (this.state.currentLength < this.state.totalLength) {
+	                moreButton = React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', onClick: this.morePoints },
+	                    '\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0435\u0449\u0451'
+	                );
+	            }
+
+	            if (!this.state.historyLoaded) {
+	                this.loadHistory();
+	            }
+
+	            var points = this.state.history.slice(0, this.state.currentLength).map(function (point) {
+	                var date = new Date(point.CreatedAt);
+	                date = date.getHours() + ':' + date.getMinutes() + ' ' + date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear();
+	                return React.createElement(
+	                    'tr',
+	                    { key: point.ID },
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        point.ID
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        point.Text
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        date
+	                    )
+	                );
+	            });
+
+	            return React.createElement(
+	                'main',
+	                null,
+	                errorPanel,
+	                React.createElement(
+	                    _reactBootstrap.Table,
+	                    { striped: true, bordered: true, condensed: true, hover: true },
+	                    React.createElement(
+	                        'thead',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '#'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0422\u0435\u043A\u0441\u0442'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0414\u0430\u0442\u0430'
+	                            )
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        points
+	                    )
+	                ),
+	                moreButton
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var page;
+
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
+	            }
+
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                page,
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return History;
+	}(React.Component);
+
+/***/ },
+/* 520 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

@@ -6,6 +6,7 @@ import {Main} from './app/pages/main.jsx';
 import {Control} from './app/pages/control.jsx';
 import {Errors} from './app/pages/errors.jsx';
 import {Issues} from './app/pages/issues.jsx';
+import {History} from './app/pages/history.jsx';
 import {NotFound} from './app/pages/404.jsx';
 
 ReactDOM.render(
@@ -14,6 +15,7 @@ ReactDOM.render(
         <Route path='/control' component={Control}/>
         <Route path='/errors' component={Errors}/>
         <Route path='/issues' component={Issues}/>
+        <Route path='/history' component={History}/>
         <Route path='*' component={NotFound}/>
     </Router>,
     document.getElementById('root')
