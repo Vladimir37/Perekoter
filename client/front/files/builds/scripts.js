@@ -49107,6 +49107,8 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -49122,10 +49124,18 @@
 	        var _this = _possibleConstructorReturn(this, (Settings.__proto__ || Object.getPrototypeOf(Settings)).call(this, props));
 
 	        _this.state = {
+	            showDataModal: false,
+	            showUserModal: false,
+	            showPasscodeModal: false,
 	            loaded: false,
 	            logged: false
 	        };
 
+	        _this.generateDataModal = _this.generateDataModal.bind(_this);
+	        _this.generateUserModal = _this.generateUserModal.bind(_this);
+	        _this.generatePasscodeModal = _this.generatePasscodeModal.bind(_this);
+	        _this.openModal = _this.openModal.bind(_this);
+	        _this.closeModal = _this.closeModal.bind(_this);
 	        _this.loadPage = _this.loadPage.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
@@ -49151,6 +49161,371 @@
 	                    loaded: true
 	                });
 	            });
+	        }
+	    }, {
+	        key: 'openModal',
+	        value: function openModal(type) {
+	            var _this3 = this;
+
+	            return function () {
+	                _this3.setState(_defineProperty({}, 'show' + type + 'Modal', true));
+	            };
+	        }
+	    }, {
+	        key: 'closeModal',
+	        value: function closeModal() {
+	            this.setState({
+	                showDataModal: false,
+	                showUserModal: false,
+	                showPasscodeModal: false
+	            });
+	        }
+	    }, {
+	        key: 'changeForm',
+	        value: function changeForm(type) {
+	            var _this4 = this;
+
+	            return function (e) {
+	                _this4.setState(_defineProperty({}, type, e.target.value));
+	            };
+	        }
+	    }, {
+	        key: 'changeCheckbox',
+	        value: function changeCheckbox(type) {
+	            var _this5 = this;
+
+	            return function (e) {
+	                _this5.setState(_defineProperty({}, type, e.target.checked));
+	            };
+	        }
+	    }, {
+	        key: 'generateDataModal',
+	        value: function generateDataModal() {
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showDataModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0418\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u0434\u0430\u043D\u043D\u044B\u0445'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'login-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u041B\u043E\u0433\u0438\u043D'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.login,
+	                            placeholder: '\u041B\u043E\u0433\u0438\u043D',
+	                            onChange: this.changeForm("login")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'pass-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u041F\u0430\u0440\u043E\u043B\u044C'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'password',
+	                            value: this.state.password,
+	                            placeholder: '\u041F\u0430\u0440\u043E\u043B\u044C',
+	                            onChange: this.changeForm("password")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'period-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0427\u0430\u0441\u0442\u043E\u0442\u0430 \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438 \u0442\u0440\u0435\u0434\u0430'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.period,
+	                            placeholder: '\u0427\u0430\u0441\u0442\u043E\u0442\u0430 \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438',
+	                            onChange: this.changeForm("period")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'base-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C\u044B\u0439 \u0434\u043E\u043C\u0435\u043D'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.base,
+	                            placeholder: '\u0410\u0434\u0440\u0435\u0441',
+	                            onChange: this.changeForm("base")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'bot-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0418\u043C\u044F \u0431\u043E\u0442\u0430 (\u0434\u043E\u043F\u0443\u0441\u043A\u0430\u0435\u0442\u0441\u044F \u0442\u0440\u0438\u043F\u043A\u043E\u0434)'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.botname,
+	                            placeholder: '\u0418\u043C\u044F \u0431\u043E\u0442\u0430',
+	                            onChange: this.changeForm("botname")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0423\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F \u043E \u041F\u0435\u0440\u0435\u043A\u043E\u0442\u0435 \u0432 \u0442\u043E\u043D\u0443\u0449\u0435\u043C \u0442\u0440\u0435\u0434\u0435'
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Checkbox,
+	                            {
+	                                value: this.state.notification,
+	                                onChange: this.changeCheckbox("notification")
+	                            },
+	                            '\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-text-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0422\u0435\u043A\u0441\u0442 \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F (\u043F\u043E\u0441\u043B\u0435 \u043D\u0435\u0433\u043E \u0441\u0442\u0430\u0432\u0438\u0442\u0441\u044F \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430 \u0431\u0435\u0437 ">>")'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.notification_text,
+	                            disabled: this.state.notification,
+	                            placeholder: '\u0422\u0435\u043A\u0441\u0442 \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F',
+	                            onChange: this.changeForm("notification_text")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-text-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0421\u0435\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043A\u043B\u044E\u0447 (\u043F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F \u0434\u043B\u044F \u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u0438\u044F)'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.secret_key,
+	                            placeholder: '\u0421\u0435\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043A\u043B\u044E\u0447',
+	                            onChange: this.changeForm("secret_key")
+	                        })
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success' },
+	                        '\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'generateUserModal',
+	        value: function generateUserModal() {
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showUserModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0418\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u044E\u0437\u0435\u0440\u0430'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'lod-login-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0421\u0442\u0430\u0440\u044B\u0439 \u043B\u043E\u0433\u0438\u043D'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.old_login,
+	                            placeholder: '\u0421\u0442\u0430\u0440\u044B\u0439 \u043B\u043E\u0433\u0438\u043D',
+	                            onChange: this.changeForm("old_login")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-text-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0421\u0442\u0430\u0440\u044B\u0439 \u043F\u0430\u0440\u043E\u043B\u044C'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'password',
+	                            value: this.state.old_pass,
+	                            placeholder: '\u0421\u0442\u0430\u0440\u044B\u0439 \u043F\u0430\u0440\u043E\u043B\u044C',
+	                            onChange: this.changeForm("old_pass")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-text-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u041D\u043E\u0432\u044B\u0439 \u043B\u043E\u0433\u0438\u043D'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.new_login,
+	                            placeholder: '\u041D\u043E\u0432\u044B\u0439 \u043B\u043E\u0433\u0438\u043D',
+	                            onChange: this.changeForm("new_login")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-text-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u041D\u043E\u0432\u044B\u0439 \u043F\u0430\u0440\u043E\u043B\u044C'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.new_pass,
+	                            placeholder: '\u0421\u0435\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043A\u043B\u044E\u0447',
+	                            onChange: this.changeForm("new_pass")
+	                        })
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success' },
+	                        '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u044E\u0437\u0435\u0440\u0430'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'generatePasscodeModal',
+	        value: function generatePasscodeModal() {
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showPasscodeModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0418\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043F\u0430\u0441\u0441\u043A\u043E\u0434\u0430'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'notification-text-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C\u044B\u0439 \u043F\u0430\u0441\u0441\u043A\u043E\u0434'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.passcode,
+	                            placeholder: '\u041F\u0430\u0441\u0441\u043A\u043E\u0434',
+	                            onChange: this.changeForm("passcode")
+	                        })
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success' },
+	                        '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u0430\u0441\u0441\u043A\u043E\u0434'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
 	        }
 	    }, {
 	        key: 'generatePage',
@@ -49265,7 +49640,7 @@
 	                            { md: 3 },
 	                            React.createElement(
 	                                _reactBootstrap.Button,
-	                                { bsStyle: 'primary' },
+	                                { bsStyle: 'primary', onClick: this.openModal('Data') },
 	                                '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435'
 	                            )
 	                        ),
@@ -49274,7 +49649,7 @@
 	                            { md: 3 },
 	                            React.createElement(
 	                                _reactBootstrap.Button,
-	                                { bsStyle: 'primary' },
+	                                { bsStyle: 'primary', onClick: this.openModal('User') },
 	                                '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u044E\u0437\u0435\u0440\u0430'
 	                            )
 	                        ),
@@ -49283,12 +49658,15 @@
 	                            { md: 3 },
 	                            React.createElement(
 	                                _reactBootstrap.Button,
-	                                { bsStyle: 'primary' },
+	                                { bsStyle: 'primary', onClick: this.openModal('Passcode') },
 	                                '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u0430\u0441\u0441\u043A\u043E\u0434'
 	                            )
 	                        )
 	                    )
-	                )
+	                ),
+	                this.generateDataModal(),
+	                this.generateUserModal(),
+	                this.generatePasscodeModal()
 	            );
 	        }
 	    }, {
