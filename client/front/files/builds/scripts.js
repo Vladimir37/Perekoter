@@ -49248,7 +49248,57 @@
 	    }, {
 	        key: 'sendData',
 	        value: function sendData() {
-	            var allData = this.state.login && this.state.password && this.state.period && this.state.base && this.state.notification && this.state.secret_key;
+	            var _this7 = this;
+
+	            var allData = this.state.login && this.state.password && this.state.period && this.state.base && this.state.notification_text && this.state.secret_key;
+
+	            if (!allData) {
+	                this.setState({
+	                    errorData: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            var key_length = this.state.secret_key.length;
+
+	            if (key_length != 16 && key_length != 24 && key_length != 32) {
+	                this.setState({
+	                    errorData: "Неверное количество символов в секретном ключе"
+	                });
+	                return false;
+	            }
+
+	            _axios2.default.post('/api/settings/set_settings', {
+	                login: this.state.login,
+	                password: this.state.password,
+	                period: Number(this.state.period),
+	                base: this.state.base,
+	                botname: this.state.botname,
+	                notification: this.state.notification,
+	                notification_text: this.state.notification_text,
+	                secret_key: this.state.secret_key
+	            }).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this7.setState({
+	                        errorData: null
+	                    });
+	                    _this7.getSettingsData();
+	                    _this7.closeModal();
+	                } else if (response.status == 2) {
+	                    _this7.setState({
+	                        errorData: "Неверный логин или пароль"
+	                    });
+	                } else {
+	                    _this7.setState({
+	                        errorData: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this7.setState({
+	                    errorData: "Ошибка сервера"
+	                });
+	            });
 	        }
 	    }, {
 	        key: 'sendUser',
@@ -49263,6 +49313,15 @@
 	    }, {
 	        key: 'generateDataModal',
 	        value: function generateDataModal() {
+	            var errorPanel;
+	            if (this.state.errorData) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorData
+	                );
+	            }
+
 	            return React.createElement(
 	                _reactBootstrap.Modal,
 	                { show: this.state.showDataModal, onHide: this.closeModal },
@@ -49278,6 +49337,7 @@
 	                React.createElement(
 	                    _reactBootstrap.Modal.Body,
 	                    null,
+	                    errorPanel,
 	                    React.createElement(
 	                        _reactBootstrap.FormGroup,
 	                        {

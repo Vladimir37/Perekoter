@@ -22,13 +22,13 @@ func (c *ConfigOperator) Read() {
 func (c *ConfigOperator) Write(data ConfigStruct) error {
 	newConfig, errFormat := json.Marshal(data)
 	if errFormat != nil {
-		NewError("Failing to formate new config")
+		NewError("Failed to formate new config (utility)")
 		return errFormat
 	}
 
-	errWriting := ioutil.WriteFile("./config", newConfig, 0777)
-	if errWriting == nil {
-		NewError("Failing to write new config")
+	errWriting := ioutil.WriteFile("./config.json", newConfig, 0777)
+	if errWriting != nil {
+		NewError("Failed to write new config (utility)")
 		return errWriting
 	} else {
 		c.Config = data

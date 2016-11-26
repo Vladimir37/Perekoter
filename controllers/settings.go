@@ -29,7 +29,7 @@ func SetSetting(c *gin.Context) {
 	}
 
 	if len(request.SecretKey) != 16 && len(request.SecretKey) != 24 && len(request.SecretKey) != 32 {
-		go utility.NewError("Failed to write to config")
+		go utility.NewError("Incorrect secret key length")
 		c.JSON(200, gin.H{
 			"status": 4,
 		})
