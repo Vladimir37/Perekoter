@@ -48810,7 +48810,7 @@
 	                        React.createElement(
 	                            _reactBootstrap.Button,
 	                            { bsStyle: 'success', onClick: this.closeIssue(this.state.currentIssue.ID) },
-	                            '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C'
+	                            '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
 	                        ),
 	                        React.createElement(
 	                            _reactBootstrap.Button,
@@ -49099,11 +49099,17 @@
 
 	var _reactBootstrap = __webpack_require__(237);
 
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
 	var _header = __webpack_require__(236);
 
 	var _footer = __webpack_require__(514);
 
 	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -49127,10 +49133,19 @@
 	            showDataModal: false,
 	            showUserModal: false,
 	            showPasscodeModal: false,
+	            errorData: null,
+	            errorUser: null,
+	            errorPasscode: null,
+	            settingsLoaded: false,
+	            errorLoading: null,
+	            settings: {},
 	            loaded: false,
 	            logged: false
 	        };
 
+	        _this.sendData = _this.sendData.bind(_this);
+	        _this.sendUser = _this.sendUser.bind(_this);
+	        _this.sendPasscode = _this.sendPasscode.bind(_this);
 	        _this.generateDataModal = _this.generateDataModal.bind(_this);
 	        _this.generateUserModal = _this.generateUserModal.bind(_this);
 	        _this.generatePasscodeModal = _this.generatePasscodeModal.bind(_this);
@@ -49163,12 +49178,44 @@
 	            });
 	        }
 	    }, {
-	        key: 'openModal',
-	        value: function openModal(type) {
+	        key: 'getSettingsData',
+	        value: function getSettingsData() {
 	            var _this3 = this;
 
+	            _axios2.default.get('/api/settings/get_settings').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this3.setState({
+	                        settings: response.body,
+	                        settingsLoaded: true,
+	                        period: response.body.Period,
+	                        base: response.body.Base,
+	                        botname: response.body.Botname,
+	                        notification: response.body.Notification,
+	                        notification_text: response.body.NotificationText,
+	                        secret_key: response.body.SecretKey,
+	                        passcode: response.body.Passcode
+	                    });
+	                } else {
+	                    _this3.setState({
+	                        errorLoading: "Ошибка сервера",
+	                        settingsLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this3.setState({
+	                    errorLoading: "Ошибка сервера",
+	                    settingsLoaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'openModal',
+	        value: function openModal(type) {
+	            var _this4 = this;
+
 	            return function () {
-	                _this3.setState(_defineProperty({}, 'show' + type + 'Modal', true));
+	                _this4.setState(_defineProperty({}, 'show' + type + 'Modal', true));
 	            };
 	        }
 	    }, {
@@ -49183,20 +49230,35 @@
 	    }, {
 	        key: 'changeForm',
 	        value: function changeForm(type) {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            return function (e) {
-	                _this4.setState(_defineProperty({}, type, e.target.value));
+	                _this5.setState(_defineProperty({}, type, e.target.value));
 	            };
 	        }
 	    }, {
 	        key: 'changeCheckbox',
 	        value: function changeCheckbox(type) {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            return function (e) {
-	                _this5.setState(_defineProperty({}, type, e.target.checked));
+	                _this6.setState(_defineProperty({}, type, e.target.checked));
 	            };
+	        }
+	    }, {
+	        key: 'sendData',
+	        value: function sendData() {
+	            var allData = this.state.login && this.state.password && this.state.period && this.state.base && this.state.notification && this.state.secret_key;
+	        }
+	    }, {
+	        key: 'sendUser',
+	        value: function sendUser() {
+	            //
+	        }
+	    }, {
+	        key: 'sendPasscode',
+	        value: function sendPasscode() {
+	            //
 	        }
 	    }, {
 	        key: 'generateDataModal',
@@ -49314,7 +49376,8 @@
 	                        React.createElement(
 	                            _reactBootstrap.Checkbox,
 	                            {
-	                                value: this.state.notification,
+	                                value: true,
+	                                checked: this.state.notification,
 	                                onChange: this.changeCheckbox("notification")
 	                            },
 	                            '\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F'
@@ -49333,7 +49396,7 @@
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
 	                            value: this.state.notification_text,
-	                            disabled: this.state.notification,
+	                            disabled: !this.state.notification,
 	                            placeholder: '\u0422\u0435\u043A\u0441\u0442 \u0443\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F',
 	                            onChange: this.changeForm("notification_text")
 	                        })
@@ -49346,7 +49409,7 @@
 	                        React.createElement(
 	                            _reactBootstrap.ControlLabel,
 	                            null,
-	                            '\u0421\u0435\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043A\u043B\u044E\u0447 (\u043F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F \u0434\u043B\u044F \u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u0438\u044F)'
+	                            '\u041A\u043B\u044E\u0447 \u0434\u043B\u044F \u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u0438\u044F (\u0442\u043E\u043B\u044C\u043A\u043E 16, 24 \u0438\u043B\u0438 32 \u0441\u0438\u043C\u0432\u043E\u043B\u0430)'
 	                        ),
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
@@ -49361,7 +49424,7 @@
 	                    null,
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { bsStyle: 'success' },
+	                        { bsStyle: 'success', onClick: this.sendData },
 	                        '\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435'
 	                    ),
 	                    React.createElement(
@@ -49464,7 +49527,7 @@
 	                    null,
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { bsStyle: 'success' },
+	                        { bsStyle: 'success', onClick: this.sendUser },
 	                        '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u044E\u0437\u0435\u0440\u0430'
 	                    ),
 	                    React.createElement(
@@ -49496,6 +49559,40 @@
 	                    React.createElement(
 	                        _reactBootstrap.FormGroup,
 	                        {
+	                            controlId: 'login-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u041B\u043E\u0433\u0438\u043D'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.login,
+	                            placeholder: '\u041B\u043E\u0433\u0438\u043D',
+	                            onChange: this.changeForm("login")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
+	                            controlId: 'pass-data'
+	                        },
+	                        React.createElement(
+	                            _reactBootstrap.ControlLabel,
+	                            null,
+	                            '\u041F\u0430\u0440\u043E\u043B\u044C'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'password',
+	                            value: this.state.password,
+	                            placeholder: '\u041F\u0430\u0440\u043E\u043B\u044C',
+	                            onChange: this.changeForm("password")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.FormGroup,
+	                        {
 	                            controlId: 'notification-text-data'
 	                        },
 	                        React.createElement(
@@ -49516,7 +49613,7 @@
 	                    null,
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { bsStyle: 'success' },
+	                        { bsStyle: 'success', onClick: this.sendPasscode },
 	                        '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u0430\u0441\u0441\u043A\u043E\u0434'
 	                    ),
 	                    React.createElement(
@@ -49530,9 +49627,19 @@
 	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
+	            var errorPanel;
+	            if (this.state.errorLoading) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorLoading
+	                );
+	            }
+
 	            return React.createElement(
 	                'main',
 	                null,
+	                errorPanel,
 	                React.createElement(
 	                    'article',
 	                    { className: 'settings' },
@@ -49553,7 +49660,7 @@
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                    this.state.settings.Period
 	                                )
 	                            ),
 	                            React.createElement(
@@ -49567,7 +49674,7 @@
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                    this.state.settings.Base
 	                                )
 	                            ),
 	                            React.createElement(
@@ -49576,12 +49683,12 @@
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u0418\u043C\u044F \u0431\u043E\u0442\u0430 (\u0434\u043E\u043F\u0443\u0441\u043A\u0430\u0435\u0442\u0441\u044F \u0442\u0440\u0438\u043F\u043A\u043E\u0434)'
+	                                    '\u0418\u043C\u044F \u0431\u043E\u0442\u0430'
 	                                ),
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                    this.state.settings.Botname
 	                                )
 	                            ),
 	                            React.createElement(
@@ -49595,7 +49702,7 @@
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                    this.state.settings.Notification ? "Yes" : "No"
 	                                )
 	                            ),
 	                            React.createElement(
@@ -49609,7 +49716,7 @@
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                    this.state.settings.NotificationText
 	                                )
 	                            ),
 	                            React.createElement(
@@ -49623,7 +49730,21 @@
 	                                React.createElement(
 	                                    'td',
 	                                    null,
-	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                    this.state.settings.SecretKey
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    '\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C\u044B\u0439 \u043F\u0430\u0441\u0441\u043A\u043E\u0434'
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    null,
+	                                    this.state.settings.Passcode
 	                                )
 	                            )
 	                        )
@@ -49673,6 +49794,10 @@
 	        key: 'render',
 	        value: function render() {
 	            var page;
+
+	            if (!this.state.settingsLoaded) {
+	                this.getSettingsData();
+	            }
 
 	            if (!this.state.loaded) {
 	                this.loadPage();

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {Modal, FormGroup, FormControl, ControlLabel, Checkbox, Table, Button, Grid, Col, Row} from 'react-bootstrap';
+import {Modal, FormGroup, FormControl, ControlLabel, Checkbox, Table, Button, Grid, Col, Row, Alert} from 'react-bootstrap';
+import Axios from 'axios';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
 import {checkUser, forbiddenGenerator} from '../utility/checkUser.jsx';
@@ -13,10 +14,19 @@ export class Settings extends React.Component {
             showDataModal: false,
             showUserModal: false,
             showPasscodeModal: false,
+            errorData: null,
+            errorUser: null,
+            errorPasscode: null,
+            settingsLoaded: false,
+            errorLoading: null,
+            settings: {},
             loaded: false,
             logged: false
         };
 
+        this.sendData = this.sendData.bind(this);
+        this.sendUser = this.sendUser.bind(this);
+        this.sendPasscode = this.sendPasscode.bind(this);
         this.generateDataModal = this.generateDataModal.bind(this);
         this.generateUserModal = this.generateUserModal.bind(this);
         this.generatePasscodeModal = this.generatePasscodeModal.bind(this);
@@ -42,6 +52,37 @@ export class Settings extends React.Component {
                 loaded: true
             });
         });
+    }
+
+    getSettingsData() {
+        Axios.get('/api/settings/get_settings')
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        settings: response.body,
+                        settingsLoaded: true,
+                        period: response.body.Period,
+                        base: response.body.Base,
+                        botname: response.body.Botname,
+                        notification: response.body.Notification,
+                        notification_text: response.body.NotificationText,
+                        secret_key: response.body.SecretKey,
+                        passcode: response.body.Passcode
+                    });
+                } else {
+                    this.setState({
+                        errorLoading: "Ошибка сервера",
+                        settingsLoaded: true
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorLoading: "Ошибка сервера",
+                    settingsLoaded: true
+                });
+            });
     }
 
     openModal(type) {
@@ -74,6 +115,19 @@ export class Settings extends React.Component {
                 [type]: e.target.checked
             });
         }
+    }
+
+    sendData() {
+        var allData = (this.state.login && this.state.password && this.state.period && this.state.base
+            && this.state.notification && this.state.secret_key);
+    }
+
+    sendUser() {
+        //
+    }
+
+    sendPasscode() {
+        //
     }
 
     generateDataModal() {
@@ -142,7 +196,8 @@ export class Settings extends React.Component {
                 >
                     <ControlLabel>Уведомления о Перекоте в тонущем треде</ControlLabel>
                     <Checkbox
-                        value={this.state.notification}
+                        value={true}
+                        checked={this.state.notification}
                         onChange={this.changeCheckbox("notification")}
                     >Включить уведомления</Checkbox>
                 </FormGroup>
@@ -153,7 +208,7 @@ export class Settings extends React.Component {
                     <FormControl
                         type="text"
                         value={this.state.notification_text}
-                        disabled={this.state.notification}
+                        disabled={!this.state.notification}
                         placeholder="Текст уведомления"
                         onChange={this.changeForm("notification_text")}
                     />
@@ -161,7 +216,7 @@ export class Settings extends React.Component {
                 <FormGroup
                     controlId="notification-text-data"
                 >
-                    <ControlLabel>Секретный ключ (применяется для шифрования)</ControlLabel>
+                    <ControlLabel>Ключ для шифрования (только 16, 24 или 32 символа)</ControlLabel>
                     <FormControl
                         type="text"
                         value={this.state.secret_key}
@@ -171,7 +226,7 @@ export class Settings extends React.Component {
                 </FormGroup>
             </Modal.Body>
             <Modal.Footer>
-                <Button bsStyle="success">Сохранить данные</Button>
+                <Button bsStyle="success" onClick={this.sendData}>Сохранить данные</Button>
                 <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
             </Modal.Footer>
         </Modal>;
@@ -229,7 +284,7 @@ export class Settings extends React.Component {
                 </FormGroup>
             </Modal.Body>
             <Modal.Footer>
-                <Button bsStyle="success">Изменить юзера</Button>
+                <Button bsStyle="success" onClick={this.sendUser}>Изменить юзера</Button>
                 <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
             </Modal.Footer>
         </Modal>;
@@ -241,6 +296,28 @@ export class Settings extends React.Component {
                 <Modal.Title>Изменение пасскода</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                <FormGroup
+                    controlId="login-data"
+                >
+                    <ControlLabel>Логин</ControlLabel>
+                    <FormControl
+                        type="text"
+                        value={this.state.login}
+                        placeholder="Логин"
+                        onChange={this.changeForm("login")}
+                    />
+                </FormGroup>
+                <FormGroup
+                    controlId="pass-data"
+                >
+                    <ControlLabel>Пароль</ControlLabel>
+                    <FormControl
+                        type="password"
+                        value={this.state.password}
+                        placeholder="Пароль"
+                        onChange={this.changeForm("password")}
+                    />
+                </FormGroup>
                 <FormGroup
                     controlId="notification-text-data"
                 >
@@ -254,40 +331,50 @@ export class Settings extends React.Component {
                 </FormGroup>
             </Modal.Body>
             <Modal.Footer>
-                <Button bsStyle="success">Изменить пасскод</Button>
+                <Button bsStyle="success" onClick={this.sendPasscode}>Изменить пасскод</Button>
                 <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
             </Modal.Footer>
         </Modal>;
     }
 
     generatePage() {
+        var errorPanel;
+        if (this.state.errorLoading) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorLoading}</Alert>;
+        }
+
         return <main>
+            {errorPanel}
             <article className="settings">
                 <Table striped bordered condensed hover>
                     <tbody>
                         <tr>
                         <td>Частота проверки (в минутах)</td>
-                        <td>Название</td>
+                        <td>{this.state.settings.Period}</td>
                     </tr>
                     <tr>
                         <td>Адрес</td>
-                        <td>Название</td>
+                        <td>{this.state.settings.Base}</td>
                     </tr>
                     <tr>
-                        <td>Имя бота (допускается трипкод)</td>
-                        <td>Название</td>
+                        <td>Имя бота</td>
+                        <td>{this.state.settings.Botname}</td>
                     </tr>
                     <tr>
                         <td>Уведомления в тонущий тред</td>
-                        <td>Название</td>
+                        <td>{this.state.settings.Notification ? "Yes" : "No"}</td>
                     </tr>
                     <tr>
                         <td>Текст уведомления (после текста идёт номер треда без ">>")</td>
-                        <td>Название</td>
+                        <td>{this.state.settings.NotificationText}</td>
                     </tr>
                     <tr>
                         <td>Секретный ключ (для шифрования)</td>
-                        <td>Название</td>
+                        <td>{this.state.settings.SecretKey}</td>
+                    </tr>
+                    <tr>
+                        <td>Используемый пасскод</td>
+                        <td>{this.state.settings.Passcode}</td>
                     </tr>
                     </tbody>
                 </Table>
@@ -313,6 +400,10 @@ export class Settings extends React.Component {
     
     render() {
         var page;
+
+        if (!this.state.settingsLoaded) {
+            this.getSettingsData();
+        }
 
         if (!this.state.loaded) {
             this.loadPage();

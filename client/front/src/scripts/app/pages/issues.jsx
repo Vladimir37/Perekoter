@@ -83,7 +83,7 @@ export class Issues extends React.Component {
             .catch((err) => {
                 this.setState({
                     error: "Ошибка сервера",
-                        issuesLoaded: true
+                    issuesLoaded: true
                 });
             });
     }
@@ -197,7 +197,7 @@ export class Issues extends React.Component {
                     <a href={this.state.currentIssue.Link} target="_blank">{this.state.currentIssue.Link}</a>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button bsStyle="success" onClick={this.closeIssue(this.state.currentIssue.ID)}>Отправить</Button>
+                    <Button bsStyle="success" onClick={this.closeIssue(this.state.currentIssue.ID)}>Просмотрено</Button>
                     <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
                 </Modal.Footer>
             </Modal>
