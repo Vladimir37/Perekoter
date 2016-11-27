@@ -44,45 +44,45 @@ func getApiRouter(baseRouter *gin.Engine) {
 		{
 			boards.GET("get_all_boards", controllers.GetAllBoards)
 			boards.GET("get_board", controllers.GetBoard)
-			boards.POST("add_board", controllers.AddBoard)
-			boards.POST("edit_board", controllers.EditBoard)
-			boards.POST("delete_board", controllers.DeleteBoard)
+			boards.POST("add_board", controllers.CheckMiddleware, controllers.AddBoard)
+			boards.POST("edit_board", controllers.CheckMiddleware, controllers.EditBoard)
+			boards.POST("delete_board", controllers.CheckMiddleware, controllers.DeleteBoard)
 		}
 
 		threads := api.Group("/threads")
 		{
 			threads.GET("get_all_threads", controllers.GetAllThreads)
 			threads.GET("get_thread", controllers.GetThread)
-			threads.POST("add_thread", controllers.AddThread)
-			threads.POST("edit_thread", controllers.EditThread)
-			threads.POST("upload_image", controllers.UploadImage)
-			threads.POST("delete_thread", controllers.DeleteThread)
+			threads.POST("add_thread", controllers.CheckMiddleware, controllers.AddThread)
+			threads.POST("edit_thread", controllers.CheckMiddleware, controllers.EditThread)
+			threads.POST("upload_image", controllers.CheckMiddleware, controllers.UploadImage)
+			threads.POST("delete_thread", controllers.CheckMiddleware, controllers.DeleteThread)
 		}
 
 		settings := api.Group("/settings")
 		{
-			settings.GET("/get_settings", controllers.GetSettings)
-			settings.POST("/set_settings", controllers.SetSetting)
-			settings.POST("/set_user", controllers.SetUser)
-			settings.POST("/change_passcode", controllers.ChangePasscode)
+			settings.GET("/get_settings", controllers.CheckMiddleware, controllers.GetSettings)
+			settings.POST("/set_settings", controllers.CheckMiddleware, controllers.SetSetting)
+			settings.POST("/set_user", controllers.CheckMiddleware, controllers.SetUser)
+			settings.POST("/change_passcode", controllers.CheckMiddleware, controllers.ChangePasscode)
 		}
 
 		issues := api.Group("/issues")
 		{
-			issues.GET("/get_all_issues", controllers.GetAllIssues)
+			issues.GET("/get_all_issues", controllers.CheckMiddleware, controllers.GetAllIssues)
 			issues.POST("/send_issue", controllers.SendIssue)
-			issues.POST("/close_issue", controllers.CloseIssue)
+			issues.POST("/close_issue", controllers.CheckMiddleware, controllers.CloseIssue)
 		}
 
-		errors := api.Group("/errors") 
+		errors := api.Group("/errors")
 		{
-			errors.GET("/get_all_errors", controllers.GetAllErrors)
-			errors.POST("/close_error", controllers.CloseError)
+			errors.GET("/get_all_errors", controllers.CheckMiddleware, controllers.GetAllErrors)
+			errors.POST("/close_error", controllers.CheckMiddleware, controllers.CloseError)
 		}
 
 		history := api.Group("/history")
 		{
-			history.GET("/get_all_history", controllers.GetAllHistory)
+			history.GET("/get_all_history", controllers.CheckMiddleware, controllers.GetAllHistory)
 		}
 	}
 }

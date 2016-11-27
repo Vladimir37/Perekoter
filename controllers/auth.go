@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"Perekoter/utility"
 	"Perekoter/models"
+	"Perekoter/utility"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +18,7 @@ func Login(c *gin.Context) {
 		if err != nil {
 			go utility.NewHistoryPoint("Encription error")
 			go utility.NewError("Failed to encrypt password")
-			
+
 			c.JSON(200, gin.H{
 				"status": 2,
 			})
@@ -58,13 +58,12 @@ func CheckMiddleware(c *gin.Context) {
 		return
 	}
 
-	if config.Password == code {
-		c.Next()
-	} else {
+	if config.Password != code {
 		c.JSON(403, gin.H{
 			"status": 10,
 		})
 		c.AbortWithStatus(403)
+		return
 	}
 }
 
@@ -112,6 +111,6 @@ func AdminData(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status": 0,
-		"body": response,
+		"body":   response,
 	})
 }

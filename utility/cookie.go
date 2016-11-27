@@ -14,6 +14,7 @@ func SetCookie(c *gin.Context, key string, value string) {
 		Name:    key,
 		Value:   value,
 		Expires: expiration,
+		Path:    "/",
 	}
 	http.SetCookie(c.Writer, &cookie)
 }
