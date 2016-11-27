@@ -75,7 +75,7 @@ type ConfigRequest struct {
 	Period           int    `json:"period" binding:"required"`
 	Base             string `json:"base" binding:"required"`
 	Botname          string `json:"botname" binding:"required"`
-	Notification     bool   `json:"notification" binding:"required"`
+	Notification     bool   `json:"notification"`
 	NotificationText string `json:"notification_text" binding:"required"`
 	SecretKey        string `json:"secret_key" binding:"required"`
 }

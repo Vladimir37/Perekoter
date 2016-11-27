@@ -110,7 +110,7 @@ func ChangePasscode(c *gin.Context) {
 			"status": 3,
 		})
 	} else {
-		go utility.NewHistoryPoint("User was edited")
+		go utility.NewHistoryPoint("Passcode was edited")
 		c.JSON(200, gin.H{
 			"status": 0,
 		})

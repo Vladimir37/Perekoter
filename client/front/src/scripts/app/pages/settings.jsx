@@ -137,7 +137,7 @@ export class Settings extends React.Component {
             return false;
         }
 
-        Axios.post('/api/settings/set_settings', {
+        var req_data = {
             login: this.state.login,
             password: this.state.password,
             period: Number(this.state.period),
@@ -146,7 +146,10 @@ export class Settings extends React.Component {
             notification: this.state.notification,
             notification_text: this.state.notification_text,
             secret_key: this.state.secret_key
-        }).then((response) => {
+        };
+
+        Axios.post('/api/settings/set_settings', req_data)
+            .then((response) => {
                 response = response.data;
                 if (response.status == 0) {
                     this.setState({
@@ -172,11 +175,92 @@ export class Settings extends React.Component {
     }
 
     sendUser() {
-        //
+        var allData = (this.state.old_login && this.state.old_password && this.state.new_login && this.state.new_password);
+
+        if (!allData) {
+            this.setState({
+                errorUser: "Не все поля заполнены"
+            });
+            return false;
+        }
+
+        var req_data = {
+            old_login: this.state.old_login,
+            old_password: this.state.old_password,
+            new_login: this.state.new_login,
+            new_password: this.state.new_password
+        };
+
+        Axios.post('/api/settings/set_user', req_data)
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorUser: null,
+                        old_login: null,
+                        old_password: null,
+                        new_login: null,
+                        new_password: null
+                    })
+                    this.getSettingsData();
+                    this.closeModal();
+                } else if (response.status == 2) {
+                    this.setState({
+                        errorUser: "Неверный старый логин или пароль"
+                    });
+                } else {
+                    this.setState({
+                        errorUser: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorUser: "Ошибка сервера"
+                });
+            });
     }
 
     sendPasscode() {
-        //
+        var allData = (this.state.login && this.state.password && this.state.passcode);
+        if (!allData) {
+            this.setState({
+                errorPasscode: "Не все поля заполнены"
+            });
+            return false;
+        }
+
+        var req_data = {
+            login: this.state.login,
+            password: this.state.password,
+            passcode: this.state.passcode
+        };
+
+        Axios.post('/api/settings/change_passcode', req_data)
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorUser: null,
+                        passcode: null
+                    })
+                    this.getSettingsData();
+                    this.closeModal();
+                } else if (response.status == 2) {
+                    this.setState({
+                        errorPasscode: "Неверный логин или пароль"
+                    });
+                } else {
+                    this.setState({
+                        errorPasscode: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorPasscode: "Ошибка сервера"
+                });
+            });
     }
 
     generateDataModal() {
@@ -288,11 +372,17 @@ export class Settings extends React.Component {
     }
 
     generateUserModal() {
+        var errorPanel;
+        if (this.state.errorUser) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorUser}</Alert>;
+        }
+
         return <Modal show={this.state.showUserModal} onHide={this.closeModal}>
             <Modal.Header closeButton>
                 <Modal.Title>Изменение юзера</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {errorPanel}
                 <FormGroup
                     controlId="lod-login-data"
                 >
@@ -312,7 +402,7 @@ export class Settings extends React.Component {
                         type="password"
                         value={this.state.old_pass}
                         placeholder="Старый пароль"
-                        onChange={this.changeForm("old_pass")}
+                        onChange={this.changeForm("old_password")}
                     />
                 </FormGroup>
                 <FormGroup
@@ -334,7 +424,7 @@ export class Settings extends React.Component {
                         type="text"
                         value={this.state.new_pass}
                         placeholder="Секретный ключ"
-                        onChange={this.changeForm("new_pass")}
+                        onChange={this.changeForm("new_password")}
                     />
                 </FormGroup>
             </Modal.Body>
@@ -346,11 +436,17 @@ export class Settings extends React.Component {
     }
 
     generatePasscodeModal() {
+        var errorPanel;
+        if (this.state.errorPasscode) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorPasscode}</Alert>;
+        }
+
         return <Modal show={this.state.showPasscodeModal} onHide={this.closeModal}>
             <Modal.Header closeButton>
                 <Modal.Title>Изменение пасскода</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {errorPanel}
                 <FormGroup
                     controlId="login-data"
                 >

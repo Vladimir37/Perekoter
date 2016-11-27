@@ -49268,7 +49268,7 @@
 	                return false;
 	            }
 
-	            _axios2.default.post('/api/settings/set_settings', {
+	            var req_data = {
 	                login: this.state.login,
 	                password: this.state.password,
 	                period: Number(this.state.period),
@@ -49277,7 +49277,9 @@
 	                notification: this.state.notification,
 	                notification_text: this.state.notification_text,
 	                secret_key: this.state.secret_key
-	            }).then(function (response) {
+	            };
+
+	            _axios2.default.post('/api/settings/set_settings', req_data).then(function (response) {
 	                response = response.data;
 	                if (response.status == 0) {
 	                    _this7.setState({
@@ -49303,12 +49305,93 @@
 	    }, {
 	        key: 'sendUser',
 	        value: function sendUser() {
-	            //
+	            var _this8 = this;
+
+	            var allData = this.state.old_login && this.state.old_password && this.state.new_login && this.state.new_password;
+
+	            if (!allData) {
+	                this.setState({
+	                    errorUser: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            var req_data = {
+	                old_login: this.state.old_login,
+	                old_password: this.state.old_password,
+	                new_login: this.state.new_login,
+	                new_password: this.state.new_password
+	            };
+
+	            _axios2.default.post('/api/settings/set_user', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this8.setState({
+	                        errorUser: null,
+	                        old_login: null,
+	                        old_password: null,
+	                        new_login: null,
+	                        new_password: null
+	                    });
+	                    _this8.getSettingsData();
+	                    _this8.closeModal();
+	                } else if (response.status == 2) {
+	                    _this8.setState({
+	                        errorUser: "Неверный старый логин или пароль"
+	                    });
+	                } else {
+	                    _this8.setState({
+	                        errorUser: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this8.setState({
+	                    errorUser: "Ошибка сервера"
+	                });
+	            });
 	        }
 	    }, {
 	        key: 'sendPasscode',
 	        value: function sendPasscode() {
-	            //
+	            var _this9 = this;
+
+	            var allData = this.state.login && this.state.password && this.state.passcode;
+	            if (!allData) {
+	                this.setState({
+	                    errorPasscode: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            var req_data = {
+	                login: this.state.login,
+	                password: this.state.password,
+	                passcode: this.state.passcode
+	            };
+
+	            _axios2.default.post('/api/settings/change_passcode', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this9.setState({
+	                        errorUser: null,
+	                        passcode: null
+	                    });
+	                    _this9.getSettingsData();
+	                    _this9.closeModal();
+	                } else if (response.status == 2) {
+	                    _this9.setState({
+	                        errorPasscode: "Неверный логин или пароль"
+	                    });
+	                } else {
+	                    _this9.setState({
+	                        errorPasscode: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this9.setState({
+	                    errorPasscode: "Ошибка сервера"
+	                });
+	            });
 	        }
 	    }, {
 	        key: 'generateDataModal',
@@ -49498,6 +49581,15 @@
 	    }, {
 	        key: 'generateUserModal',
 	        value: function generateUserModal() {
+	            var errorPanel;
+	            if (this.state.errorUser) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorUser
+	                );
+	            }
+
 	            return React.createElement(
 	                _reactBootstrap.Modal,
 	                { show: this.state.showUserModal, onHide: this.closeModal },
@@ -49513,6 +49605,7 @@
 	                React.createElement(
 	                    _reactBootstrap.Modal.Body,
 	                    null,
+	                    errorPanel,
 	                    React.createElement(
 	                        _reactBootstrap.FormGroup,
 	                        {
@@ -49544,7 +49637,7 @@
 	                            type: 'password',
 	                            value: this.state.old_pass,
 	                            placeholder: '\u0421\u0442\u0430\u0440\u044B\u0439 \u043F\u0430\u0440\u043E\u043B\u044C',
-	                            onChange: this.changeForm("old_pass")
+	                            onChange: this.changeForm("old_password")
 	                        })
 	                    ),
 	                    React.createElement(
@@ -49578,7 +49671,7 @@
 	                            type: 'text',
 	                            value: this.state.new_pass,
 	                            placeholder: '\u0421\u0435\u043A\u0440\u0435\u0442\u043D\u044B\u0439 \u043A\u043B\u044E\u0447',
-	                            onChange: this.changeForm("new_pass")
+	                            onChange: this.changeForm("new_password")
 	                        })
 	                    )
 	                ),
@@ -49601,6 +49694,15 @@
 	    }, {
 	        key: 'generatePasscodeModal',
 	        value: function generatePasscodeModal() {
+	            var errorPanel;
+	            if (this.state.errorPasscode) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorPasscode
+	                );
+	            }
+
 	            return React.createElement(
 	                _reactBootstrap.Modal,
 	                { show: this.state.showPasscodeModal, onHide: this.closeModal },
@@ -49616,6 +49718,7 @@
 	                React.createElement(
 	                    _reactBootstrap.Modal.Body,
 	                    null,
+	                    errorPanel,
 	                    React.createElement(
 	                        _reactBootstrap.FormGroup,
 	                        {
