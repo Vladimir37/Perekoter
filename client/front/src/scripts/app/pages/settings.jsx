@@ -128,6 +128,13 @@ export class Settings extends React.Component {
             return false;
         }
 
+        if (isNaN(this.state.period)) {
+            this.setState({
+                errorData: "Частота проверки должна быть числом"
+            });
+            return false;
+        }
+
         var key_length = this.state.secret_key.length;
 
         if (key_length != 16 && key_length != 24 && key_length != 32) {

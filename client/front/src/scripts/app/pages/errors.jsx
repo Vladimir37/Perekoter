@@ -132,7 +132,7 @@ export class Errors extends React.Component {
             var date = new Date(error.CreatedAt);
             date = (date.getHours()) + ':' + (date.getMinutes()) + ' ' + (date.getDate()) + '-' + (date.getMonth() + 1) + '-' + (date.getFullYear());
             let activity_pic = error.Active ? "✗" : "✓";
-            let close_button = error.Active ? <Button bsStyle="primary" bsSize="small" onClick={this.closeError(error.ID)}>Просмотрено</Button> : '';
+            let close_button = error.Active ? <Button bsStyle="primary" bsSize="xsmall" onClick={this.closeError(error.ID)}>Просмотрено</Button> : '';
             return <tr key={error.ID}>
                 <td>{error.ID}</td>
                 <td>{error.Text}</td>

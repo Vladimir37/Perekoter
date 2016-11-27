@@ -47,7 +47,7 @@ export class History extends React.Component {
             .catch((err) => {
                 this.setState({
                     error: "Ошибка сервера",
-                        historyLoaded: true
+                    historyLoaded: true
                 });
             });
     }

@@ -60,15 +60,17 @@
 
 	var _control = __webpack_require__(515);
 
-	var _errors = __webpack_require__(517);
+	var _boards = __webpack_require__(517);
 
-	var _issues = __webpack_require__(518);
+	var _errors = __webpack_require__(518);
 
-	var _history = __webpack_require__(519);
+	var _issues = __webpack_require__(519);
 
-	var _settings = __webpack_require__(520);
+	var _history = __webpack_require__(520);
 
-	var _ = __webpack_require__(521);
+	var _settings = __webpack_require__(521);
+
+	var _ = __webpack_require__(522);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -77,6 +79,7 @@
 	    { history: _reactRouter.browserHistory },
 	    React.createElement(_reactRouter.Route, { path: '/', component: _main.Main }),
 	    React.createElement(_reactRouter.Route, { path: '/control', component: _control.Control }),
+	    React.createElement(_reactRouter.Route, { path: '/boards', component: _boards.Boards }),
 	    React.createElement(_reactRouter.Route, { path: '/errors', component: _errors.Errors }),
 	    React.createElement(_reactRouter.Route, { path: '/issues', component: _issues.Issues }),
 	    React.createElement(_reactRouter.Route, { path: '/history', component: _history.History }),
@@ -48153,6 +48156,387 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.Boards = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Boards = exports.Boards = function (_React$Component) {
+	    _inherits(Boards, _React$Component);
+
+	    function Boards(props) {
+	        _classCallCheck(this, Boards);
+
+	        var _this = _possibleConstructorReturn(this, (Boards.__proto__ || Object.getPrototypeOf(Boards)).call(this, props));
+
+	        _this.state = {
+	            boardsLoaded: false,
+	            showNewModal: false,
+	            showEditModal: false,
+	            error: null,
+	            errorNew: null,
+	            boards: [],
+	            loaded: false,
+	            logged: false
+	        };
+
+	        _this.generateNewModal = _this.generateNewModal.bind(_this);
+	        _this.openModal = _this.openModal.bind(_this);
+	        _this.closeModal = _this.closeModal.bind(_this);
+	        _this.createNew = _this.createNew.bind(_this);
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(Boards, [{
+	        key: 'openModal',
+	        value: function openModal(type) {
+	            var _this2 = this;
+
+	            return function () {
+	                _this2.setState(_defineProperty({}, 'show' + type + 'Modal', true));
+	            };
+	        }
+	    }, {
+	        key: 'closeModal',
+	        value: function closeModal() {
+	            this.setState({
+	                showNewModal: false,
+	                showEditModal: false
+	            });
+	        }
+	    }, {
+	        key: 'loadBoards',
+	        value: function loadBoards() {
+	            var _this3 = this;
+
+	            _axios2.default.get('/api/boards/get_all_boards').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this3.setState({
+	                        boards: response.body,
+	                        boardsLoaded: true
+	                    });
+	                } else {
+	                    _this3.setState({
+	                        error: "Ошибка сервера",
+	                        boardsLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this3.setState({
+	                    error: "Ошибка сервера",
+	                    boardsLoaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this4 = this;
+
+	            (0, _checkUser.checkUser)().then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
+	                _this4.setState({
+	                    loaded: true,
+	                    logged: logged
+	                });
+	            }).catch(function (page) {
+	                _this4.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'changeForm',
+	        value: function changeForm(type) {
+	            var _this5 = this;
+
+	            return function (e) {
+	                _this5.setState(_defineProperty({}, type, e.target.value));
+	            };
+	        }
+	    }, {
+	        key: 'createNew',
+	        value: function createNew() {
+	            var _this6 = this;
+
+	            var allData = this.state.name && this.state.addr && this.state.bumplimit;
+
+	            if (!allData) {
+	                this.setState({
+	                    errorNew: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            if (isNaN(this.state.bumplimit)) {
+	                this.setState({
+	                    errorNew: "Бамплимит должен быть числом"
+	                });
+	                return false;
+	            }
+
+	            var req_data = {
+	                name: this.state.name,
+	                addr: this.state.addr,
+	                bumplimit: Number(this.state.bumplimit)
+	            };
+
+	            _axios2.default.post('/api/boards/add_board', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this6.setState({
+	                        errorNew: null
+	                    });
+	                    _this6.loadBoards();
+	                    _this6.closeModal();
+	                } else {
+	                    _this6.setState({
+	                        errorNew: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this6.setState({
+	                    errorNew: "Ошибка сервера"
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'generateNewModal',
+	        value: function generateNewModal() {
+	            var errorPanel;
+	            if (this.state.errorNew) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorNew
+	                );
+	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showNewModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u041D\u043E\u0432\u0430\u044F \u0434\u043E\u0441\u043A\u0430'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorPanel,
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.name,
+	                        placeholder: '\u0418\u043C\u044F',
+	                        onChange: this.changeForm("name")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.addr,
+	                        placeholder: '\u0410\u0434\u0440\u0435\u0441',
+	                        onChange: this.changeForm("addr")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.bumplimit,
+	                        placeholder: '\u0411\u0430\u043C\u043F\u043B\u0438\u043C\u0438\u0442',
+	                        onChange: this.changeForm("bumplimit")
+	                    })
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success', onClick: this.createNew },
+	                        '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            var errorPanel;
+	            if (this.state.error) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.error
+	                );
+	            }
+
+	            if (!this.state.boardsLoaded) {
+	                this.loadBoards();
+	            }
+
+	            var boards = this.state.boards.map(function (board) {
+	                return React.createElement(
+	                    'tr',
+	                    { key: board.ID },
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.ID
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.Name
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.Addr
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.Bumplimit
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', bsSize: 'xsmall' },
+	                            '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
+	                        )
+	                    )
+	                );
+	            });
+
+	            return React.createElement(
+	                'main',
+	                null,
+	                errorPanel,
+	                React.createElement(
+	                    _reactBootstrap.Table,
+	                    { striped: true, bordered: true, condensed: true, hover: true },
+	                    React.createElement(
+	                        'thead',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '#'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0418\u043C\u044F'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0410\u0434\u0440\u0435\u0441'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0411\u0430\u043C\u043F\u043B\u0438\u043C\u0438\u0442'
+	                            ),
+	                            React.createElement('th', null)
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        boards
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', onClick: this.openModal("New") },
+	                    '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
+	                ),
+	                this.generateNewModal()
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var page;
+
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
+	            }
+
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                page,
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return Boards;
+	}(React.Component);
+
+/***/ },
+/* 518 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 	exports.Errors = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -48334,7 +48718,7 @@
 	                var activity_pic = error.Active ? "✗" : "✓";
 	                var close_button = error.Active ? React.createElement(
 	                    _reactBootstrap.Button,
-	                    { bsStyle: 'primary', bsSize: 'small', onClick: _this6.closeError(error.ID) },
+	                    { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this6.closeError(error.ID) },
 	                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
 	                ) : '';
 	                return React.createElement(
@@ -48458,7 +48842,7 @@
 	}(React.Component);
 
 /***/ },
-/* 518 */
+/* 519 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -48673,7 +49057,7 @@
 	                var activity_pic = issue.Active ? "✗" : "✓";
 	                var close_button = issue.Active ? React.createElement(
 	                    _reactBootstrap.Button,
-	                    { bsStyle: 'primary', bsSize: 'small', onClick: _this7.openModal(issue, date) },
+	                    { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this7.openModal(issue, date) },
 	                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C'
 	                ) : '';
 	                return React.createElement(
@@ -48848,7 +49232,7 @@
 	}(React.Component);
 
 /***/ },
-/* 519 */
+/* 520 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49081,7 +49465,7 @@
 	}(React.Component);
 
 /***/ },
-/* 520 */
+/* 521 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49255,6 +49639,13 @@
 	            if (!allData) {
 	                this.setState({
 	                    errorData: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            if (isNaN(this.state.period)) {
+	                this.setState({
+	                    errorData: "Частота проверки должна быть числом"
 	                });
 	                return false;
 	            }
@@ -49984,7 +50375,7 @@
 	}(React.Component);
 
 /***/ },
-/* 521 */
+/* 522 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

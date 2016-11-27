@@ -155,7 +155,7 @@ export class Issues extends React.Component {
             var date = new Date(issue.CreatedAt);
             date = (date.getHours()) + ':' + (date.getMinutes()) + ' ' + (date.getDate()) + '-' + (date.getMonth() + 1) + '-' + (date.getFullYear());
             let activity_pic = issue.Active ? "✗" : "✓";
-            let close_button = issue.Active ? <Button bsStyle="primary" bsSize="small" onClick={this.openModal(issue, date)}>Просмотреть</Button> : '';
+            let close_button = issue.Active ? <Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal(issue, date)}>Просмотреть</Button> : '';
             return <tr key={issue.ID}>
                 <td>{issue.ID}</td>
                 <td>{issue.Title}</td>
