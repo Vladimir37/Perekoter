@@ -90,6 +90,18 @@ func DeleteBoard(c *gin.Context) {
 	var board models.Board
 	db.First(&board, request.Num)
 
+	var threads []models.Thread
+	db.Find(&threads, &models.Thread{
+		BoardID: board.ID,
+	})
+
+	if len(threads) != 0 {
+		c.JSON(200, gin.H{
+			"status": 1,
+		})
+		return
+	}
+
 	go utility.NewHistoryPoint("Board \"" + board.Name + "\" was deleted")
 
 	db.Delete(&board)

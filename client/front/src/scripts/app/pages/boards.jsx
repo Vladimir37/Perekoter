@@ -16,31 +16,48 @@ export class Boards extends React.Component {
             showEditModal: false,
             error: null,
             errorNew: null,
+            errorEdit: null,
+            errorDelete: null,
             boards: [],
             loaded: false,
             logged: false
         };
 
         this.generateNewModal = this.generateNewModal.bind(this);
+        this.generateEditModal = this.generateEditModal.bind(this);
+        this.generateDeleteModal = this.generateDeleteModal.bind(this);
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.createNew = this.createNew.bind(this);
+        this.editBoard = this.editBoard.bind(this);
+        this.deleteBoard = this.deleteBoard.bind(this);
         this.loadPage = this.loadPage.bind(this);
         this.generatePage = this.generatePage.bind(this);
     }
 
-    openModal(type) {
+    openModal(type, board) {
         return () => {
             this.setState({
                 ['show' + type + 'Modal']: true
             });
+
+            if (board) {
+                this.setState({
+                    editedID: board.ID,
+                    editedName: board.Name,
+                    editedAddr: board.Addr,
+                    editedBumplimit: board.Bumplimit
+                });
+            }
         }
     }
 
     closeModal() {
         this.setState({
             showNewModal: false,
-            showEditModal: false
+            showEditModal: false,
+            showDeleteModal: false,
+            errorDelete: null
         });
     }
 
@@ -140,6 +157,83 @@ export class Boards extends React.Component {
             });
     }
 
+    editBoard() {
+        var allData = (this.state.editedName && this.state.editedAddr && this.state.editedBumplimit);
+        
+        if (!allData) {
+            this.setState({
+                errorEdit: "Не все поля заполнены"
+            });
+            return false;
+        }
+
+        if (isNaN(this.state.editedBumplimit)) {
+            this.setState({
+                errorEdit: "Бамплимит должен быть числом"
+            });
+            return false;
+        }
+
+        var req_data = {
+            id: Number(this.state.editedID),
+            name: this.state.editedName,
+            addr: this.state.editedAddr,
+            bumplimit: Number(this.state.editedBumplimit)
+        };
+
+        Axios.post('/api/boards/edit_board', req_data)
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorEdit: null
+                    })
+                    this.loadBoards();
+                    this.closeModal();
+                } else {
+                    this.setState({
+                        errorEdit: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorEdit: "Ошибка сервера"
+                });
+            });
+    }
+
+    deleteBoard() {
+        var req_data = {
+            num: Number(this.state.editedID)
+        };
+
+        Axios.post('/api/boards/delete_board', req_data)
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorDelete: null
+                    })
+                    this.loadBoards();
+                    this.closeModal();
+                } else if (response.status == 1) {
+                    this.setState({
+                        errorDelete: "Вы не можете удалить доску, к которой прикреплены треды"
+                    });
+                } else {
+                    this.setState({
+                        errorDelete: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorDelete: "Ошибка сервера"
+                });
+            });
+    }
+
     generateNewModal() {
         var errorPanel;
         if (this.state.errorNew) {
@@ -180,6 +274,67 @@ export class Boards extends React.Component {
             </Modal>;
     }
 
+    generateEditModal() {
+        var errorPanel;
+        if (this.state.errorEdit) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorEdit}</Alert>;
+        }
+
+        return <Modal show={this.state.showEditModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Редактировать доску</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {errorPanel}
+                    <FormControl
+                        type="text"
+                        value={this.state.editedName}
+                        placeholder="Имя"
+                        onChange={this.changeForm("editedName")}
+                    />
+                    <br/>
+                    <FormControl
+                        type="text"
+                        value={this.state.editedAddr}
+                        placeholder="Адрес"
+                        onChange={this.changeForm("editedAddr")}
+                    />
+                    <br/>
+                    <FormControl
+                        type="text"
+                        value={this.state.editedBumplimit}
+                        placeholder="Бамплимит"
+                        onChange={this.changeForm("editedBumplimit")}
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="success" onClick={this.editBoard}>Редактировать</Button>
+                    <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
+                </Modal.Footer>
+            </Modal>;
+    }
+
+    generateDeleteModal() {
+        var errorPanel;
+        if (this.state.errorDelete) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorDelete}</Alert>;
+        }
+
+        return <Modal show={this.state.showDeleteModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Удалить доску</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {errorPanel}
+                    <p>Вы уверены, что хотите удалить доску "{this.state.editedName}" (/{this.state.editedAddr}/)?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="warning" onClick={this.deleteBoard}>Удалить</Button>
+                    <Button bsStyle="primary" onClick={this.closeModal}>Отмена</Button>
+                </Modal.Footer>
+            </Modal>;
+    }
+
     generatePage() {
         var errorPanel;
         if (this.state.error) {
@@ -190,13 +345,14 @@ export class Boards extends React.Component {
             this.loadBoards();
         }
 
-        var boards = this.state.boards.map(function (board) {
+        var boards = this.state.boards.map((board) => {
             return <tr key={board.ID}>
                 <td>{board.ID}</td>
                 <td>{board.Name}</td>
                 <td>{board.Addr}</td>
                 <td>{board.Bumplimit}</td>
-                <td><Button bsStyle="primary" bsSize="xsmall">Редактировать</Button></td>
+                <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal('Edit', board)}>Редактировать</Button></td>
+                <td><Button bsStyle="warning" bsSize="xsmall" onClick={this.openModal('Delete', board)}>Удалить</Button></td>
             </tr>;
         });
 
@@ -210,6 +366,7 @@ export class Boards extends React.Component {
                     <th>Адрес</th>
                     <th>Бамплимит</th>
                     <th></th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -218,6 +375,8 @@ export class Boards extends React.Component {
             </Table>
             <Button bsStyle="primary" onClick={this.openModal("New")}>Создать</Button>
             {this.generateNewModal()}
+            {this.generateEditModal()}
+            {this.generateDeleteModal()}
         </main>;
     }
     

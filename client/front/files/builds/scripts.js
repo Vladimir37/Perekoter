@@ -48202,15 +48202,21 @@
 	            showEditModal: false,
 	            error: null,
 	            errorNew: null,
+	            errorEdit: null,
+	            errorDelete: null,
 	            boards: [],
 	            loaded: false,
 	            logged: false
 	        };
 
 	        _this.generateNewModal = _this.generateNewModal.bind(_this);
+	        _this.generateEditModal = _this.generateEditModal.bind(_this);
+	        _this.generateDeleteModal = _this.generateDeleteModal.bind(_this);
 	        _this.openModal = _this.openModal.bind(_this);
 	        _this.closeModal = _this.closeModal.bind(_this);
 	        _this.createNew = _this.createNew.bind(_this);
+	        _this.editBoard = _this.editBoard.bind(_this);
+	        _this.deleteBoard = _this.deleteBoard.bind(_this);
 	        _this.loadPage = _this.loadPage.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
@@ -48218,11 +48224,20 @@
 
 	    _createClass(Boards, [{
 	        key: 'openModal',
-	        value: function openModal(type) {
+	        value: function openModal(type, board) {
 	            var _this2 = this;
 
 	            return function () {
 	                _this2.setState(_defineProperty({}, 'show' + type + 'Modal', true));
+
+	                if (board) {
+	                    _this2.setState({
+	                        editedID: board.ID,
+	                        editedName: board.Name,
+	                        editedAddr: board.Addr,
+	                        editedBumplimit: board.Bumplimit
+	                    });
+	                }
 	            };
 	        }
 	    }, {
@@ -48230,7 +48245,9 @@
 	        value: function closeModal() {
 	            this.setState({
 	                showNewModal: false,
-	                showEditModal: false
+	                showEditModal: false,
+	                showDeleteModal: false,
+	                errorDelete: null
 	            });
 	        }
 	    }, {
@@ -48336,6 +48353,85 @@
 	            });
 	        }
 	    }, {
+	        key: 'editBoard',
+	        value: function editBoard() {
+	            var _this7 = this;
+
+	            var allData = this.state.editedName && this.state.editedAddr && this.state.editedBumplimit;
+
+	            if (!allData) {
+	                this.setState({
+	                    errorEdit: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            if (isNaN(this.state.editedBumplimit)) {
+	                this.setState({
+	                    errorEdit: "Бамплимит должен быть числом"
+	                });
+	                return false;
+	            }
+
+	            var req_data = {
+	                id: Number(this.state.editedID),
+	                name: this.state.editedName,
+	                addr: this.state.editedAddr,
+	                bumplimit: Number(this.state.editedBumplimit)
+	            };
+
+	            _axios2.default.post('/api/boards/edit_board', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this7.setState({
+	                        errorEdit: null
+	                    });
+	                    _this7.loadBoards();
+	                    _this7.closeModal();
+	                } else {
+	                    _this7.setState({
+	                        errorEdit: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this7.setState({
+	                    errorEdit: "Ошибка сервера"
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'deleteBoard',
+	        value: function deleteBoard() {
+	            var _this8 = this;
+
+	            var req_data = {
+	                num: Number(this.state.editedID)
+	            };
+
+	            _axios2.default.post('/api/boards/delete_board', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this8.setState({
+	                        errorDelete: null
+	                    });
+	                    _this8.loadBoards();
+	                    _this8.closeModal();
+	                } else if (response.status == 1) {
+	                    _this8.setState({
+	                        errorDelete: "Вы не можете удалить доску, к которой прикреплены треды"
+	                    });
+	                } else {
+	                    _this8.setState({
+	                        errorDelete: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this8.setState({
+	                    errorDelete: "Ошибка сервера"
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'generateNewModal',
 	        value: function generateNewModal() {
 	            var errorPanel;
@@ -48401,8 +48497,129 @@
 	            );
 	        }
 	    }, {
+	        key: 'generateEditModal',
+	        value: function generateEditModal() {
+	            var errorPanel;
+	            if (this.state.errorEdit) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorEdit
+	                );
+	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showEditModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0434\u043E\u0441\u043A\u0443'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorPanel,
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.editedName,
+	                        placeholder: '\u0418\u043C\u044F',
+	                        onChange: this.changeForm("editedName")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.editedAddr,
+	                        placeholder: '\u0410\u0434\u0440\u0435\u0441',
+	                        onChange: this.changeForm("editedAddr")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.editedBumplimit,
+	                        placeholder: '\u0411\u0430\u043C\u043F\u043B\u0438\u043C\u0438\u0442',
+	                        onChange: this.changeForm("editedBumplimit")
+	                    })
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success', onClick: this.editBoard },
+	                        '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'generateDeleteModal',
+	        value: function generateDeleteModal() {
+	            var errorPanel;
+	            if (this.state.errorDelete) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorDelete
+	                );
+	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showDeleteModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0434\u043E\u0441\u043A\u0443'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorPanel,
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        '\u0412\u044B \u0443\u0432\u0435\u0440\u0435\u043D\u044B, \u0447\u0442\u043E \u0445\u043E\u0442\u0438\u0442\u0435 \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u0434\u043E\u0441\u043A\u0443 "',
+	                        this.state.editedName,
+	                        '" (/',
+	                        this.state.editedAddr,
+	                        '/)?'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'warning', onClick: this.deleteBoard },
+	                        '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u041E\u0442\u043C\u0435\u043D\u0430'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
+	            var _this9 = this;
+
 	            var errorPanel;
 	            if (this.state.error) {
 	                errorPanel = React.createElement(
@@ -48445,8 +48662,17 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'xsmall' },
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this9.openModal('Edit', board) },
 	                            '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this9.openModal('Delete', board) },
+	                            '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
 	                        )
 	                    )
 	                );
@@ -48485,6 +48711,7 @@
 	                                null,
 	                                '\u0411\u0430\u043C\u043F\u043B\u0438\u043C\u0438\u0442'
 	                            ),
+	                            React.createElement('th', null),
 	                            React.createElement('th', null)
 	                        )
 	                    ),
@@ -48499,7 +48726,9 @@
 	                    { bsStyle: 'primary', onClick: this.openModal("New") },
 	                    '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
 	                ),
-	                this.generateNewModal()
+	                this.generateNewModal(),
+	                this.generateEditModal(),
+	                this.generateDeleteModal()
 	            );
 	        }
 	    }, {
