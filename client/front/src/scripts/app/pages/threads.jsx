@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Table, Modal, Button, Alert, FormControl} from 'react-bootstrap';
+import {Table, Modal, Button, Alert, FormControl, Checkbox} from 'react-bootstrap';
 import Axios from 'axios';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
@@ -12,14 +12,38 @@ export class Threads extends React.Component {
 
         this.state = {
             threads: [],
+            boards: [],
             threadsLoaded: false,
+            boardsLoaded: false,
+            showNewModal: false,
+            showEditModal: false,
+            showDeleteModal: false,
             error: null,
             loaded: false,
             logged: false
         };
 
         this.loadPage = this.loadPage.bind(this);
+        this.openModal = this.openModal.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.generateNewModal = this.generateNewModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
+    }
+
+    changeForm(type) {
+        return (e) => {
+            this.setState({
+                [type]: e.target.value
+            });
+        }
+    }
+
+    changeCheckbox(type) {
+        return (e) => {
+            this.setState({
+                [type]: e.target.checked
+            });
+        }
     }
 
     loadPage() {
@@ -65,7 +89,32 @@ export class Threads extends React.Component {
             });
     }
 
-    openModal(type, board) {
+    loadBoards() {
+        Axios.get('/api/boards/get_all_boards')
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    response.body = response.body.reverse();
+                    this.setState({
+                        boards: response.body,
+                        boardsLoaded: true
+                    });
+                } else {
+                    this.setState({
+                        error: "Ошибка сервера",
+                        boardsLoaded: true
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    error: "Ошибка сервера",
+                    boardsLoaded: true
+                });
+            });
+    }
+
+    openModal(type, thread) {
         return () => {
             this.setState({
                 ['show' + type + 'Modal']: true
@@ -88,6 +137,86 @@ export class Threads extends React.Component {
         });
     }
 
+    generateNewModal() {
+        var errorPanel;
+        if (this.state.errorNew) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorNew}</Alert>;
+        }
+
+        var boards = this.state.boards.map((board) => {
+            return <option value={board.ID}>{board.Name} (/{board.Addr}/)</option>;
+        });
+
+        return <Modal show={this.state.showNewModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Новый тред</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {errorPanel}
+                    <FormControl
+                        type="text"
+                        value={this.state.title}
+                        placeholder="Название"
+                        onChange={this.changeForm("title")}
+                    />
+                    <Checkbox
+                        value={true}
+                        checked={this.state.numbering}
+                        onChange={this.changeCheckbox("numbering")}
+                    >Нумерация</Checkbox>
+                    <Checkbox
+                        value={true}
+                        checked={this.state.roman}
+                        onChange={this.changeCheckbox("roman")}
+                        disabled={!this.state.numbering}
+                    >Нумерация римскими цифрами</Checkbox>
+                    <FormControl
+                        type="text"
+                        value={this.state.current_num}
+                        placeholder="Текущий номер треда"
+                        onChange={this.changeForm("current_num")}
+                        disabled={!this.state.numbering}
+                    />
+                    <br/>
+                    <FormControl
+                        type="text"
+                        value={this.state.current_thread}
+                        placeholder="Текущий тред (номер ОП-поста)"
+                        onChange={this.changeForm("current_thread")}
+                    />
+                    <br/>
+                    <Checkbox
+                        value={true}
+                        checked={this.state.header_link}
+                        onChange={this.changeCheckbox("header_link")}
+                    >Шапка в виде документа по ссылке</Checkbox>
+                    <FormControl
+                        type="text"
+                        value={this.state.current_thread}
+                        placeholder="Текущий тред (номер ОП-поста)"
+                        onChange={this.changeForm("current_thread")}
+                    />
+                    <br/>
+                    <FormControl 
+                        componentClass="textarea" 
+                        placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"} 
+                    />
+                    <br/>
+                    <FormControl componentClass="select" placeholder="select">
+                        {boards}
+                    </FormControl>
+                    <FieldGroup
+                        type="file"
+                        label="Оп-пик"
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="success" onClick={this.createNew}>Создать</Button>
+                    <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
+                </Modal.Footer>
+            </Modal>;
+    }
+
     generatePage() {
         var errorPanel;
         if (this.state.error) {
@@ -96,6 +225,10 @@ export class Threads extends React.Component {
 
         if (!this.state.threadsLoaded) {
             this.loadThreads();
+        }
+
+        if (!this.state.boardsLoaded) {
+            this.loadBoards();
         }
 
         var threads = this.state.threads.map((thread) => {
@@ -125,6 +258,7 @@ export class Threads extends React.Component {
                 </tbody>
             </Table>
             <Button bsStyle="primary" onClick={this.openModal("New")}>Создать</Button>
+            {this.generateNewModal()}
         </main>;
     }
     

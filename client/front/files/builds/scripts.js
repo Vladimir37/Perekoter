@@ -48203,6 +48203,7 @@
 	            boardsLoaded: false,
 	            showNewModal: false,
 	            showEditModal: false,
+	            showDeleteModal: false,
 	            error: null,
 	            errorNew: null,
 	            errorEdit: null,
@@ -48811,21 +48812,47 @@
 
 	        _this.state = {
 	            threads: [],
+	            boards: [],
 	            threadsLoaded: false,
+	            boardsLoaded: false,
+	            showNewModal: false,
+	            showEditModal: false,
+	            showDeleteModal: false,
 	            error: null,
 	            loaded: false,
 	            logged: false
 	        };
 
 	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.openModal = _this.openModal.bind(_this);
+	        _this.closeModal = _this.closeModal.bind(_this);
+	        _this.generateNewModal = _this.generateNewModal.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
 	    }
 
 	    _createClass(Threads, [{
+	        key: 'changeForm',
+	        value: function changeForm(type) {
+	            var _this2 = this;
+
+	            return function (e) {
+	                _this2.setState(_defineProperty({}, type, e.target.value));
+	            };
+	        }
+	    }, {
+	        key: 'changeCheckbox',
+	        value: function changeCheckbox(type) {
+	            var _this3 = this;
+
+	            return function (e) {
+	                _this3.setState(_defineProperty({}, type, e.target.checked));
+	            };
+	        }
+	    }, {
 	        key: 'loadPage',
 	        value: function loadPage() {
-	            var _this2 = this;
+	            var _this4 = this;
 
 	            (0, _checkUser.checkUser)().then(function (response) {
 	                var logged = false;
@@ -48833,12 +48860,12 @@
 	                    logged = true;
 	                }
 
-	                _this2.setState({
+	                _this4.setState({
 	                    loaded: true,
 	                    logged: logged
 	                });
 	            }).catch(function (page) {
-	                _this2.setState({
+	                _this4.setState({
 	                    loaded: true
 	                });
 	            });
@@ -48846,39 +48873,65 @@
 	    }, {
 	        key: 'loadThreads',
 	        value: function loadThreads() {
-	            var _this3 = this;
+	            var _this5 = this;
 
 	            _axios2.default.get('/api/threads/get_all_threads').then(function (response) {
 	                response = response.data;
 	                if (response.status == 0) {
 	                    response.body = response.body.reverse();
-	                    _this3.setState({
+	                    _this5.setState({
 	                        threads: response.body,
 	                        threadsLoaded: true
 	                    });
 	                } else {
-	                    _this3.setState({
+	                    _this5.setState({
 	                        error: "Ошибка сервера",
 	                        threadsLoaded: true
 	                    });
 	                }
 	            }).catch(function (err) {
-	                _this3.setState({
+	                _this5.setState({
 	                    error: "Ошибка сервера",
 	                    threadsLoaded: true
 	                });
 	            });
 	        }
 	    }, {
+	        key: 'loadBoards',
+	        value: function loadBoards() {
+	            var _this6 = this;
+
+	            _axios2.default.get('/api/boards/get_all_boards').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this6.setState({
+	                        boards: response.body,
+	                        boardsLoaded: true
+	                    });
+	                } else {
+	                    _this6.setState({
+	                        error: "Ошибка сервера",
+	                        boardsLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this6.setState({
+	                    error: "Ошибка сервера",
+	                    boardsLoaded: true
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'openModal',
-	        value: function openModal(type, board) {
-	            var _this4 = this;
+	        value: function openModal(type, thread) {
+	            var _this7 = this;
 
 	            return function () {
-	                _this4.setState(_defineProperty({}, 'show' + type + 'Modal', true));
+	                _this7.setState(_defineProperty({}, 'show' + type + 'Modal', true));
 
 	                if (thread) {
-	                    _this4.setState({
+	                    _this7.setState({
 	                        //
 	                    });
 	                }
@@ -48895,9 +48948,135 @@
 	            });
 	        }
 	    }, {
+	        key: 'generateNewModal',
+	        value: function generateNewModal() {
+	            var errorPanel;
+	            if (this.state.errorNew) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorNew
+	                );
+	            }
+
+	            var boards = this.state.boards.map(function (board) {
+	                return React.createElement(
+	                    'option',
+	                    { value: board.ID },
+	                    board.Name,
+	                    ' (/',
+	                    board.Addr,
+	                    '/)'
+	                );
+	            });
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showNewModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u041D\u043E\u0432\u044B\u0439 \u0442\u0440\u0435\u0434'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorPanel,
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.title,
+	                        placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435',
+	                        onChange: this.changeForm("title")
+	                    }),
+	                    React.createElement(
+	                        _reactBootstrap.Checkbox,
+	                        {
+	                            value: true,
+	                            checked: this.state.numbering,
+	                            onChange: this.changeCheckbox("numbering")
+	                        },
+	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Checkbox,
+	                        {
+	                            value: true,
+	                            checked: this.state.roman,
+	                            onChange: this.changeCheckbox("roman"),
+	                            disabled: !this.state.numbering
+	                        },
+	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F \u0440\u0438\u043C\u0441\u043A\u0438\u043C\u0438 \u0446\u0438\u0444\u0440\u0430\u043C\u0438'
+	                    ),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.current_num,
+	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430',
+	                        onChange: this.changeForm("current_num"),
+	                        disabled: !this.state.numbering
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.current_thread,
+	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
+	                        onChange: this.changeForm("current_thread")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(
+	                        _reactBootstrap.Checkbox,
+	                        {
+	                            value: true,
+	                            checked: this.state.header_link,
+	                            onChange: this.changeCheckbox("header_link")
+	                        },
+	                        '\u0428\u0430\u043F\u043A\u0430 \u0432 \u0432\u0438\u0434\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435'
+	                    ),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.current_thread,
+	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
+	                        onChange: this.changeForm("current_thread")
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        componentClass: 'textarea',
+	                        placeholder: this.state.header_link ? "Ссылка на шапку" : "Шапка"
+	                    }),
+	                    React.createElement('br', null),
+	                    React.createElement(
+	                        _reactBootstrap.FormControl,
+	                        { componentClass: 'select', placeholder: 'select' },
+	                        boards
+	                    ),
+	                    React.createElement(FieldGroup, {
+	                        type: 'file',
+	                        label: '\u041E\u043F-\u043F\u0438\u043A'
+	                    })
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'success', onClick: this.createNew },
+	                        '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
-	            var _this5 = this;
+	            var _this8 = this;
 
 	            var errorPanel;
 	            if (this.state.error) {
@@ -48912,6 +49091,10 @@
 	                this.loadThreads();
 	            }
 
+	            if (!this.state.boardsLoaded) {
+	                this.loadBoards();
+	            }
+
 	            var threads = this.state.threads.map(function (thread) {
 	                return React.createElement(
 	                    'tr',
@@ -48924,7 +49107,7 @@
 	                    React.createElement(
 	                        'td',
 	                        null,
-	                        thread.Name
+	                        thread.Title
 	                    ),
 	                    React.createElement(
 	                        'td',
@@ -48936,7 +49119,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this5.openModal('Edit', thread) },
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this8.openModal('Edit', thread) },
 	                            '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
 	                        )
 	                    ),
@@ -48945,7 +49128,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this5.openModal('Delete', thread) },
+	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this8.openModal('Delete', thread) },
 	                            '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
 	                        )
 	                    )
@@ -48994,7 +49177,8 @@
 	                    _reactBootstrap.Button,
 	                    { bsStyle: 'primary', onClick: this.openModal("New") },
 	                    '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
-	                )
+	                ),
+	                this.generateNewModal()
 	            );
 	        }
 	    }, {

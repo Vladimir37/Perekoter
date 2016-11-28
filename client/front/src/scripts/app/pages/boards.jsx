@@ -14,6 +14,7 @@ export class Boards extends React.Component {
             boardsLoaded: false,
             showNewModal: false,
             showEditModal: false,
+            showDeleteModal: false,
             error: null,
             errorNew: null,
             errorEdit: null,
