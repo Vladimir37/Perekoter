@@ -62,15 +62,17 @@
 
 	var _boards = __webpack_require__(517);
 
-	var _errors = __webpack_require__(518);
+	var _threads = __webpack_require__(518);
 
-	var _issues = __webpack_require__(519);
+	var _errors = __webpack_require__(519);
 
-	var _history = __webpack_require__(520);
+	var _issues = __webpack_require__(520);
 
-	var _settings = __webpack_require__(521);
+	var _history = __webpack_require__(521);
 
-	var _ = __webpack_require__(522);
+	var _settings = __webpack_require__(522);
+
+	var _ = __webpack_require__(523);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -80,6 +82,7 @@
 	    React.createElement(_reactRouter.Route, { path: '/', component: _main.Main }),
 	    React.createElement(_reactRouter.Route, { path: '/control', component: _control.Control }),
 	    React.createElement(_reactRouter.Route, { path: '/boards', component: _boards.Boards }),
+	    React.createElement(_reactRouter.Route, { path: '/threads', component: _threads.Threads }),
 	    React.createElement(_reactRouter.Route, { path: '/errors', component: _errors.Errors }),
 	    React.createElement(_reactRouter.Route, { path: '/issues', component: _issues.Issues }),
 	    React.createElement(_reactRouter.Route, { path: '/history', component: _history.History }),
@@ -48766,6 +48769,269 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.Threads = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(237);
+
+	var _axios = __webpack_require__(489);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	var _header = __webpack_require__(236);
+
+	var _footer = __webpack_require__(514);
+
+	var _checkUser = __webpack_require__(516);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Threads = exports.Threads = function (_React$Component) {
+	    _inherits(Threads, _React$Component);
+
+	    function Threads(props) {
+	        _classCallCheck(this, Threads);
+
+	        var _this = _possibleConstructorReturn(this, (Threads.__proto__ || Object.getPrototypeOf(Threads)).call(this, props));
+
+	        _this.state = {
+	            threads: [],
+	            threadsLoaded: false,
+	            error: null,
+	            loaded: false,
+	            logged: false
+	        };
+
+	        _this.loadPage = _this.loadPage.bind(_this);
+	        _this.generatePage = _this.generatePage.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(Threads, [{
+	        key: 'loadPage',
+	        value: function loadPage() {
+	            var _this2 = this;
+
+	            (0, _checkUser.checkUser)().then(function (response) {
+	                var logged = false;
+	                if (response) {
+	                    logged = true;
+	                }
+
+	                _this2.setState({
+	                    loaded: true,
+	                    logged: logged
+	                });
+	            }).catch(function (page) {
+	                _this2.setState({
+	                    loaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'loadThreads',
+	        value: function loadThreads() {
+	            var _this3 = this;
+
+	            _axios2.default.get('/api/threads/get_all_threads').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this3.setState({
+	                        threads: response.body,
+	                        threadsLoaded: true
+	                    });
+	                } else {
+	                    _this3.setState({
+	                        error: "Ошибка сервера",
+	                        threadsLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this3.setState({
+	                    error: "Ошибка сервера",
+	                    threadsLoaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'openModal',
+	        value: function openModal(type, board) {
+	            var _this4 = this;
+
+	            return function () {
+	                _this4.setState(_defineProperty({}, 'show' + type + 'Modal', true));
+
+	                if (thread) {
+	                    _this4.setState({
+	                        //
+	                    });
+	                }
+	            };
+	        }
+	    }, {
+	        key: 'closeModal',
+	        value: function closeModal() {
+	            this.setState({
+	                showNewModal: false,
+	                showEditModal: false,
+	                showDeleteModal: false,
+	                errorDelete: null
+	            });
+	        }
+	    }, {
+	        key: 'generatePage',
+	        value: function generatePage() {
+	            var _this5 = this;
+
+	            var errorPanel;
+	            if (this.state.error) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.error
+	                );
+	            }
+
+	            if (!this.state.threadsLoaded) {
+	                this.loadThreads();
+	            }
+
+	            var threads = this.state.threads.map(function (thread) {
+	                return React.createElement(
+	                    'tr',
+	                    { key: thread.ID },
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        thread.ID
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        thread.Name
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        thread.Board.Name
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this5.openModal('Edit', thread) },
+	                            '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this5.openModal('Delete', thread) },
+	                            '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
+	                        )
+	                    )
+	                );
+	            });
+
+	            return React.createElement(
+	                'main',
+	                null,
+	                errorPanel,
+	                React.createElement(
+	                    _reactBootstrap.Table,
+	                    { striped: true, bordered: true, condensed: true, hover: true },
+	                    React.createElement(
+	                        'thead',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '#'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0418\u043C\u044F'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0414\u043E\u0441\u043A\u0430'
+	                            ),
+	                            React.createElement('th', null),
+	                            React.createElement('th', null)
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        threads
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', onClick: this.openModal("New") },
+	                    '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var page;
+
+	            if (!this.state.loaded) {
+	                this.loadPage();
+	            } else if (!this.state.logged) {
+	                page = (0, _checkUser.forbiddenGenerator)();
+	            } else {
+	                page = this.generatePage();
+	            }
+
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(_header.Header, null),
+	                page,
+	                React.createElement(_footer.Footer, null)
+	            );
+	        }
+	    }]);
+
+	    return Threads;
+	}(React.Component);
+
+/***/ },
+/* 519 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 	exports.Errors = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -49071,7 +49337,7 @@
 	}(React.Component);
 
 /***/ },
-/* 519 */
+/* 520 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49461,7 +49727,7 @@
 	}(React.Component);
 
 /***/ },
-/* 520 */
+/* 521 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49694,7 +49960,7 @@
 	}(React.Component);
 
 /***/ },
-/* 521 */
+/* 522 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50604,7 +50870,7 @@
 	}(React.Component);
 
 /***/ },
-/* 522 */
+/* 523 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

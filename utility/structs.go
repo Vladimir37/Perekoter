@@ -45,15 +45,15 @@ type BoardRequest struct {
 
 type ThreadRequest struct {
 	ID            int    `json:"id"`
-	Numbering     bool   `json:"numbering" binding:"required"`
-	Roman         bool   `json:"roman" binding:"required"`
+	Numbering     bool   `json:"numbering"`
+	Roman         bool   `json:"roman"`
 	CurrentNum    int    `json:"current_num" binding:"required"`
 	CurrentThread int    `json:"current_thread"`
 	Title         string `json:"title" binding:"required"`
-	HeaderLink    bool   `json:"header_link" binding:"required"`
+	HeaderLink    bool   `json:"header_link"`
 	Header        string `json:"header" binding:"required"`
 	BoardNum      int    `json:"board_num" binding:"required"`
-	Active        bool   `json:"active" binding:"required"`
+	Active        bool   `json:"active"`
 }
 
 type UserChangingRequest struct {
