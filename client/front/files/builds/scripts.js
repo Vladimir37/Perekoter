@@ -48818,6 +48818,7 @@
 	            showNewModal: false,
 	            showEditModal: false,
 	            showDeleteModal: false,
+	            board: 1,
 	            error: null,
 	            loaded: false,
 	            logged: false
@@ -48908,6 +48909,7 @@
 	                    response.body = response.body.reverse();
 	                    _this6.setState({
 	                        boards: response.body,
+	                        board: response.body[0] ? response.body[0].ID : 1,
 	                        boardsLoaded: true
 	                    });
 	                } else {
@@ -49070,7 +49072,6 @@
 	                                value: this.state.board,
 	                                componentClass: 'select',
 	                                placeholder: 'select',
-	                                defaultValue: boards[0] ? boards[0].ID : 1,
 	                                onChange: this.changeForm("board") },
 	                            boards
 	                        ),

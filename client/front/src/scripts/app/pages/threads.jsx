@@ -18,6 +18,7 @@ export class Threads extends React.Component {
             showNewModal: false,
             showEditModal: false,
             showDeleteModal: false,
+            board: 1,
             error: null,
             loaded: false,
             logged: false
@@ -98,6 +99,7 @@ export class Threads extends React.Component {
                     response.body = response.body.reverse();
                     this.setState({
                         boards: response.body,
+                        board: response.body[0] ? response.body[0].ID : 1,
                         boardsLoaded: true
                     });
                 } else {
@@ -220,7 +222,6 @@ export class Threads extends React.Component {
                         value={this.state.board} 
                         componentClass="select" 
                         placeholder="select"
-                        defaultValue={boards[0] ? boards[0].ID : 1}
                         onChange={this.changeForm("board")}>
                             {boards}
                     </FormControl>
