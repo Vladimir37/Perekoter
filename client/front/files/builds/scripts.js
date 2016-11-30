@@ -48826,6 +48826,7 @@
 	        _this.loadPage = _this.loadPage.bind(_this);
 	        _this.openModal = _this.openModal.bind(_this);
 	        _this.closeModal = _this.closeModal.bind(_this);
+	        _this.createNew = _this.createNew.bind(_this);
 	        _this.generateNewModal = _this.generateNewModal.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
@@ -48948,6 +48949,17 @@
 	            });
 	        }
 	    }, {
+	        key: 'createNew',
+	        value: function createNew(e) {
+	            var allData = this.state.title && this.state.header && this.state.board;
+	            console.log(this.state.title);
+	            console.log(this.state.header);
+	            console.log(this.state.board);
+
+	            e.preventDefault();
+	            return false;
+	        }
+	    }, {
 	        key: 'generateNewModal',
 	        value: function generateNewModal() {
 	            var errorPanel;
@@ -48962,7 +48974,7 @@
 	            var boards = this.state.boards.map(function (board) {
 	                return React.createElement(
 	                    'option',
-	                    { value: board.ID },
+	                    { key: board.ID, value: board.ID },
 	                    board.Name,
 	                    ' (/',
 	                    board.Addr,
@@ -48974,101 +48986,113 @@
 	                _reactBootstrap.Modal,
 	                { show: this.state.showNewModal, onHide: this.closeModal },
 	                React.createElement(
-	                    _reactBootstrap.Modal.Header,
-	                    { closeButton: true },
+	                    'form',
+	                    { action: '/api/threads/add_thread', method: 'POST', onSubmit: this.createNew },
 	                    React.createElement(
-	                        _reactBootstrap.Modal.Title,
+	                        _reactBootstrap.Modal.Header,
+	                        { closeButton: true },
+	                        React.createElement(
+	                            _reactBootstrap.Modal.Title,
+	                            null,
+	                            '\u041D\u043E\u0432\u044B\u0439 \u0442\u0440\u0435\u0434'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Body,
 	                        null,
-	                        '\u041D\u043E\u0432\u044B\u0439 \u0442\u0440\u0435\u0434'
-	                    )
-	                ),
-	                React.createElement(
-	                    _reactBootstrap.Modal.Body,
-	                    null,
-	                    errorPanel,
-	                    React.createElement(_reactBootstrap.FormControl, {
-	                        type: 'text',
-	                        value: this.state.title,
-	                        placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435',
-	                        onChange: this.changeForm("title")
-	                    }),
-	                    React.createElement(
-	                        _reactBootstrap.Checkbox,
-	                        {
-	                            value: true,
-	                            checked: this.state.numbering,
-	                            onChange: this.changeCheckbox("numbering")
-	                        },
-	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F'
-	                    ),
-	                    React.createElement(
-	                        _reactBootstrap.Checkbox,
-	                        {
-	                            value: true,
-	                            checked: this.state.roman,
-	                            onChange: this.changeCheckbox("roman"),
+	                        errorPanel,
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.title,
+	                            placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435',
+	                            onChange: this.changeForm("title")
+	                        }),
+	                        React.createElement(
+	                            _reactBootstrap.Checkbox,
+	                            {
+	                                value: true,
+	                                checked: this.state.numbering,
+	                                onChange: this.changeCheckbox("numbering")
+	                            },
+	                            '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F'
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Checkbox,
+	                            {
+	                                value: true,
+	                                checked: this.state.roman,
+	                                onChange: this.changeCheckbox("roman"),
+	                                disabled: !this.state.numbering
+	                            },
+	                            '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F \u0440\u0438\u043C\u0441\u043A\u0438\u043C\u0438 \u0446\u0438\u0444\u0440\u0430\u043C\u0438'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.current_num,
+	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430',
+	                            onChange: this.changeForm("current_num"),
 	                            disabled: !this.state.numbering
-	                        },
-	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F \u0440\u0438\u043C\u0441\u043A\u0438\u043C\u0438 \u0446\u0438\u0444\u0440\u0430\u043C\u0438'
-	                    ),
-	                    React.createElement(_reactBootstrap.FormControl, {
-	                        type: 'text',
-	                        value: this.state.current_num,
-	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430',
-	                        onChange: this.changeForm("current_num"),
-	                        disabled: !this.state.numbering
-	                    }),
-	                    React.createElement('br', null),
-	                    React.createElement(_reactBootstrap.FormControl, {
-	                        type: 'text',
-	                        value: this.state.current_thread,
-	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
-	                        onChange: this.changeForm("current_thread")
-	                    }),
-	                    React.createElement('br', null),
-	                    React.createElement(
-	                        _reactBootstrap.Checkbox,
-	                        {
-	                            value: true,
-	                            checked: this.state.header_link,
-	                            onChange: this.changeCheckbox("header_link")
-	                        },
-	                        '\u0428\u0430\u043F\u043A\u0430 \u0432 \u0432\u0438\u0434\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435'
-	                    ),
-	                    React.createElement(_reactBootstrap.FormControl, {
-	                        type: 'text',
-	                        value: this.state.current_thread,
-	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
-	                        onChange: this.changeForm("current_thread")
-	                    }),
-	                    React.createElement('br', null),
-	                    React.createElement(_reactBootstrap.FormControl, {
-	                        componentClass: 'textarea',
-	                        placeholder: this.state.header_link ? "Ссылка на шапку" : "Шапка"
-	                    }),
-	                    React.createElement('br', null),
-	                    React.createElement(
-	                        _reactBootstrap.FormControl,
-	                        { componentClass: 'select', placeholder: 'select' },
-	                        boards
-	                    ),
-	                    React.createElement(FieldGroup, {
-	                        type: 'file',
-	                        label: '\u041E\u043F-\u043F\u0438\u043A'
-	                    })
-	                ),
-	                React.createElement(
-	                    _reactBootstrap.Modal.Footer,
-	                    null,
-	                    React.createElement(
-	                        _reactBootstrap.Button,
-	                        { bsStyle: 'success', onClick: this.createNew },
-	                        '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.current_thread,
+	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
+	                            onChange: this.changeForm("current_thread")
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(
+	                            _reactBootstrap.Checkbox,
+	                            {
+	                                value: true,
+	                                checked: this.state.header_link,
+	                                onChange: this.changeCheckbox("header_link")
+	                            },
+	                            '\u0428\u0430\u043F\u043A\u0430 \u0432 \u0432\u0438\u0434\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435'
+	                        ),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
+	                            value: this.state.current_thread,
+	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
+	                            onChange: this.changeForm("current_thread")
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            componentClass: 'textarea',
+	                            placeholder: this.state.header_link ? "Ссылка на шапку" : "Шапка",
+	                            value: this.state.header,
+	                            onChange: this.changeForm("header")
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(
+	                            _reactBootstrap.FormControl,
+	                            {
+	                                value: this.state.board,
+	                                componentClass: 'select',
+	                                placeholder: 'select',
+	                                defaultValue: boards[0] ? boards[0].ID : 1,
+	                                onChange: this.changeForm("board") },
+	                            boards
+	                        ),
+	                        React.createElement('br', null),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'file',
+	                            name: 'img'
+	                        })
 	                    ),
 	                    React.createElement(
-	                        _reactBootstrap.Button,
-	                        { bsStyle: 'primary', onClick: this.closeModal },
-	                        '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                        _reactBootstrap.Modal.Footer,
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'success', type: 'submit' },
+	                            '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', onClick: this.closeModal },
+	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                        )
 	                    )
 	                )
 	            );

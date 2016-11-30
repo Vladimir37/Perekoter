@@ -47,7 +47,7 @@ type ThreadRequest struct {
 	ID            int    `json:"id"`
 	Numbering     bool   `json:"numbering"`
 	Roman         bool   `json:"roman"`
-	CurrentNum    int    `json:"current_num" binding:"required"`
+	CurrentNum    int    `json:"current_num"`
 	CurrentThread int    `json:"current_thread"`
 	Title         string `json:"title" binding:"required"`
 	HeaderLink    bool   `json:"header_link"`

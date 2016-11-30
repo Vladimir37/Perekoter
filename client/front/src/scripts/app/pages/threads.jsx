@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Table, Modal, Button, Alert, FormControl, Checkbox} from 'react-bootstrap';
+import {Table, Modal, Button, Alert, FormControl, Checkbox, FieldGroup} from 'react-bootstrap';
 import Axios from 'axios';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
@@ -26,6 +26,7 @@ export class Threads extends React.Component {
         this.loadPage = this.loadPage.bind(this);
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this.createNew = this.createNew.bind(this);
         this.generateNewModal = this.generateNewModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
     }
@@ -137,6 +138,16 @@ export class Threads extends React.Component {
         });
     }
 
+    createNew(e) {
+        var allData = (this.state.title && this.state.header && this.state.board);
+        console.log(this.state.title);
+        console.log(this.state.header);
+        console.log(this.state.board);
+
+        e.preventDefault();
+        return false;
+    }
+
     generateNewModal() {
         var errorPanel;
         if (this.state.errorNew) {
@@ -144,10 +155,11 @@ export class Threads extends React.Component {
         }
 
         var boards = this.state.boards.map((board) => {
-            return <option value={board.ID}>{board.Name} (/{board.Addr}/)</option>;
+            return <option key={board.ID} value={board.ID}>{board.Name} (/{board.Addr}/)</option>;
         });
 
         return <Modal show={this.state.showNewModal} onHide={this.closeModal}>
+                <form action="/api/threads/add_thread" method="POST" onSubmit={this.createNew}>
                 <Modal.Header closeButton>
                     <Modal.Title>Новый тред</Modal.Title>
                 </Modal.Header>
@@ -199,21 +211,30 @@ export class Threads extends React.Component {
                     <br/>
                     <FormControl 
                         componentClass="textarea" 
-                        placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"} 
+                        placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"}
+                        value={this.state.header}
+                        onChange={this.changeForm("header")}
                     />
                     <br/>
-                    <FormControl componentClass="select" placeholder="select">
-                        {boards}
+                    <FormControl 
+                        value={this.state.board} 
+                        componentClass="select" 
+                        placeholder="select"
+                        defaultValue={boards[0] ? boards[0].ID : 1}
+                        onChange={this.changeForm("board")}>
+                            {boards}
                     </FormControl>
-                    <FieldGroup
+                    <br/>
+                    <FormControl
                         type="file"
-                        label="Оп-пик"
+                        name="img"
                     />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button bsStyle="success" onClick={this.createNew}>Создать</Button>
+                    <Button bsStyle="success" type="submit">Создать</Button>
                     <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
                 </Modal.Footer>
+                </form>
             </Modal>;
     }
 
