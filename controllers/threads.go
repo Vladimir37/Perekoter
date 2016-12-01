@@ -132,7 +132,6 @@ func EditThread(c *gin.Context) {
 	thread.Header = request.Header
 	thread.Board = targetBoard
 	thread.BoardID = targetBoard.ID
-	thread.Active = request.Active
 
 	db.Save(&thread)
 
@@ -185,6 +184,34 @@ func UploadImage(c *gin.Context) {
 	db.Save(&thread)
 
 	go utility.NewHistoryPoint("Image of thread \"" + thread.Title + "\" was changed")
+
+	c.JSON(200, gin.H{
+		"status": 0,
+	})
+}
+
+func SwitchThreadActivity(c *gin.Context) {
+	var request utility.NumRequest
+	c.Bind(&request)
+
+	db := models.DB()
+	defer db.Close()
+
+	var thread models.Thread
+	db.First(&thread, request.Num)
+
+	thread.Active = !thread.Active
+
+	db.Save(&thread)
+
+	var status string
+	if thread.Active {
+		status = "has been activated"
+	} else {
+		status = "has been deactivated"
+	}
+
+	go utility.NewHistoryPoint("Thread \"" + thread.Title + "\" " + status)
 
 	c.JSON(200, gin.H{
 		"status": 0,

@@ -56,6 +56,7 @@ func getApiRouter(baseRouter *gin.Engine) {
 			threads.POST("add_thread", controllers.CheckMiddleware, controllers.AddThread)
 			threads.POST("edit_thread", controllers.CheckMiddleware, controllers.EditThread)
 			threads.POST("upload_image", controllers.CheckMiddleware, controllers.UploadImage)
+			threads.POST("switch_thread_activity", controllers.CheckMiddleware, controllers.SwitchThreadActivity)
 			threads.POST("delete_thread", controllers.CheckMiddleware, controllers.DeleteThread)
 		}
 

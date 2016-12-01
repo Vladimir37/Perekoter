@@ -63,7 +63,7 @@ export class Errors extends React.Component {
     }
 
     closeAllErrors() {
-        Axios.post('/api/errors/close_all_errors', )
+        Axios.post('/api/errors/close_all_errors')
             .then((response) => {
                 response = response.data;
                 if (response.status == 0) {

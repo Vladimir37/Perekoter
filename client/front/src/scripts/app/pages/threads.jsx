@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Table, Modal, Button, Alert, FormControl, Checkbox, FieldGroup} from 'react-bootstrap';
 import Axios from 'axios';
+import Switcher from 'react-switcher';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
 import {checkUser, forbiddenGenerator} from '../utility/checkUser.jsx';
@@ -27,6 +28,7 @@ export class Threads extends React.Component {
         this.loadPage = this.loadPage.bind(this);
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this.switchActive = this.switchActive.bind(this);
         this.createNew = this.createNew.bind(this);
         this.generateNewModal = this.generateNewModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
@@ -138,6 +140,28 @@ export class Threads extends React.Component {
             showDeleteModal: false,
             errorDelete: null
         });
+    }
+
+    switchActive(thread) {
+        return () => {
+            Axios.post('/api/threads/switch_thread_activity', {
+                num: thread
+            }).then((response) => {
+                    response = response.data;
+                    if (response.status == 0) {
+                        this.loadThreads();
+                    } else {
+                        this.setState({
+                            error: "Ошибка сервера"
+                        });
+                    }
+                })
+                .catch((err) => {
+                    this.setState({
+                        error: "Ошибка сервера"
+                    });
+                });
+        }
     }
 
     createNew(e) {
@@ -284,7 +308,7 @@ export class Threads extends React.Component {
                 <td>{thread.ID}</td>
                 <td>{thread.Title}</td>
                 <td>{thread.Board.Name}</td>
-                <td>{thread.Active ? "✓" : "✗"}</td>
+                <td><Switcher on={thread.Active} onClick={this.switchActive(thread.ID)}>{thread.Active ? ' Активен' : ' Неактивен'}</Switcher></td>
                 <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal('Edit', thread)}>Редактировать</Button></td>
                 <td><Button bsStyle="warning" bsSize="xsmall" onClick={this.openModal('Delete', thread)}>Удалить</Button></td>
             </tr>;
