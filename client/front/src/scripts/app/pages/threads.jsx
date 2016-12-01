@@ -31,6 +31,7 @@ export class Threads extends React.Component {
         this.switchActive = this.switchActive.bind(this);
         this.createNew = this.createNew.bind(this);
         this.generateNewModal = this.generateNewModal.bind(this);
+        this.generateEditModal = this.generateEditModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
     }
 
@@ -289,6 +290,97 @@ export class Threads extends React.Component {
             </Modal>;
     }
 
+    generateEditModal() {
+        var errorPanel;
+        if (this.state.errorEdit) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorEdit}</Alert>;
+        }
+
+        var boards = this.state.boards.map((board) => {
+            return <option key={board.ID} value={board.ID}>{board.Name} (/{board.Addr}/)</option>;
+        });
+
+        return <Modal show={this.state.showEditModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Изменить тред</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {errorPanel}
+                    <FormControl
+                        type="text"
+                        value={this.state.title}
+                        name="title"
+                        placeholder="Название"
+                        onChange={this.changeForm("title")}
+                    />
+                    <Checkbox
+                        value={true}
+                        name="numbering"
+                        checked={this.state.numbering}
+                        onChange={this.changeCheckbox("numbering")}
+                    >Нумерация</Checkbox>
+                    <Checkbox
+                        value={true}
+                        checked={this.state.roman}
+                        name="roman"
+                        onChange={this.changeCheckbox("roman")}
+                        disabled={!this.state.numbering}
+                    >Нумерация римскими цифрами</Checkbox>
+                    <FormControl
+                        type="text"
+                        value={this.state.current_num}
+                        name="current_num"
+                        placeholder="Текущий номер треда"
+                        onChange={this.changeForm("current_num")}
+                        disabled={!this.state.numbering}
+                    />
+                    <br/>
+                    <FormControl
+                        type="text"
+                        value={this.state.current_thread}
+                        name="current_thread"
+                        placeholder="Текущий тред (номер ОП-поста)"
+                        onChange={this.changeForm("current_thread")}
+                    />
+                    <br/>
+                    <Checkbox
+                        value={true}
+                        checked={this.state.header_link}
+                        name="header_link"
+                        onChange={this.changeCheckbox("header_link")}
+                    >Шапка в виде документа по ссылке</Checkbox>
+                    <br/>
+                    <FormControl 
+                        componentClass="textarea" 
+                        name="header"
+                        placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"}
+                        value={this.state.header}
+                        onChange={this.changeForm("header")}
+                    />
+                    <br/>
+                    <FormControl 
+                        value={this.state.board} 
+                        componentClass="select"
+                        name="board_num"
+                        placeholder="select"
+                        onChange={this.changeForm("board")}>
+                            {boards}
+                    </FormControl>
+                    <br/>
+                    <FormControl
+                        type="file"
+                        name="cover"
+                        value={this.state.cover}
+                        onChange={this.changeForm("cover")}
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="success" type="submit">Изменить</Button>
+                    <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
+                </Modal.Footer>
+            </Modal>;
+    }
+
     generatePage() {
         var errorPanel;
         if (this.state.error) {
@@ -333,6 +425,7 @@ export class Threads extends React.Component {
             </Table>
             <Button bsStyle="primary" onClick={this.openModal("New")}>Создать</Button>
             {this.generateNewModal()}
+            {this.generateEditModal()}
         </main>;
     }
     
