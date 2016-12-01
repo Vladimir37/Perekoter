@@ -284,6 +284,7 @@ export class Threads extends React.Component {
                 <td>{thread.ID}</td>
                 <td>{thread.Title}</td>
                 <td>{thread.Board.Name}</td>
+                <td>{thread.Active ? "✓" : "✗"}</td>
                 <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal('Edit', thread)}>Редактировать</Button></td>
                 <td><Button bsStyle="warning" bsSize="xsmall" onClick={this.openModal('Delete', thread)}>Удалить</Button></td>
             </tr>;
@@ -297,6 +298,7 @@ export class Threads extends React.Component {
                     <th>#</th>
                     <th>Имя</th>
                     <th>Доска</th>
+                    <th>Активность</th>
                     <th></th>
                     <th></th>
                 </tr>

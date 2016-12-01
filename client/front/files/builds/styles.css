@@ -32,6 +32,10 @@ main {
   width: 960px;
   margin: 0 auto;
 }
+.error-closeAll {
+  margin-bottom: 15px !important;
+  float: right;
+}
 /*!
  * bootswatch v3.3.7
  * Homepage: http://bootswatch.com

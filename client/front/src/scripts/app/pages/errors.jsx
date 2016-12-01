@@ -22,6 +22,7 @@ export class Errors extends React.Component {
         this.loadPage = this.loadPage.bind(this);
         this.loadErrors = this.loadErrors.bind(this);
         this.closeError = this.closeError.bind(this);
+        this.closeAllErrors = this.closeAllErrors.bind(this);
         this.generatePage = this.generatePage.bind(this);
         this.changeCategory = this.changeCategory.bind(this);
         this.checkCategory = this.checkCategory.bind(this);
@@ -59,6 +60,25 @@ export class Errors extends React.Component {
                 });
             });
         }
+    }
+
+    closeAllErrors() {
+        Axios.post('/api/errors/close_all_errors', )
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.loadErrors();
+                } else {
+                    this.setState({
+                        error: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    error: "Ошибка сервера"
+                });
+            });
     }
 
     loadPage() {
@@ -144,6 +164,8 @@ export class Errors extends React.Component {
 
         return <main>
             {errorPanel}
+            <Button bsStyle="primary" className="error-closeAll" onClick={this.closeAllErrors}>Отметить все ошибки просмотренными</Button>
+            <br/>
             <ButtonGroup justified>
                 <Button href="#" active={this.checkCategory(0)} onClick={this.changeCategory(0)}>Новые</Button>
                 <Button href="#" active={this.checkCategory(1)} onClick={this.changeCategory(1)}>Просмотренные</Button>

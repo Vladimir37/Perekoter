@@ -49165,6 +49165,11 @@
 	                    React.createElement(
 	                        'td',
 	                        null,
+	                        thread.Active ? "✓" : "✗"
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
 	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this8.openModal('Edit', thread) },
@@ -49210,6 +49215,11 @@
 	                                'th',
 	                                null,
 	                                '\u0414\u043E\u0441\u043A\u0430'
+	                            ),
+	                            React.createElement(
+	                                'th',
+	                                null,
+	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C'
 	                            ),
 	                            React.createElement('th', null),
 	                            React.createElement('th', null)
@@ -49314,6 +49324,7 @@
 	        _this.loadPage = _this.loadPage.bind(_this);
 	        _this.loadErrors = _this.loadErrors.bind(_this);
 	        _this.closeError = _this.closeError.bind(_this);
+	        _this.closeAllErrors = _this.closeAllErrors.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        _this.changeCategory = _this.changeCategory.bind(_this);
 	        _this.checkCategory = _this.checkCategory.bind(_this);
@@ -49361,9 +49372,29 @@
 	            };
 	        }
 	    }, {
+	        key: 'closeAllErrors',
+	        value: function closeAllErrors() {
+	            var _this4 = this;
+
+	            _axios2.default.post('/api/errors/close_all_errors').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this4.loadErrors();
+	                } else {
+	                    _this4.setState({
+	                        error: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this4.setState({
+	                    error: "Ошибка сервера"
+	                });
+	            });
+	        }
+	    }, {
 	        key: 'loadPage',
 	        value: function loadPage() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            (0, _checkUser.checkUser)().then(function (response) {
 	                var logged = false;
@@ -49371,12 +49402,12 @@
 	                    logged = true;
 	                }
 
-	                _this4.setState({
+	                _this5.setState({
 	                    loaded: true,
 	                    logged: logged
 	                });
 	            }).catch(function (page) {
-	                _this4.setState({
+	                _this5.setState({
 	                    loaded: true
 	                });
 	            });
@@ -49384,24 +49415,24 @@
 	    }, {
 	        key: 'loadErrors',
 	        value: function loadErrors() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            _axios2.default.get('/api/errors/get_all_errors').then(function (response) {
 	                response = response.data;
 	                if (response.status == 0) {
 	                    response.body = response.body.reverse();
-	                    _this5.setState({
+	                    _this6.setState({
 	                        allErrors: response.body,
 	                        errorsLoaded: true
 	                    });
 	                } else {
-	                    _this5.setState({
+	                    _this6.setState({
 	                        error: "Ошибка сервера",
 	                        errorsLoaded: true
 	                    });
 	                }
 	            }).catch(function (err) {
-	                _this5.setState({
+	                _this6.setState({
 	                    error: "Ошибка сервера",
 	                    errorsLoaded: true
 	                });
@@ -49410,7 +49441,7 @@
 	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
-	            var _this6 = this;
+	            var _this7 = this;
 
 	            var errorPanel;
 	            if (this.state.error) {
@@ -49445,7 +49476,7 @@
 	                var activity_pic = error.Active ? "✗" : "✓";
 	                var close_button = error.Active ? React.createElement(
 	                    _reactBootstrap.Button,
-	                    { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this6.closeError(error.ID) },
+	                    { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this7.closeError(error.ID) },
 	                    '\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043E'
 	                ) : '';
 	                return React.createElement(
@@ -49483,6 +49514,12 @@
 	                'main',
 	                null,
 	                errorPanel,
+	                React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', className: 'error-closeAll', onClick: this.closeAllErrors },
+	                    '\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u0432\u0441\u0435 \u043E\u0448\u0438\u0431\u043A\u0438 \u043F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u043D\u044B\u043C\u0438'
+	                ),
+	                React.createElement('br', null),
 	                React.createElement(
 	                    _reactBootstrap.ButtonGroup,
 	                    { justified: true },

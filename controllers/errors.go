@@ -38,3 +38,14 @@ func CloseError (c *gin.Context) {
 		"status": 0,
 	})
 }
+
+func CloseAllErrors (c *gin.Context) {
+	db := models.DB()
+	defer db.Close()
+
+	db.Model(&models.Error{}).Update("Active", false)
+
+	c.JSON(200, gin.H{
+		"status": 0,
+	})
+}

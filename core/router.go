@@ -78,6 +78,7 @@ func getApiRouter(baseRouter *gin.Engine) {
 		{
 			errors.GET("/get_all_errors", controllers.CheckMiddleware, controllers.GetAllErrors)
 			errors.POST("/close_error", controllers.CheckMiddleware, controllers.CloseError)
+			errors.POST("/close_all_errors", controllers.CheckMiddleware, controllers.CloseAllErrors)
 		}
 
 		history := api.Group("/history")
