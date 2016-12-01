@@ -1,5 +1,6 @@
 .idea/
 .vscode/
 node_modules/
+covers/
 test.db
 config.json

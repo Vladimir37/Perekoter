@@ -141,13 +141,30 @@ export class Threads extends React.Component {
     }
 
     createNew(e) {
-        var allData = (this.state.title && this.state.header && this.state.board);
-        console.log(this.state.title);
-        console.log(this.state.header);
-        console.log(this.state.board);
+        var allData = (this.state.title && this.state.header && this.state.board && this.state.cover);
 
-        e.preventDefault();
-        return false;
+        if (!allData) {
+            this.setState({
+                errorNew: 'Не все поля заполнены'
+            });
+
+            e.preventDefault();
+            return false;
+        }
+
+        if (
+            (this.state.current_thread && isNaN(this.state.current_thread)) || 
+            (this.state.current_num && isNaN(this.state.current_num))
+        ) {
+            this.setState({
+                errorNew: 'Текущий тред и текущий номер должны быть цифрами'
+            });
+
+            e.preventDefault();
+            return false;
+        }
+
+        return true;
     }
 
     generateNewModal() {
@@ -161,32 +178,41 @@ export class Threads extends React.Component {
         });
 
         return <Modal show={this.state.showNewModal} onHide={this.closeModal}>
-                <form action="/api/threads/add_thread" method="POST" onSubmit={this.createNew}>
+                <form action="/api/threads/add_thread" method="POST" encType="multipart/form-data" onSubmit={this.createNew}>
                 <Modal.Header closeButton>
                     <Modal.Title>Новый тред</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {errorPanel}
                     <FormControl
+                        type="hidden"
+                        name="redirect"
+                        value={true}
+                    />
+                    <FormControl
                         type="text"
                         value={this.state.title}
+                        name="title"
                         placeholder="Название"
                         onChange={this.changeForm("title")}
                     />
                     <Checkbox
                         value={true}
+                        name="numbering"
                         checked={this.state.numbering}
                         onChange={this.changeCheckbox("numbering")}
                     >Нумерация</Checkbox>
                     <Checkbox
                         value={true}
                         checked={this.state.roman}
+                        name="roman"
                         onChange={this.changeCheckbox("roman")}
                         disabled={!this.state.numbering}
                     >Нумерация римскими цифрами</Checkbox>
                     <FormControl
                         type="text"
                         value={this.state.current_num}
+                        name="current_num"
                         placeholder="Текущий номер треда"
                         onChange={this.changeForm("current_num")}
                         disabled={!this.state.numbering}
@@ -195,6 +221,7 @@ export class Threads extends React.Component {
                     <FormControl
                         type="text"
                         value={this.state.current_thread}
+                        name="current_thread"
                         placeholder="Текущий тред (номер ОП-поста)"
                         onChange={this.changeForm("current_thread")}
                     />
@@ -202,17 +229,13 @@ export class Threads extends React.Component {
                     <Checkbox
                         value={true}
                         checked={this.state.header_link}
+                        name="header_link"
                         onChange={this.changeCheckbox("header_link")}
                     >Шапка в виде документа по ссылке</Checkbox>
-                    <FormControl
-                        type="text"
-                        value={this.state.current_thread}
-                        placeholder="Текущий тред (номер ОП-поста)"
-                        onChange={this.changeForm("current_thread")}
-                    />
                     <br/>
                     <FormControl 
                         componentClass="textarea" 
+                        name="header"
                         placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"}
                         value={this.state.header}
                         onChange={this.changeForm("header")}
@@ -220,7 +243,8 @@ export class Threads extends React.Component {
                     <br/>
                     <FormControl 
                         value={this.state.board} 
-                        componentClass="select" 
+                        componentClass="select"
+                        name="board_num"
                         placeholder="select"
                         onChange={this.changeForm("board")}>
                             {boards}
@@ -228,7 +252,9 @@ export class Threads extends React.Component {
                     <br/>
                     <FormControl
                         type="file"
-                        name="img"
+                        name="cover"
+                        value={this.state.cover}
+                        onChange={this.changeForm("cover")}
                     />
                 </Modal.Body>
                 <Modal.Footer>

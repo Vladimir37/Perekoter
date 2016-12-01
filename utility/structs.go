@@ -54,6 +54,7 @@ type ThreadRequest struct {
 	Header        string `json:"header" binding:"required"`
 	BoardNum      int    `json:"board_num" binding:"required"`
 	Active        bool   `json:"active"`
+	Redirect      bool   `json:"redirect"`
 }
 
 type UserChangingRequest struct {

@@ -18,7 +18,7 @@ func GetAllThreads(c *gin.Context) {
 	db := models.DB()
 	defer db.Close()
 
-	db.Find(&threads)
+	db.Preload("Board").Find(&threads)
 
 	c.JSON(200, gin.H{
 		"status": 0,
@@ -43,23 +43,30 @@ func GetThread(c *gin.Context) {
 }
 
 func AddThread(c *gin.Context) {
-	var request utility.ThreadRequest
-	c.Bind(&request)
+	title := c.PostForm("title")
+	numbering := c.PostForm("numbering") != ""
+	roman := c.PostForm("roman") != ""
+	currentNum, _ := strconv.Atoi(c.PostForm("current_num"))
+	currentThread, _ := strconv.Atoi(c.PostForm("current_thread"))
+	header := c.PostForm("header")
+	headerLink := c.PostForm("header_link") != ""
+	boardNum, _ := strconv.Atoi(c.PostForm("board_num"))
+	redirect := c.PostForm("redirect") != ""
 
 	db := models.DB()
 	defer db.Close()
 
 	var targetBoard models.Board
-	db.First(&targetBoard, request.BoardNum)
+	db.First(&targetBoard, boardNum)
 
 	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".png"
 
 	img, _, errImg := c.Request.FormFile("cover")
-	out, errFile := os.Open("./covers/" + imageName)
+	out, errFile := os.Create("./covers/" + imageName)
 
 	if (errFile != nil) || (errImg != nil) {
 		go utility.NewError("Failed to create thread - image not opened")
-		go utility.NewHistoryPoint("ERROR: Thread \"" + request.Title + "\" was not created - image not opened")
+		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not created - image not opened")
 		c.JSON(200, gin.H{
 			"status": 2,
 		})
@@ -72,7 +79,7 @@ func AddThread(c *gin.Context) {
 
 	if errWriting != nil {
 		go utility.NewError("Failed to creating thread - image not created")
-		go utility.NewHistoryPoint("ERROR: Thread \"" + request.Title + "\" was not created - image not created")
+		go utility.NewHistoryPoint("ERROR: Thread \"" + title + "\" was not created - image not created")
 		c.JSON(200, gin.H{
 			"status": 3,
 		})
@@ -80,24 +87,27 @@ func AddThread(c *gin.Context) {
 	}
 
 	db.Create(&models.Thread{
-		Numbering:     request.Numbering,
-		Roman:         request.Roman,
-		CurrentNum:    request.CurrentNum,
-		CurrentThread: request.CurrentThread,
-		Title:         request.Title,
-		HeaderLink:    request.HeaderLink,
-		Header:        request.Header,
+		Numbering:     numbering,
+		Roman:         roman,
+		CurrentNum:    currentNum,
+		CurrentThread: currentThread,
+		Title:         title,
+		HeaderLink:    headerLink,
+		Header:        header,
 		Image:         imageName,
-		Board:         targetBoard,
 		BoardID:       targetBoard.ID,
 		Active:        true,
 	})
 
-	go utility.NewHistoryPoint("Thread \"" + request.Title + "\" was created")
+	go utility.NewHistoryPoint("Thread \"" + title + "\" was created")
 
-	c.JSON(200, gin.H{
-		"status": 0,
-	})
+	if redirect {
+		c.Redirect(301, "/threads")
+	} else {
+		c.JSON(200, gin.H{
+			"status": 0,
+		})
+	}
 }
 
 func EditThread(c *gin.Context) {

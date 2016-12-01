@@ -48953,13 +48953,27 @@
 	    }, {
 	        key: 'createNew',
 	        value: function createNew(e) {
-	            var allData = this.state.title && this.state.header && this.state.board;
-	            console.log(this.state.title);
-	            console.log(this.state.header);
-	            console.log(this.state.board);
+	            var allData = this.state.title && this.state.header && this.state.board && this.state.cover;
 
-	            e.preventDefault();
-	            return false;
+	            if (!allData) {
+	                this.setState({
+	                    errorNew: 'Не все поля заполнены'
+	                });
+
+	                e.preventDefault();
+	                return false;
+	            }
+
+	            if (this.state.current_thread && isNaN(this.state.current_thread) || this.state.current_num && isNaN(this.state.current_num)) {
+	                this.setState({
+	                    errorNew: 'Текущий тред и текущий номер должны быть цифрами'
+	                });
+
+	                e.preventDefault();
+	                return false;
+	            }
+
+	            return true;
 	        }
 	    }, {
 	        key: 'generateNewModal',
@@ -48989,7 +49003,7 @@
 	                { show: this.state.showNewModal, onHide: this.closeModal },
 	                React.createElement(
 	                    'form',
-	                    { action: '/api/threads/add_thread', method: 'POST', onSubmit: this.createNew },
+	                    { action: '/api/threads/add_thread', method: 'POST', encType: 'multipart/form-data', onSubmit: this.createNew },
 	                    React.createElement(
 	                        _reactBootstrap.Modal.Header,
 	                        { closeButton: true },
@@ -49004,8 +49018,14 @@
 	                        null,
 	                        errorPanel,
 	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'hidden',
+	                            name: 'redirect',
+	                            value: true
+	                        }),
+	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
 	                            value: this.state.title,
+	                            name: 'title',
 	                            placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435',
 	                            onChange: this.changeForm("title")
 	                        }),
@@ -49013,6 +49033,7 @@
 	                            _reactBootstrap.Checkbox,
 	                            {
 	                                value: true,
+	                                name: 'numbering',
 	                                checked: this.state.numbering,
 	                                onChange: this.changeCheckbox("numbering")
 	                            },
@@ -49023,6 +49044,7 @@
 	                            {
 	                                value: true,
 	                                checked: this.state.roman,
+	                                name: 'roman',
 	                                onChange: this.changeCheckbox("roman"),
 	                                disabled: !this.state.numbering
 	                            },
@@ -49031,6 +49053,7 @@
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
 	                            value: this.state.current_num,
+	                            name: 'current_num',
 	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430',
 	                            onChange: this.changeForm("current_num"),
 	                            disabled: !this.state.numbering
@@ -49039,6 +49062,7 @@
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
 	                            value: this.state.current_thread,
+	                            name: 'current_thread',
 	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
 	                            onChange: this.changeForm("current_thread")
 	                        }),
@@ -49048,19 +49072,15 @@
 	                            {
 	                                value: true,
 	                                checked: this.state.header_link,
+	                                name: 'header_link',
 	                                onChange: this.changeCheckbox("header_link")
 	                            },
 	                            '\u0428\u0430\u043F\u043A\u0430 \u0432 \u0432\u0438\u0434\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435'
 	                        ),
-	                        React.createElement(_reactBootstrap.FormControl, {
-	                            type: 'text',
-	                            value: this.state.current_thread,
-	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
-	                            onChange: this.changeForm("current_thread")
-	                        }),
 	                        React.createElement('br', null),
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            componentClass: 'textarea',
+	                            name: 'header',
 	                            placeholder: this.state.header_link ? "Ссылка на шапку" : "Шапка",
 	                            value: this.state.header,
 	                            onChange: this.changeForm("header")
@@ -49071,6 +49091,7 @@
 	                            {
 	                                value: this.state.board,
 	                                componentClass: 'select',
+	                                name: 'board_num',
 	                                placeholder: 'select',
 	                                onChange: this.changeForm("board") },
 	                            boards
@@ -49078,7 +49099,9 @@
 	                        React.createElement('br', null),
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'file',
-	                            name: 'img'
+	                            name: 'cover',
+	                            value: this.state.cover,
+	                            onChange: this.changeForm("cover")
 	                        })
 	                    ),
 	                    React.createElement(
