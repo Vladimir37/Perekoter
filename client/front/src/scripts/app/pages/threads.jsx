@@ -183,7 +183,7 @@ export class Threads extends React.Component {
     }
 
     createNew(e) {
-        var allData = (this.state.title && this.state.header && this.state.board && this.state.cover);
+        var allData = (this.state.title && this.state.header && this.state.board && this.state.cover && this.state.current_thread);
 
         if (!allData) {
             this.setState({
@@ -194,10 +194,7 @@ export class Threads extends React.Component {
             return false;
         }
 
-        if (
-            (this.state.current_thread && isNaN(this.state.current_thread)) || 
-            (this.state.current_num && isNaN(this.state.current_num))
-        ) {
+        if (isNaN(this.state.current_thread) || (this.state.current_num && isNaN(this.state.current_num))) {
             this.setState({
                 errorNew: 'Текущий тред и текущий номер должны быть цифрами'
             });
