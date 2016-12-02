@@ -48822,6 +48822,7 @@
 	            showNewModal: false,
 	            showEditModal: false,
 	            showDeleteModal: false,
+	            editedBoard: {},
 	            board: 1,
 	            error: null,
 	            loaded: false,
@@ -48833,6 +48834,7 @@
 	        _this.closeModal = _this.closeModal.bind(_this);
 	        _this.switchActive = _this.switchActive.bind(_this);
 	        _this.createNew = _this.createNew.bind(_this);
+	        _this.editThread = _this.editThread.bind(_this);
 	        _this.generateNewModal = _this.generateNewModal.bind(_this);
 	        _this.generateEditModal = _this.generateEditModal.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
@@ -48941,7 +48943,15 @@
 
 	                if (thread) {
 	                    _this7.setState({
-	                        //
+	                        editedID: thread.ID,
+	                        editedNumbering: thread.Numbering,
+	                        editedRoman: thread.Roman,
+	                        editedCurrentNum: thread.CurrentNum,
+	                        editedCurrentThread: thread.CurrentThread,
+	                        editedTitle: thread.Title,
+	                        editedHeaderLink: thread.HeaderLink,
+	                        editedHeader: thread.Header,
+	                        editedBoard: thread.Board.ID
 	                    });
 	                }
 	            };
@@ -49004,6 +49014,58 @@
 	            }
 
 	            return true;
+	        }
+	    }, {
+	        key: 'editThread',
+	        value: function editThread() {
+	            var _this9 = this;
+
+	            var allData = this.state.editedTitle && this.state.editedHeader && this.state.editedBoard;
+
+	            if (!allData) {
+	                this.setState({
+	                    errorEdit: "Не все поля заполнены"
+	                });
+	                return false;
+	            }
+
+	            if (this.state.editedCurrentThread && isNaN(this.state.editedCurrentThread) || this.state.editedCurrentNum && isNaN(this.state.editedCurrentNum)) {
+	                this.setState({
+	                    errorNew: 'Текущий тред и текущий номер должны быть цифрами'
+	                });
+	                return false;
+	            }
+
+	            var req_data = {
+	                id: this.state.editedID,
+	                numbering: this.state.editedNumbering,
+	                roman: this.state.editedRoman,
+	                current_num: Number(this.state.editedCurrentNum),
+	                current_thread: Number(this.state.editedCurrentThread),
+	                title: this.state.editedTitle,
+	                header_link: this.state.editedHeaderLink,
+	                header: this.state.editedHeader,
+	                board_num: Number(this.state.editedBoard)
+	            };
+
+	            _axios2.default.post('/api/threads/edit_thread', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this9.setState({
+	                        errorEdit: null
+	                    });
+	                    _this9.loadThreads();
+	                    _this9.closeModal();
+	                } else {
+	                    _this9.setState({
+	                        errorEdit: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this9.setState({
+	                    errorEdit: "Ошибка сервера"
+	                });
+	            });
 	        }
 	    }, {
 	        key: 'generateNewModal',
@@ -49192,18 +49254,16 @@
 	                    errorPanel,
 	                    React.createElement(_reactBootstrap.FormControl, {
 	                        type: 'text',
-	                        value: this.state.title,
-	                        name: 'title',
+	                        value: this.state.editedTitle,
 	                        placeholder: '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435',
-	                        onChange: this.changeForm("title")
+	                        onChange: this.changeForm("editedTitle")
 	                    }),
 	                    React.createElement(
 	                        _reactBootstrap.Checkbox,
 	                        {
 	                            value: true,
-	                            name: 'numbering',
-	                            checked: this.state.numbering,
-	                            onChange: this.changeCheckbox("numbering")
+	                            checked: this.state.editedNumbering,
+	                            onChange: this.changeCheckbox("editedNumbering")
 	                        },
 	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F'
 	                    ),
@@ -49211,73 +49271,60 @@
 	                        _reactBootstrap.Checkbox,
 	                        {
 	                            value: true,
-	                            checked: this.state.roman,
-	                            name: 'roman',
-	                            onChange: this.changeCheckbox("roman"),
-	                            disabled: !this.state.numbering
+	                            checked: this.state.editedRoman,
+	                            onChange: this.changeCheckbox("editedRoman"),
+	                            disabled: !this.state.editedNumbering
 	                        },
 	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F \u0440\u0438\u043C\u0441\u043A\u0438\u043C\u0438 \u0446\u0438\u0444\u0440\u0430\u043C\u0438'
 	                    ),
 	                    React.createElement(_reactBootstrap.FormControl, {
 	                        type: 'text',
-	                        value: this.state.current_num,
-	                        name: 'current_num',
+	                        value: this.state.editedCurrentNum,
 	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430',
-	                        onChange: this.changeForm("current_num"),
-	                        disabled: !this.state.numbering
+	                        onChange: this.changeForm("editedCurrentNum"),
+	                        disabled: !this.state.editedNumbering
 	                    }),
 	                    React.createElement('br', null),
 	                    React.createElement(_reactBootstrap.FormControl, {
 	                        type: 'text',
-	                        value: this.state.current_thread,
-	                        name: 'current_thread',
+	                        value: this.state.editedCurrentThread,
 	                        placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u0442\u0440\u0435\u0434 (\u043D\u043E\u043C\u0435\u0440 \u041E\u041F-\u043F\u043E\u0441\u0442\u0430)',
-	                        onChange: this.changeForm("current_thread")
+	                        onChange: this.changeForm("editedCurrentThread")
 	                    }),
 	                    React.createElement('br', null),
 	                    React.createElement(
 	                        _reactBootstrap.Checkbox,
 	                        {
 	                            value: true,
-	                            checked: this.state.header_link,
-	                            name: 'header_link',
-	                            onChange: this.changeCheckbox("header_link")
+	                            checked: this.state.editedHeaderLink,
+	                            onChange: this.changeCheckbox("editedHeaderLink")
 	                        },
 	                        '\u0428\u0430\u043F\u043A\u0430 \u0432 \u0432\u0438\u0434\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435'
 	                    ),
 	                    React.createElement('br', null),
 	                    React.createElement(_reactBootstrap.FormControl, {
 	                        componentClass: 'textarea',
-	                        name: 'header',
-	                        placeholder: this.state.header_link ? "Ссылка на шапку" : "Шапка",
-	                        value: this.state.header,
-	                        onChange: this.changeForm("header")
+	                        placeholder: this.state.editedHeaderLink ? "Ссылка на шапку" : "Шапка",
+	                        value: this.state.editedHeader,
+	                        onChange: this.changeForm("editedHeader")
 	                    }),
 	                    React.createElement('br', null),
 	                    React.createElement(
 	                        _reactBootstrap.FormControl,
 	                        {
-	                            value: this.state.board,
+	                            value: this.state.editedBoard,
 	                            componentClass: 'select',
-	                            name: 'board_num',
 	                            placeholder: 'select',
-	                            onChange: this.changeForm("board") },
+	                            onChange: this.changeForm("editedBoard") },
 	                        boards
-	                    ),
-	                    React.createElement('br', null),
-	                    React.createElement(_reactBootstrap.FormControl, {
-	                        type: 'file',
-	                        name: 'cover',
-	                        value: this.state.cover,
-	                        onChange: this.changeForm("cover")
-	                    })
+	                    )
 	                ),
 	                React.createElement(
 	                    _reactBootstrap.Modal.Footer,
 	                    null,
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { bsStyle: 'success', type: 'submit' },
+	                        { bsStyle: 'success', onClick: this.editThread },
 	                        '\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C'
 	                    ),
 	                    React.createElement(
@@ -49291,7 +49338,7 @@
 	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
-	            var _this9 = this;
+	            var _this10 = this;
 
 	            var errorPanel;
 	            if (this.state.error) {
@@ -49334,7 +49381,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactSwitcher2.default,
-	                            { on: thread.Active, onClick: _this9.switchActive(thread.ID) },
+	                            { on: thread.Active, onClick: _this10.switchActive(thread.ID) },
 	                            thread.Active ? ' Активен' : ' Неактивен'
 	                        )
 	                    ),
@@ -49343,7 +49390,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this9.openModal('Edit', thread) },
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this10.openModal('Edit', thread) },
 	                            '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
 	                        )
 	                    ),
@@ -49352,7 +49399,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this9.openModal('Delete', thread) },
+	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this10.openModal('Delete', thread) },
 	                            '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
 	                        )
 	                    )

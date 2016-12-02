@@ -19,6 +19,7 @@ export class Threads extends React.Component {
             showNewModal: false,
             showEditModal: false,
             showDeleteModal: false,
+            editedBoard: {},
             board: 1,
             error: null,
             loaded: false,
@@ -30,6 +31,7 @@ export class Threads extends React.Component {
         this.closeModal = this.closeModal.bind(this);
         this.switchActive = this.switchActive.bind(this);
         this.createNew = this.createNew.bind(this);
+        this.editThread = this.editThread.bind(this);
         this.generateNewModal = this.generateNewModal.bind(this);
         this.generateEditModal = this.generateEditModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
@@ -128,7 +130,15 @@ export class Threads extends React.Component {
 
             if (thread) {
                 this.setState({
-                    //
+                    editedID: thread.ID,
+                    editedNumbering: thread.Numbering,
+                    editedRoman: thread.Roman,
+                    editedCurrentNum: thread.CurrentNum,
+                    editedCurrentThread: thread.CurrentThread,
+                    editedTitle: thread.Title,
+                    editedHeaderLink: thread.HeaderLink,
+                    editedHeader: thread.Header,
+                    editedBoard: thread.Board.ID
                 });
             }
         }
@@ -190,6 +200,60 @@ export class Threads extends React.Component {
         }
 
         return true;
+    }
+
+    editThread() {
+        var allData = (this.state.editedTitle && this.state.editedHeader && this.state.editedBoard);
+        
+        if (!allData) {
+            this.setState({
+                errorEdit: "Не все поля заполнены"
+            });
+            return false;
+        }
+
+        if (
+            (this.state.editedCurrentThread && isNaN(this.state.editedCurrentThread)) || 
+            (this.state.editedCurrentNum && isNaN(this.state.editedCurrentNum))
+        ) {
+            this.setState({
+                errorNew: 'Текущий тред и текущий номер должны быть цифрами'
+            });
+            return false;
+        }
+
+        var req_data = {
+            id: this.state.editedID,
+            numbering: this.state.editedNumbering,
+            roman: this.state.editedRoman,
+            current_num: Number(this.state.editedCurrentNum),
+            current_thread: Number(this.state.editedCurrentThread),
+            title: this.state.editedTitle,
+            header_link: this.state.editedHeaderLink,
+            header: this.state.editedHeader,
+            board_num: Number(this.state.editedBoard)
+        };
+
+        Axios.post('/api/threads/edit_thread', req_data)
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorEdit: null
+                    })
+                    this.loadThreads();
+                    this.closeModal();
+                } else {
+                    this.setState({
+                        errorEdit: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorEdit: "Ошибка сервера"
+                });
+            });
     }
 
     generateNewModal() {
@@ -308,74 +372,59 @@ export class Threads extends React.Component {
                     {errorPanel}
                     <FormControl
                         type="text"
-                        value={this.state.title}
-                        name="title"
+                        value={this.state.editedTitle}
                         placeholder="Название"
-                        onChange={this.changeForm("title")}
+                        onChange={this.changeForm("editedTitle")}
                     />
                     <Checkbox
                         value={true}
-                        name="numbering"
-                        checked={this.state.numbering}
-                        onChange={this.changeCheckbox("numbering")}
+                        checked={this.state.editedNumbering}
+                        onChange={this.changeCheckbox("editedNumbering")}
                     >Нумерация</Checkbox>
                     <Checkbox
                         value={true}
-                        checked={this.state.roman}
-                        name="roman"
-                        onChange={this.changeCheckbox("roman")}
-                        disabled={!this.state.numbering}
+                        checked={this.state.editedRoman}
+                        onChange={this.changeCheckbox("editedRoman")}
+                        disabled={!this.state.editedNumbering}
                     >Нумерация римскими цифрами</Checkbox>
                     <FormControl
                         type="text"
-                        value={this.state.current_num}
-                        name="current_num"
+                        value={this.state.editedCurrentNum}
                         placeholder="Текущий номер треда"
-                        onChange={this.changeForm("current_num")}
-                        disabled={!this.state.numbering}
+                        onChange={this.changeForm("editedCurrentNum")}
+                        disabled={!this.state.editedNumbering}
                     />
                     <br/>
                     <FormControl
                         type="text"
-                        value={this.state.current_thread}
-                        name="current_thread"
+                        value={this.state.editedCurrentThread}
                         placeholder="Текущий тред (номер ОП-поста)"
-                        onChange={this.changeForm("current_thread")}
+                        onChange={this.changeForm("editedCurrentThread")}
                     />
                     <br/>
                     <Checkbox
                         value={true}
-                        checked={this.state.header_link}
-                        name="header_link"
-                        onChange={this.changeCheckbox("header_link")}
+                        checked={this.state.editedHeaderLink}
+                        onChange={this.changeCheckbox("editedHeaderLink")}
                     >Шапка в виде документа по ссылке</Checkbox>
                     <br/>
                     <FormControl 
                         componentClass="textarea" 
-                        name="header"
-                        placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"}
-                        value={this.state.header}
-                        onChange={this.changeForm("header")}
+                        placeholder={this.state.editedHeaderLink ? "Ссылка на шапку" : "Шапка"}
+                        value={this.state.editedHeader}
+                        onChange={this.changeForm("editedHeader")}
                     />
                     <br/>
                     <FormControl 
-                        value={this.state.board} 
+                        value={this.state.editedBoard} 
                         componentClass="select"
-                        name="board_num"
                         placeholder="select"
-                        onChange={this.changeForm("board")}>
+                        onChange={this.changeForm("editedBoard")}>
                             {boards}
                     </FormControl>
-                    <br/>
-                    <FormControl
-                        type="file"
-                        name="cover"
-                        value={this.state.cover}
-                        onChange={this.changeForm("cover")}
-                    />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button bsStyle="success" type="submit">Изменить</Button>
+                    <Button bsStyle="success" onClick={this.editThread}>Изменить</Button>
                     <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
                 </Modal.Footer>
             </Modal>;
