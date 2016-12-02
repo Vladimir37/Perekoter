@@ -48821,6 +48821,7 @@
 	            boardsLoaded: false,
 	            showNewModal: false,
 	            showEditModal: false,
+	            showUploadModal: false,
 	            showDeleteModal: false,
 	            editedBoard: {},
 	            board: 1,
@@ -48835,8 +48836,10 @@
 	        _this.switchActive = _this.switchActive.bind(_this);
 	        _this.createNew = _this.createNew.bind(_this);
 	        _this.editThread = _this.editThread.bind(_this);
+	        _this.uploadImage = _this.uploadImage.bind(_this);
 	        _this.generateNewModal = _this.generateNewModal.bind(_this);
 	        _this.generateEditModal = _this.generateEditModal.bind(_this);
+	        _this.generateUploadModal = _this.generateUploadModal.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
 	    }
@@ -48951,7 +48954,8 @@
 	                        editedTitle: thread.Title,
 	                        editedHeaderLink: thread.HeaderLink,
 	                        editedHeader: thread.Header,
-	                        editedBoard: thread.Board.ID
+	                        editedBoard: thread.Board.ID,
+	                        currentImage: thread.Image
 	                    });
 	                }
 	            };
@@ -48962,6 +48966,7 @@
 	            this.setState({
 	                showNewModal: false,
 	                showEditModal: false,
+	                showUploadModal: false,
 	                showDeleteModal: false,
 	                errorDelete: null
 	            });
@@ -49066,6 +49071,20 @@
 	                    errorEdit: "Ошибка сервера"
 	                });
 	            });
+	        }
+	    }, {
+	        key: 'uploadImage',
+	        value: function uploadImage(e) {
+	            if (!this.state.newCover) {
+	                this.setState({
+	                    errorUpload: "Новое изображение не загружено"
+	                });
+
+	                e.preventDefault();
+	                return false;
+	            }
+
+	            return true;
 	        }
 	    }, {
 	        key: 'generateNewModal',
@@ -49336,6 +49355,72 @@
 	            );
 	        }
 	    }, {
+	        key: 'generateUploadModal',
+	        value: function generateUploadModal() {
+	            var errorPanel;
+	            if (this.state.errorUpload) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorUpload
+	                );
+	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showUploadModal, onHide: this.closeModal },
+	                React.createElement(
+	                    'form',
+	                    { action: '/api/threads/upload_image', method: 'POST', encType: 'multipart/form-data', onSubmit: this.uploadImage },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Header,
+	                        { closeButton: true },
+	                        React.createElement(
+	                            _reactBootstrap.Modal.Title,
+	                            null,
+	                            '\u041D\u043E\u0432\u044B\u0439 \u0442\u0440\u0435\u0434'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Body,
+	                        null,
+	                        errorPanel,
+	                        React.createElement('img', { src: "/covers/" + this.state.currentImage, className: 'cover', alt: 'thread_image' }),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'hidden',
+	                            name: 'redirect',
+	                            value: true
+	                        }),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'hidden',
+	                            name: 'num',
+	                            value: this.state.editedID
+	                        }),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'file',
+	                            name: 'cover',
+	                            value: this.state.newCover,
+	                            onChange: this.changeForm("newCover")
+	                        })
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Footer,
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'success', type: 'submit' },
+	                            '\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C'
+	                        ),
+	                        React.createElement(
+	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', onClick: this.closeModal },
+	                            '\u0417\u0430\u043A\u0440\u044B\u0442\u044C'
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
 	            var _this10 = this;
@@ -49399,6 +49484,15 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this10.openModal('Upload', thread) },
+	                            '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            _reactBootstrap.Button,
 	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this10.openModal('Delete', thread) },
 	                            '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
 	                        )
@@ -49440,6 +49534,7 @@
 	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C'
 	                            ),
 	                            React.createElement('th', null),
+	                            React.createElement('th', null),
 	                            React.createElement('th', null)
 	                        )
 	                    ),
@@ -49455,7 +49550,8 @@
 	                    '\u0421\u043E\u0437\u0434\u0430\u0442\u044C'
 	                ),
 	                this.generateNewModal(),
-	                this.generateEditModal()
+	                this.generateEditModal(),
+	                this.generateUploadModal()
 	            );
 	        }
 	    }, {

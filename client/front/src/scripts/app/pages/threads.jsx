@@ -18,6 +18,7 @@ export class Threads extends React.Component {
             boardsLoaded: false,
             showNewModal: false,
             showEditModal: false,
+            showUploadModal: false,
             showDeleteModal: false,
             editedBoard: {},
             board: 1,
@@ -32,8 +33,10 @@ export class Threads extends React.Component {
         this.switchActive = this.switchActive.bind(this);
         this.createNew = this.createNew.bind(this);
         this.editThread = this.editThread.bind(this);
+        this.uploadImage = this.uploadImage.bind(this);
         this.generateNewModal = this.generateNewModal.bind(this);
         this.generateEditModal = this.generateEditModal.bind(this);
+        this.generateUploadModal = this.generateUploadModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
     }
 
@@ -138,7 +141,8 @@ export class Threads extends React.Component {
                     editedTitle: thread.Title,
                     editedHeaderLink: thread.HeaderLink,
                     editedHeader: thread.Header,
-                    editedBoard: thread.Board.ID
+                    editedBoard: thread.Board.ID,
+                    currentImage: thread.Image
                 });
             }
         }
@@ -148,6 +152,7 @@ export class Threads extends React.Component {
         this.setState({
             showNewModal: false,
             showEditModal: false,
+            showUploadModal: false,
             showDeleteModal: false,
             errorDelete: null
         });
@@ -254,6 +259,19 @@ export class Threads extends React.Component {
                     errorEdit: "Ошибка сервера"
                 });
             });
+    }
+
+    uploadImage(e) {
+        if (!this.state.newCover) {
+            this.setState({
+                errorUpload: "Новое изображение не загружено"
+            });
+
+            e.preventDefault();
+            return false;
+        }
+
+        return true;
     }
 
     generateNewModal() {
@@ -430,6 +448,46 @@ export class Threads extends React.Component {
             </Modal>;
     }
 
+    generateUploadModal() {
+        var errorPanel;
+        if (this.state.errorUpload) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorUpload}</Alert>;
+        }
+
+        return <Modal show={this.state.showUploadModal} onHide={this.closeModal}>
+                <form action="/api/threads/upload_image" method="POST" encType="multipart/form-data" onSubmit={this.uploadImage}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Новый тред</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {errorPanel}
+                    <img src={"/covers/" + this.state.currentImage} className="cover" alt="thread_image"/>
+                    <FormControl
+                        type="hidden"
+                        name="redirect"
+                        value={true}
+                    />
+                    <FormControl
+                        type="hidden"
+                        name="num"
+                        value={this.state.editedID}
+                    />
+                    
+                    <FormControl
+                        type="file"
+                        name="cover"
+                        value={this.state.newCover}
+                        onChange={this.changeForm("newCover")}
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="success" type="submit">Загрузить</Button>
+                    <Button bsStyle="primary" onClick={this.closeModal}>Закрыть</Button>
+                </Modal.Footer>
+                </form>
+            </Modal>;
+    }
+
     generatePage() {
         var errorPanel;
         if (this.state.error) {
@@ -451,6 +509,7 @@ export class Threads extends React.Component {
                 <td>{thread.Board.Name}</td>
                 <td><Switcher on={thread.Active} onClick={this.switchActive(thread.ID)}>{thread.Active ? ' Активен' : ' Неактивен'}</Switcher></td>
                 <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal('Edit', thread)}>Редактировать</Button></td>
+                <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal('Upload', thread)}>Изображение</Button></td>
                 <td><Button bsStyle="warning" bsSize="xsmall" onClick={this.openModal('Delete', thread)}>Удалить</Button></td>
             </tr>;
         });
@@ -466,6 +525,7 @@ export class Threads extends React.Component {
                     <th>Активность</th>
                     <th></th>
                     <th></th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -475,6 +535,7 @@ export class Threads extends React.Component {
             <Button bsStyle="primary" onClick={this.openModal("New")}>Создать</Button>
             {this.generateNewModal()}
             {this.generateEditModal()}
+            {this.generateUploadModal()}
         </main>;
     }
     

@@ -13,6 +13,7 @@ func GetRouter() *gin.Engine {
 	router.LoadHTMLGlob("client/page.html")
 
 	router.Static("/src", "./client/front/files/")
+	router.Static("/covers", "./covers/")
 	getApiRouter(router)
 
 	router.NoRoute(func(c *gin.Context) {

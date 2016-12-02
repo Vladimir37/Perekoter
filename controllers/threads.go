@@ -143,19 +143,19 @@ func EditThread(c *gin.Context) {
 }
 
 func UploadImage(c *gin.Context) {
-	var request utility.NumRequest
-	c.Bind(&request)
+	num := c.PostForm("num")
+	redirect := c.PostForm("redirect") != ""
 
 	db := models.DB()
 	defer db.Close()
 
 	var thread models.Thread
-	db.First(&thread, request.Num)
+	db.First(&thread, num)
 
 	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".png"
 
 	img, _, errImg := c.Request.FormFile("cover")
-	out, errFile := os.Open("./covers/" + imageName)
+	out, errFile := os.Create("./covers/" + imageName)
 
 	if (errFile != nil) || (errImg != nil) {
 		go utility.NewError("Failed to upload new thread image - image not opened")
@@ -185,9 +185,13 @@ func UploadImage(c *gin.Context) {
 
 	go utility.NewHistoryPoint("Image of thread \"" + thread.Title + "\" was changed")
 
-	c.JSON(200, gin.H{
-		"status": 0,
-	})
+	if redirect {
+		c.Redirect(301, "/threads")
+	} else {
+		c.JSON(200, gin.H{
+			"status": 0,
+		})
+	}
 }
 
 func SwitchThreadActivity(c *gin.Context) {
