@@ -34,9 +34,11 @@ export class Threads extends React.Component {
         this.createNew = this.createNew.bind(this);
         this.editThread = this.editThread.bind(this);
         this.uploadImage = this.uploadImage.bind(this);
+        this.deleteThread = this.deleteThread.bind(this);
         this.generateNewModal = this.generateNewModal.bind(this);
         this.generateEditModal = this.generateEditModal.bind(this);
         this.generateUploadModal = this.generateUploadModal.bind(this);
+        this.generateDeleteModal = this.generateDeleteModal.bind(this);
         this.generatePage = this.generatePage.bind(this);
     }
 
@@ -274,6 +276,33 @@ export class Threads extends React.Component {
         return true;
     }
 
+    deleteThread() {
+        var req_data = {
+            num: Number(this.state.editedID)
+        };
+
+        Axios.post('/api/threads/delete_thread', req_data)
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    this.setState({
+                        errorDelete: null
+                    })
+                    this.loadThreads();
+                    this.closeModal();
+                } else {
+                    this.setState({
+                        errorDelete: "Ошибка сервера"
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorDelete: "Ошибка сервера"
+                });
+            });
+    }
+
     generateNewModal() {
         var errorPanel;
         if (this.state.errorNew) {
@@ -488,6 +517,27 @@ export class Threads extends React.Component {
             </Modal>;
     }
 
+    generateDeleteModal() {
+        var errorPanel;
+        if (this.state.errorDelete) {
+            errorPanel = <Alert bsStyle="danger">{this.state.errorDelete}</Alert>;
+        }
+
+        return <Modal show={this.state.showDeleteModal} onHide={this.closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Удалить доску</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {errorPanel}
+                    <p>Вы уверены, что хотите удалить тред "{this.state.editedTitle}"?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="warning" onClick={this.deleteThread}>Удалить</Button>
+                    <Button bsStyle="primary" onClick={this.closeModal}>Отмена</Button>
+                </Modal.Footer>
+            </Modal>;
+    }
+
     generatePage() {
         var errorPanel;
         if (this.state.error) {
@@ -536,6 +586,7 @@ export class Threads extends React.Component {
             {this.generateNewModal()}
             {this.generateEditModal()}
             {this.generateUploadModal()}
+            {this.generateDeleteModal()}
         </main>;
     }
     

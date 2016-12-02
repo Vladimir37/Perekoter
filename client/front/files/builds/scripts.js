@@ -48837,9 +48837,11 @@
 	        _this.createNew = _this.createNew.bind(_this);
 	        _this.editThread = _this.editThread.bind(_this);
 	        _this.uploadImage = _this.uploadImage.bind(_this);
+	        _this.deleteThread = _this.deleteThread.bind(_this);
 	        _this.generateNewModal = _this.generateNewModal.bind(_this);
 	        _this.generateEditModal = _this.generateEditModal.bind(_this);
 	        _this.generateUploadModal = _this.generateUploadModal.bind(_this);
+	        _this.generateDeleteModal = _this.generateDeleteModal.bind(_this);
 	        _this.generatePage = _this.generatePage.bind(_this);
 	        return _this;
 	    }
@@ -49085,6 +49087,34 @@
 	            }
 
 	            return true;
+	        }
+	    }, {
+	        key: 'deleteThread',
+	        value: function deleteThread() {
+	            var _this10 = this;
+
+	            var req_data = {
+	                num: Number(this.state.editedID)
+	            };
+
+	            _axios2.default.post('/api/threads/delete_thread', req_data).then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    _this10.setState({
+	                        errorDelete: null
+	                    });
+	                    _this10.loadThreads();
+	                    _this10.closeModal();
+	                } else {
+	                    _this10.setState({
+	                        errorDelete: "Ошибка сервера"
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this10.setState({
+	                    errorDelete: "Ошибка сервера"
+	                });
+	            });
 	        }
 	    }, {
 	        key: 'generateNewModal',
@@ -49421,9 +49451,61 @@
 	            );
 	        }
 	    }, {
+	        key: 'generateDeleteModal',
+	        value: function generateDeleteModal() {
+	            var errorPanel;
+	            if (this.state.errorDelete) {
+	                errorPanel = React.createElement(
+	                    _reactBootstrap.Alert,
+	                    { bsStyle: 'danger' },
+	                    this.state.errorDelete
+	                );
+	            }
+
+	            return React.createElement(
+	                _reactBootstrap.Modal,
+	                { show: this.state.showDeleteModal, onHide: this.closeModal },
+	                React.createElement(
+	                    _reactBootstrap.Modal.Header,
+	                    { closeButton: true },
+	                    React.createElement(
+	                        _reactBootstrap.Modal.Title,
+	                        null,
+	                        '\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0434\u043E\u0441\u043A\u0443'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Body,
+	                    null,
+	                    errorPanel,
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        '\u0412\u044B \u0443\u0432\u0435\u0440\u0435\u043D\u044B, \u0447\u0442\u043E \u0445\u043E\u0442\u0438\u0442\u0435 \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u0442\u0440\u0435\u0434 "',
+	                        this.state.editedTitle,
+	                        '"?'
+	                    )
+	                ),
+	                React.createElement(
+	                    _reactBootstrap.Modal.Footer,
+	                    null,
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'warning', onClick: this.deleteThread },
+	                        '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.Button,
+	                        { bsStyle: 'primary', onClick: this.closeModal },
+	                        '\u041E\u0442\u043C\u0435\u043D\u0430'
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
-	            var _this10 = this;
+	            var _this11 = this;
 
 	            var errorPanel;
 	            if (this.state.error) {
@@ -49466,7 +49548,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactSwitcher2.default,
-	                            { on: thread.Active, onClick: _this10.switchActive(thread.ID) },
+	                            { on: thread.Active, onClick: _this11.switchActive(thread.ID) },
 	                            thread.Active ? ' Активен' : ' Неактивен'
 	                        )
 	                    ),
@@ -49475,7 +49557,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this10.openModal('Edit', thread) },
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this11.openModal('Edit', thread) },
 	                            '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
 	                        )
 	                    ),
@@ -49484,7 +49566,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this10.openModal('Upload', thread) },
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this11.openModal('Upload', thread) },
 	                            '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435'
 	                        )
 	                    ),
@@ -49493,7 +49575,7 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this10.openModal('Delete', thread) },
+	                            { bsStyle: 'warning', bsSize: 'xsmall', onClick: _this11.openModal('Delete', thread) },
 	                            '\u0423\u0434\u0430\u043B\u0438\u0442\u044C'
 	                        )
 	                    )
@@ -49551,7 +49633,8 @@
 	                ),
 	                this.generateNewModal(),
 	                this.generateEditModal(),
-	                this.generateUploadModal()
+	                this.generateUploadModal(),
+	                this.generateDeleteModal()
 	            );
 	        }
 	    }, {
