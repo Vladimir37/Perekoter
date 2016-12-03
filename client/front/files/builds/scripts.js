@@ -27156,14 +27156,19 @@
 
 	        _this.state = {
 	            showModal: false,
+	            category: 0,
 	            threads: [],
+	            boards: [],
 	            threadsLoaded: false,
+	            boardsLoaded: false,
 	            editedBoard: {}
 	        };
 
 	        _this.loadThreads = _this.loadThreads.bind(_this);
 	        _this.openModal = _this.openModal.bind(_this);
 	        _this.closeModal = _this.closeModal.bind(_this);
+	        _this.changeCategory = _this.changeCategory.bind(_this);
+	        _this.checkCategory = _this.checkCategory.bind(_this);
 	        _this.generateModal = _this.generateModal.bind(_this);
 	        return _this;
 	    }
@@ -27202,28 +27207,70 @@
 	            });
 	        }
 	    }, {
+	        key: 'changeCategory',
+	        value: function changeCategory(category) {
+	            var _this3 = this;
+
+	            return function () {
+	                _this3.setState({
+	                    category: category
+	                });
+	            };
+	        }
+	    }, {
+	        key: 'checkCategory',
+	        value: function checkCategory(category) {
+	            return this.state.category == category;
+	        }
+	    }, {
 	        key: 'loadThreads',
 	        value: function loadThreads() {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            _axios2.default.get('/api/threads/get_all_threads').then(function (response) {
 	                response = response.data;
 	                if (response.status == 0) {
 	                    response.body = response.body.reverse();
-	                    _this3.setState({
+	                    _this4.setState({
 	                        threads: response.body,
 	                        threadsLoaded: true
 	                    });
 	                } else {
-	                    _this3.setState({
+	                    _this4.setState({
 	                        error: "Ошибка сервера",
 	                        threadsLoaded: true
 	                    });
 	                }
 	            }).catch(function (err) {
-	                _this3.setState({
+	                _this4.setState({
 	                    error: "Ошибка сервера",
 	                    threadsLoaded: true
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'loadBoards',
+	        value: function loadBoards() {
+	            var _this5 = this;
+
+	            _axios2.default.get('/api/boards/get_all_boards').then(function (response) {
+	                response = response.data;
+	                if (response.status == 0) {
+	                    response.body = response.body.reverse();
+	                    _this5.setState({
+	                        boards: response.body,
+	                        boardsLoaded: true
+	                    });
+	                } else {
+	                    _this5.setState({
+	                        error: "Ошибка сервера",
+	                        boardsLoaded: true
+	                    });
+	                }
+	            }).catch(function (err) {
+	                _this5.setState({
+	                    error: "Ошибка сервера",
+	                    boardsLoaded: true
 	                });
 	            });
 	        }
@@ -27389,7 +27436,7 @@
 	    }, {
 	        key: 'generatePage',
 	        value: function generatePage() {
-	            var _this4 = this;
+	            var _this6 = this;
 
 	            var errorPanel;
 	            if (this.state.error) {
@@ -27402,6 +27449,10 @@
 
 	            if (!this.state.threadsLoaded) {
 	                this.loadThreads();
+	            }
+
+	            if (!this.state.boardsLoaded) {
+	                this.loadBoards();
 	            }
 
 	            var threads = this.state.threads.map(function (thread) {
@@ -27428,9 +27479,38 @@
 	                        null,
 	                        React.createElement(
 	                            _reactBootstrap.Button,
-	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this4.openModal(thread) },
+	                            { bsStyle: 'primary', bsSize: 'xsmall', onClick: _this6.openModal(thread) },
 	                            '\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u043E'
 	                        )
+	                    )
+	                );
+	            });
+
+	            var boards = this.state.boards.map(function (board) {
+	                return React.createElement(
+	                    'tr',
+	                    null,
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.ID
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.Name
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        '/',
+	                        board.Addr,
+	                        '/'
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        board.Bumplimit
 	                    )
 	                );
 	            });
@@ -27440,36 +27520,95 @@
 	                null,
 	                errorPanel,
 	                React.createElement(
-	                    _reactBootstrap.Table,
-	                    { striped: true, bordered: true, condensed: true, hover: true },
+	                    _reactBootstrap.ButtonGroup,
+	                    { justified: true },
 	                    React.createElement(
-	                        'thead',
-	                        null,
-	                        React.createElement(
-	                            'tr',
-	                            null,
-	                            React.createElement(
-	                                'th',
-	                                null,
-	                                '#'
-	                            ),
-	                            React.createElement(
-	                                'th',
-	                                null,
-	                                '\u0418\u043C\u044F'
-	                            ),
-	                            React.createElement(
-	                                'th',
-	                                null,
-	                                '\u0414\u043E\u0441\u043A\u0430'
-	                            ),
-	                            React.createElement('th', null)
-	                        )
+	                        _reactBootstrap.Button,
+	                        { href: '#', active: this.checkCategory(0), onClick: this.changeCategory(0) },
+	                        '\u0422\u0440\u0435\u0434\u044B'
 	                    ),
 	                    React.createElement(
-	                        'tbody',
-	                        null,
-	                        threads
+	                        _reactBootstrap.Button,
+	                        { href: '#', active: this.checkCategory(1), onClick: this.changeCategory(1) },
+	                        '\u0414\u043E\u0441\u043A\u0438'
+	                    )
+	                ),
+	                React.createElement(
+	                    'section',
+	                    { className: this.state.category == 0 ? '' : 'hidden' },
+	                    React.createElement(
+	                        _reactBootstrap.Table,
+	                        { striped: true, bordered: true, condensed: true, hover: true },
+	                        React.createElement(
+	                            'thead',
+	                            null,
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '#'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u0418\u043C\u044F'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u0414\u043E\u0441\u043A\u0430'
+	                                ),
+	                                React.createElement('th', null)
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'tbody',
+	                            null,
+	                            threads
+	                        )
+	                    )
+	                ),
+	                React.createElement(
+	                    'section',
+	                    { className: this.state.category == 1 ? '' : 'hidden' },
+	                    React.createElement(
+	                        _reactBootstrap.Table,
+	                        { striped: true, bordered: true, condensed: true, hover: true },
+	                        React.createElement(
+	                            'thead',
+	                            null,
+	                            React.createElement(
+	                                'tr',
+	                                null,
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '#'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u0410\u0434\u0440\u0435\u0441'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u0411\u0430\u043C\u043F\u043B\u0438\u043C\u0438\u0442'
+	                                )
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'tbody',
+	                            null,
+	                            boards
+	                        )
 	                    )
 	                ),
 	                this.generateModal()

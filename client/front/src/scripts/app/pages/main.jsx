@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Table, Modal, Button, Alert} from 'react-bootstrap';
+import {Table, Modal, Button, ButtonGroup, Alert} from 'react-bootstrap';
 import Axios from 'axios';
 import {Header} from '../components/header.jsx';
 import {Footer} from '../components/footer.jsx';
@@ -10,14 +10,19 @@ export class Main extends React.Component {
 
         this.state = {
             showModal: false,
+            category: 0,
             threads: [],
+            boards: [],
             threadsLoaded: false,
+            boardsLoaded: false,
             editedBoard: {}
         };
 
         this.loadThreads = this.loadThreads.bind(this);
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this.changeCategory = this.changeCategory.bind(this);
+        this.checkCategory = this.checkCategory.bind(this);
         this.generateModal = this.generateModal.bind(this);
     }
 
@@ -50,6 +55,18 @@ export class Main extends React.Component {
         });
     }
 
+    changeCategory(category) {
+        return () => {
+            this.setState({
+                category
+            });
+        }
+    }
+
+    checkCategory(category) {
+        return this.state.category == category;
+    }
+
     loadThreads() {
         Axios.get('/api/threads/get_all_threads')
             .then((response) => {
@@ -71,6 +88,31 @@ export class Main extends React.Component {
                 this.setState({
                     error: "Ошибка сервера",
                     threadsLoaded: true
+                });
+            });
+    }
+
+    loadBoards() {
+        Axios.get('/api/boards/get_all_boards')
+            .then((response) => {
+                response = response.data;
+                if (response.status == 0) {
+                    response.body = response.body.reverse();
+                    this.setState({
+                        boards: response.body,
+                        boardsLoaded: true
+                    });
+                } else {
+                    this.setState({
+                        error: "Ошибка сервера",
+                        boardsLoaded: true
+                    });
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    error: "Ошибка сервера",
+                    boardsLoaded: true
                 });
             });
     }
@@ -127,6 +169,10 @@ export class Main extends React.Component {
             this.loadThreads();
         }
 
+        if (!this.state.boardsLoaded) {
+            this.loadBoards();
+        }
+
         var threads = this.state.threads.map((thread) => {
             return <tr key={thread.ID}>
                 <td>{thread.ID}</td>
@@ -136,21 +182,51 @@ export class Main extends React.Component {
             </tr>;
         });
 
+        var boards = this.state.boards.map((board) => {
+            return <tr>
+                <td>{board.ID}</td>
+                <td>{board.Name}</td>
+                <td>/{board.Addr}/</td>
+                <td>{board.Bumplimit}</td>
+            </tr>;
+        });
+
         return <main>
             {errorPanel}
-            <Table striped bordered condensed hover>
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Имя</th>
-                    <th>Доска</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                    {threads}
-                </tbody>
-            </Table>
+            <ButtonGroup justified>
+                <Button href="#" active={this.checkCategory(0)} onClick={this.changeCategory(0)}>Треды</Button>
+                <Button href="#" active={this.checkCategory(1)} onClick={this.changeCategory(1)}>Доски</Button>
+            </ButtonGroup>
+            <section className={this.state.category == 0 ? '' : 'hidden'}>
+                <Table striped bordered condensed hover>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Имя</th>
+                        <th>Доска</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {threads}
+                    </tbody>
+                </Table>
+            </section>
+            <section className={this.state.category == 1 ? '' : 'hidden'}>
+                <Table striped bordered condensed hover>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Название</th>
+                        <th>Адрес</th>
+                        <th>Бамплимит</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {boards}
+                    </tbody>
+                </Table>
+            </section>
             {this.generateModal()}
         </main>;
     }
