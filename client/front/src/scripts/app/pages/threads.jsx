@@ -483,7 +483,7 @@ export class Threads extends React.Component {
         return <Modal show={this.state.showUploadModal} onHide={this.closeModal}>
                 <form action="/api/threads/upload_image" method="POST" encType="multipart/form-data" onSubmit={this.uploadImage}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Новый тред</Modal.Title>
+                    <Modal.Title>Загрузить новое изображение треда</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {errorPanel}
@@ -522,7 +522,7 @@ export class Threads extends React.Component {
 
         return <Modal show={this.state.showDeleteModal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Удалить доску</Modal.Title>
+                    <Modal.Title>Удалить тред</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {errorPanel}

@@ -76,13 +76,13 @@ export class Main extends React.Component {
     }
 
     generateModal() {
-        var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/' + this.state.editedCurrentNum + '.html';
+        var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/' + this.state.editedCurrentThread + '.html';
         var numberingBlock;
         var headerBlock;
         if (this.state.editedNumbering) {
             numberingBlock = <div>
                 <p><b>Нумерация римскими цифрами:</b> {this.state.editedRoman ? 'Да' : 'Нет'} </p>
-                <p><b>Текущий номер:</b> {this.state.editedCurrentNum ? 'Да' : 'Нет'}</p>
+                <p><b>Текущий номер:</b> {this.state.editedCurrentNum}</p>
             </div>;
         }
         if (this.state.editedHeaderLink) {
@@ -91,7 +91,7 @@ export class Main extends React.Component {
             headerBlock = <div>
                 <b>Шапка:</b>
                 <br/>
-                <textarea className="public-header" disabled={true}>{this.state.Header}</textarea>
+                <textarea className="public-header" disabled={true}>{this.state.editedHeader}</textarea>
             </div>;
         }
 
