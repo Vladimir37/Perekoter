@@ -102,7 +102,7 @@ func ChangePasscode(c *gin.Context) {
 	config.Passcode = request.Passcode
 	err := utility.Config.Write(config)
 
-	// TODO - проверка и активация нового пасскода
+	utility.CurrentUsercode.PasscodeAuth()
 
 	if err != nil {
 		go utility.NewError("Failed to write to config")

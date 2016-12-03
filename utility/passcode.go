@@ -13,11 +13,12 @@ type Passcode struct {
 }
 
 func (c *Passcode) PasscodeAuth() bool {
-	path := Config.Get().Base + "makaba/makaba.fcgi"
+	config := Config.Get()
+	path := config.Base + "makaba/makaba.fcgi"
 
 	postForm := url.Values{
 		"task":     {"auth"},
-		"usercode": {Config.Get().Passcode},
+		"usercode": {config.Passcode},
 	}
 
 	request, errReq := http.NewRequest("POST", path, bytes.NewBufferString(postForm.Encode()))
@@ -40,6 +41,8 @@ func (c *Passcode) PasscodeAuth() bool {
 	setCookie = strings.Split(setCookie[0], "=")
 
 	c.Usercode = setCookie[0]
+	c.Error = false
+
 	return true
 }
 
