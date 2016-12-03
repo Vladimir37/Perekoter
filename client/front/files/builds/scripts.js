@@ -47932,6 +47932,7 @@
 	            loggedCheck: false,
 	            errorsNum: 0,
 	            issuesNum: 0,
+	            passcodeActivity: 0,
 	            login: '',
 	            password: '',
 	            title: '',
@@ -48230,6 +48231,16 @@
 	                    { pullRight: true },
 	                    React.createElement(
 	                        _reactBootstrap.NavItem,
+	                        { onClick: this.goToLink, href: '/settings' },
+	                        '\u041F\u0430\u0441\u0441\u043A\u043E\u0434  ',
+	                        React.createElement(
+	                            _reactBootstrap.Badge,
+	                            null,
+	                            this.state.passcodeActivity ? "✓" : "✗"
+	                        )
+	                    ),
+	                    React.createElement(
+	                        _reactBootstrap.NavItem,
 	                        { onClick: this.goToLink, href: '/issues' },
 	                        '\u041F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F  ',
 	                        React.createElement(
@@ -48297,7 +48308,8 @@
 	                if (response.status == 0) {
 	                    _this7.setState({
 	                        errorsNum: response.body.Errors,
-	                        issuesNum: response.body.Issues
+	                        issuesNum: response.body.Issues,
+	                        passcodeActivity: Boolean(response.body.Passcode)
 	                    });
 	                } else {
 	                    _this7.setState({

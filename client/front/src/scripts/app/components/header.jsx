@@ -28,6 +28,7 @@ export class Header extends React.Component {
             loggedCheck: false,
             errorsNum: 0,
             issuesNum: 0,
+            passcodeActivity: 0,
             login: '',
             password: '',
             title: '',
@@ -248,6 +249,7 @@ export class Header extends React.Component {
             </Nav>;
         } else {
             return <Nav pullRight>
+                <NavItem onClick={this.goToLink} href="/settings">Пасскод  <Badge>{this.state.passcodeActivity ? "✓" : "✗"}</Badge></NavItem>
                 <NavItem onClick={this.goToLink} href="/issues">Предложения  <Badge>{this.state.issuesNum}</Badge></NavItem>
                 <NavItem onClick={this.goToLink} href="/errors">Ошибки  <Badge>{this.state.errorsNum}</Badge></NavItem>
                 <NavItem onClick={this.goToLink} href="/control">Управление</NavItem>
@@ -288,7 +290,8 @@ export class Header extends React.Component {
                 if (response.status == 0) {
                     this.setState({
                         errorsNum: response.body.Errors,
-                        issuesNum: response.body.Issues
+                        issuesNum: response.body.Issues,
+                        passcodeActivity: Boolean(response.body.Passcode)
                     });
                 } else {
                     this.setState({

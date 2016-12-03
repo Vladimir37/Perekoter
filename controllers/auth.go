@@ -104,9 +104,17 @@ func AdminData(c *gin.Context) {
 		Active: true,
 	}).Count(&issues)
 
+	var passcode int
+	if utility.CurrentUsercode.Error {
+		passcode = 0
+	} else {
+		passcode = 1
+	}
+
 	response := map[string]int{
-		"Errors": errors,
-		"Issues": issues,
+		"Errors":   errors,
+		"Issues":   issues,
+		"Passcode": passcode,
 	}
 
 	c.JSON(200, gin.H{
