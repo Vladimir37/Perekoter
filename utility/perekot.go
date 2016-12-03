@@ -11,37 +11,44 @@ import (
 	"strconv"
 
 	"github.com/StefanSchroeder/Golang-Roman"
+	"github.com/parnurzeal/gorequest"
 )
 
 func Perekot(thread models.Thread) error {
+	config := Config.Get()
 	db := models.DB()
 	defer db.Close()
 
-	urlPath := Config.Get().Base + "/makaba/posting.fcgi"
-	//imgPath := "./covers/" + thread.Image
-
-	//TODO - загрузка и отправка изображения
+	urlPath := config.Base + "/makaba/posting.fcgi?json=1"
+	imgPath := "./covers/" + thread.Image
 
 	title, errTitle := createTitle(thread)
 	post, errPost := generatePost(thread)
+	file, errFile := ioutil.ReadFile(imgPath)
 
-	if (errTitle != nil) || (errPost != nil) {
+	if (errTitle != nil) || (errPost != nil) || (errFile != nil) {
 		threadID := strconv.Itoa(int(thread.ID))
-		NewError("Failed to create thread " + threadID)
+		NewError("Failed to create header of thread " + threadID)
 		return errors.New("Not created")
 	}
 
-	postForm := url.Values{
-		"json":    {"1"},
-		"task":    {"post"},
-		"board":   {thread.Board.Addr},
-		"thread":  {"0"},
-		"name":    {Config.Get().Botname},
-		"subject": {title},
-		"comment": {post},
+	cookie := http.Cookie{
+		Name:  "passcode_auth",
+		Value: CurrentUsercode.Usercode,
 	}
 
-	response, errSend := http.PostForm(urlPath, postForm)
+	request := gorequest.New()
+	_, body, errSend := request.Post(urlPath).
+		Type("multipart").
+		SendFile(file, thread.Image, "formimages[]").
+		Send("task=post").
+		Send("board=" + thread.Board.Addr).
+		Send("thread=0").
+		Send("name=" + config.Botname).
+		Send("subject=" + title).
+		Send("comment=" + post).
+		AddCookie(&cookie).
+		End()
 
 	if errSend != nil {
 		threadID := strconv.Itoa(int(thread.ID))
@@ -50,29 +57,47 @@ func Perekot(thread models.Thread) error {
 		return errors.New("Perekot not sended")
 	}
 
-	defer response.Body.Close()
-	postResponse, errSave := ioutil.ReadAll(response.Body)
-	if errSave != nil {
-		NewError("Failed to create notification (thread " + thread.Title + ")")
-		NewHistoryPoint("Failed to create notification (thread " + thread.Title + ")")
-		return errors.New("Perekot not created")
-	}
+	var responseBody PostResponse
+	errFormate := json.Unmarshal([]byte(body), &responseBody)
 
-	var responseJSON PostResponse
-	errFormate := json.Unmarshal(postResponse, &responseJSON)
 	if errFormate != nil {
-		NewError("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
-		NewHistoryPoint("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
-		return errors.New("Perekot response not formatted")
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to send Perekot (thread " + threadID + ") - incorrect server response")
+		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ") - incorrect server response")
+		return errors.New("Perekot not sended")
 	}
 
-	if responseJSON.Status != "OK" {
-		NewError("Failed to create notification (thread " + thread.Title + ")")
-		NewHistoryPoint("Failed to create Perekot (thread " + thread.Title + ")")
-	} else {
-		NewHistoryPoint("Perekot " + thread.Title + "was created")
-		// TODO - Запоминание нового треда
+	if responseBody.Error != 0 {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to send Perekot (thread " + threadID + ")")
+		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ") - error " + responseBody.Reason)
+		return errors.New("Perekot not sended")
 	}
+
+	targetNum := responseBody.Target
+
+	// postResponse, errSave := ioutil.ReadAll(response.Body)
+	// if errSave != nil {
+	// 	NewError("Failed to create notification (thread " + thread.Title + ")")
+	// 	NewHistoryPoint("Failed to create notification (thread " + thread.Title + ")")
+	// 	return errors.New("Perekot not created")
+	// }
+
+	// var responseJSON PostResponse
+	// errFormate := json.Unmarshal(postResponse, &responseJSON)
+	// if errFormate != nil {
+	// 	NewError("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
+	// 	NewHistoryPoint("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
+	// 	return errors.New("Perekot response not formatted")
+	// }
+
+	// if responseJSON.Status != "OK" {
+	// 	NewError("Failed to create notification (thread " + thread.Title + ")")
+	// 	NewHistoryPoint("Failed to create Perekot (thread " + thread.Title + ")")
+	// } else {
+	// 	NewHistoryPoint("Perekot " + thread.Title + "was created")
+	// 	// TODO - Запоминание нового треда
+	// }
 
 	return nil
 }

@@ -16,5 +16,8 @@ func Cycle() {
 		// Убрать комментирование на проде
 		// go CheckThread(threads[i])
 		CheckThread(threads[i])
+
+		// DEBUG
+		Perekot(threads[i])
 	}
 }

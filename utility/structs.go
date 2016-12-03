@@ -23,6 +23,7 @@ type PostResponse struct {
 	Reason string
 	Status string
 	Num    int
+	Target int
 }
 
 // Request structures
