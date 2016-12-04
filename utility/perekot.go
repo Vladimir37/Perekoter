@@ -4,11 +4,11 @@ import (
 	"Perekoter/models"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strconv"
+
+	"time"
 
 	"github.com/StefanSchroeder/Golang-Roman"
 	"github.com/parnurzeal/gorequest"
@@ -18,6 +18,8 @@ func Perekot(thread models.Thread) error {
 	config := Config.Get()
 	db := models.DB()
 	defer db.Close()
+
+	oldThread := thread.CurrentThread
 
 	urlPath := config.Base + "/makaba/posting.fcgi?json=1"
 	imgPath := "./covers/" + thread.Image
@@ -69,35 +71,23 @@ func Perekot(thread models.Thread) error {
 
 	if responseBody.Error != 0 {
 		threadID := strconv.Itoa(int(thread.ID))
-		NewError("Failed to send Perekot (thread " + threadID + ")")
+		NewError("Failed to send Perekot (thread " + threadID + ") - error " + responseBody.Reason)
 		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ") - error " + responseBody.Reason)
 		return errors.New("Perekot not sended")
 	}
 
 	targetNum := responseBody.Target
 
-	// postResponse, errSave := ioutil.ReadAll(response.Body)
-	// if errSave != nil {
-	// 	NewError("Failed to create notification (thread " + thread.Title + ")")
-	// 	NewHistoryPoint("Failed to create notification (thread " + thread.Title + ")")
-	// 	return errors.New("Perekot not created")
-	// }
+	updateThreadAddr(thread, targetNum)
 
-	// var responseJSON PostResponse
-	// errFormate := json.Unmarshal(postResponse, &responseJSON)
-	// if errFormate != nil {
-	// 	NewError("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
-	// 	NewHistoryPoint("Failed to convert server response to JSON (Perekot in thread " + thread.Title + ")")
-	// 	return errors.New("Perekot response not formatted")
-	// }
+	if thread.Numbering {
+		threadIncrement(thread)
+	}
 
-	// if responseJSON.Status != "OK" {
-	// 	NewError("Failed to create notification (thread " + thread.Title + ")")
-	// 	NewHistoryPoint("Failed to create Perekot (thread " + thread.Title + ")")
-	// } else {
-	// 	NewHistoryPoint("Perekot " + thread.Title + "was created")
-	// 	// TODO - Запоминание нового треда
-	// }
+	if config.Notification {
+		time.Sleep(35 * time.Second)
+		notification(thread, oldThread, targetNum)
+	}
 
 	return nil
 }
@@ -120,23 +110,15 @@ func createTitle(thread models.Thread) (string, error) {
 func generatePost(thread models.Thread) (string, error) {
 	var post string
 	if thread.HeaderLink {
-		response, errSend := http.Get(thread.Header)
+		request := gorequest.New()
+		_, body, errSend := request.Get(thread.Header).End()
 		if errSend != nil {
 			threadID := strconv.Itoa(int(thread.ID))
 			NewError("Failed to get the post header (thread " + threadID + ")")
 			return "", errors.New("Not created")
 		}
 
-		headerResponse, errSave := ioutil.ReadAll(response.Body)
-		defer response.Body.Close()
-
-		if errSave != nil {
-			threadID := strconv.Itoa(int(thread.ID))
-			NewError("Failed to read the post header (thread " + threadID + ")")
-			return "", errors.New("Not created")
-		}
-
-		post = string(headerResponse)
+		post = body
 	} else {
 		post = thread.Header
 	}
@@ -144,25 +126,32 @@ func generatePost(thread models.Thread) (string, error) {
 	return post, nil
 }
 
-func generateNotification(thread models.Thread) string {
-	notification := Config.Get().NotificationText + strconv.Itoa(thread.CurrentThread)
+func generateNotification(newNum int) string {
+	notification := Config.Get().NotificationText + strconv.Itoa(newNum)
 	return notification
 }
 
-func notification(thread models.Thread, oldNum int) {
-	path := Config.Get().Base + "/makaba/posting.fcgi"
-	notification := generateNotification(thread)
+func notification(thread models.Thread, oldNum int, newNum int) {
+	config := Config.Get()
+	path := config.Base + "/makaba/posting.fcgi"
+	notification := generateNotification(newNum)
 
-	postForm := url.Values{
-		"json":    {"1"},
-		"task":    {"post"},
-		"board":   {thread.Board.Addr},
-		"thread":  {strconv.Itoa(oldNum)},
-		"name":    {Config.Get().Botname},
-		"comment": {notification},
+	cookie := http.Cookie{
+		Name:  "passcode_auth",
+		Value: CurrentUsercode.Usercode,
 	}
 
-	response, errSend := http.PostForm(path, postForm)
+	request := gorequest.New()
+	_, body, errSend := request.Post(path).
+		Type("multipart").
+		Send("task=post").
+		Send("board=" + thread.Board.Addr).
+		Send("thread=" + strconv.Itoa(oldNum)).
+		Send("name=" + config.Botname).
+		Send("subject=PEREKOT").
+		Send("comment=" + notification).
+		AddCookie(&cookie).
+		End()
 
 	if errSend != nil {
 		threadID := strconv.Itoa(int(thread.ID))
@@ -171,17 +160,9 @@ func notification(thread models.Thread, oldNum int) {
 		return
 	}
 
-	defer response.Body.Close()
-	postResponse, errSave := ioutil.ReadAll(response.Body)
-	if errSave != nil {
-		threadID := strconv.Itoa(int(thread.ID))
-		NewError("Failed to create notification (thread " + threadID + ")")
-		NewHistoryPoint("Failed to create notification (thread " + threadID + ")")
-		return
-	}
+	var responseBody PostResponse
+	errFormate := json.Unmarshal([]byte(body), &responseBody)
 
-	var responseJSON PostResponse
-	errFormate := json.Unmarshal(postResponse, &responseJSON)
 	if errFormate != nil {
 		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to convert server response to JSON (notification in thread " + threadID + ")")
@@ -189,12 +170,27 @@ func notification(thread models.Thread, oldNum int) {
 		return
 	}
 
-	if responseJSON.Status != "OK" {
-		NewError("Failed to create notification (thread " + thread.Title + ")")
-		NewHistoryPoint("Failed to create notification (thread " + thread.Title + ")")
+	if responseBody.Error != 0 {
+		threadID := strconv.Itoa(int(thread.ID))
+		NewError("Failed to create notification (thread " + threadID + ") - error " + responseBody.Reason)
+		NewHistoryPoint("Failed to create notification (thread " + threadID + ") - error " + responseBody.Reason)
 	} else {
 		NewHistoryPoint("Notification in thread " + thread.Title + "was created")
 	}
+}
 
-	fmt.Println(response.Body)
+func threadIncrement(thread models.Thread) {
+	db := models.DB()
+	defer db.Close()
+
+	thread.CurrentNum++
+	db.Save(&thread)
+}
+
+func updateThreadAddr(thread models.Thread, newThread int) {
+	db := models.DB()
+	defer db.Close()
+
+	thread.CurrentThread = newThread
+	db.Save(&thread)
 }

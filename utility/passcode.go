@@ -33,8 +33,6 @@ func (c *Passcode) PasscodeAuth() bool {
 
 	setCookie := response.Header["Set-Cookie"]
 
-	// fmt.Println(setCookie)
-
 	if len(setCookie) == 0 {
 		c.Error = true
 		NewError("Incorrect passcode")
