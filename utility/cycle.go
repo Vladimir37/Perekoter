@@ -15,7 +15,7 @@ func Cycle() {
 		db.Model(&threads[i]).Related(&threads[i].Board)
 		// Убрать комментирование на проде
 		// go CheckThread(threads[i])
-		CheckThread(threads[i])
+		// CheckThread(threads[i])
 
 		// DEBUG
 		Perekot(threads[i])

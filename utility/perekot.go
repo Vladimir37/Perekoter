@@ -43,12 +43,13 @@ func Perekot(thread models.Thread) error {
 	_, body, errSend := request.Post(urlPath).
 		Type("multipart").
 		SendFile(file, thread.Image, "formimages[]").
+		Send("json=1").
+		Send("comment=" + post).
 		Send("task=post").
 		Send("board=" + thread.Board.Addr).
 		Send("thread=0").
 		Send("name=" + config.Botname).
 		Send("subject=" + title).
-		Send("comment=" + post).
 		AddCookie(&cookie).
 		End()
 
@@ -111,6 +112,7 @@ func generatePost(thread models.Thread) (string, error) {
 	var post string
 	if thread.HeaderLink {
 		request := gorequest.New()
+
 		_, body, errSend := request.Get(thread.Header).End()
 		if errSend != nil {
 			threadID := strconv.Itoa(int(thread.ID))
@@ -179,17 +181,23 @@ func notification(thread models.Thread, oldNum int, newNum int) {
 	}
 }
 
-func threadIncrement(thread models.Thread) {
+func threadIncrement(oldThread models.Thread) {
 	db := models.DB()
 	defer db.Close()
+
+	var thread models.Thread
+	db.First(&thread, oldThread.ID)
 
 	thread.CurrentNum++
 	db.Save(&thread)
 }
 
-func updateThreadAddr(thread models.Thread, newThread int) {
+func updateThreadAddr(oldThread models.Thread, newThread int) {
 	db := models.DB()
 	defer db.Close()
+
+	var thread models.Thread
+	db.First(&thread, oldThread.ID)
 
 	thread.CurrentThread = newThread
 	db.Save(&thread)

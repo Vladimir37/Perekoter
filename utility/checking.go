@@ -39,8 +39,5 @@ func CheckThread(thread models.Thread) bool {
 		go Perekot(thread)
 	}
 
-	//Test
-	Perekot(thread)
-
 	return true
 }
