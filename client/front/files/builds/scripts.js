@@ -27277,7 +27277,7 @@
 	    }, {
 	        key: 'generateModal',
 	        value: function generateModal() {
-	            var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/' + this.state.editedCurrentThread + '.html';
+	            var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/res/' + this.state.editedCurrentThread + '.html';
 	            var numberingBlock;
 	            var headerBlock;
 	            if (this.state.editedNumbering) {

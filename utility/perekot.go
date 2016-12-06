@@ -86,7 +86,7 @@ func Perekot(thread models.Thread) error {
 	}
 
 	if config.Notification {
-		time.Sleep(35 * time.Second)
+		time.Sleep(60 * time.Second)
 		notification(thread, oldThread, targetNum)
 	}
 
