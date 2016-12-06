@@ -49696,6 +49696,7 @@
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            componentClass: 'textarea',
 	                            name: 'header',
+	                            className: 'thread-header',
 	                            placeholder: this.state.header_link ? "Ссылка на шапку" : "Шапка",
 	                            value: this.state.header,
 	                            onChange: this.changeForm("header")
@@ -49828,6 +49829,7 @@
 	                    React.createElement(_reactBootstrap.FormControl, {
 	                        componentClass: 'textarea',
 	                        placeholder: this.state.editedHeaderLink ? "Ссылка на шапку" : "Шапка",
+	                        className: 'thread-header',
 	                        value: this.state.editedHeader,
 	                        onChange: this.changeForm("editedHeader")
 	                    }),

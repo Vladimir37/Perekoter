@@ -369,6 +369,7 @@ export class Threads extends React.Component {
                     <FormControl 
                         componentClass="textarea" 
                         name="header"
+                        className="thread-header"
                         placeholder={this.state.header_link ? "Ссылка на шапку" : "Шапка"}
                         value={this.state.header}
                         onChange={this.changeForm("header")}
@@ -455,6 +456,7 @@ export class Threads extends React.Component {
                     <FormControl 
                         componentClass="textarea" 
                         placeholder={this.state.editedHeaderLink ? "Ссылка на шапку" : "Шапка"}
+                        className="thread-header"
                         value={this.state.editedHeader}
                         onChange={this.changeForm("editedHeader")}
                     />
