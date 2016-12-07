@@ -9,6 +9,8 @@ import (
 )
 
 func GetRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.Default()
 	router.LoadHTMLGlob("client/page.html")
 

@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 )
@@ -20,13 +21,17 @@ func (c *ConfigOperator) Read() {
 }
 
 func (c *ConfigOperator) Write(data ConfigStruct) error {
+	var niceConfig bytes.Buffer
+
 	newConfig, errFormat := json.Marshal(data)
-	if errFormat != nil {
+	errPrettify := json.Indent(&niceConfig, newConfig, "", "  ")
+
+	if (errFormat != nil) || (errPrettify != nil) {
 		NewError("Failed to formate new config (utility)")
 		return errFormat
 	}
 
-	errWriting := ioutil.WriteFile("./config.json", newConfig, 0777)
+	errWriting := ioutil.WriteFile("./config.json", niceConfig.Bytes(), 0777)
 	if errWriting != nil {
 		NewError("Failed to write new config (utility)")
 		return errWriting

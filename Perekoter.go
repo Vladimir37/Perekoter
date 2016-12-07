@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aubm/interval"
-	//"github.com/aubm/interval"
 	"time"
+
+	"github.com/aubm/interval"
 )
 
 func main() {
