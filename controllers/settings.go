@@ -51,6 +51,7 @@ func SetSetting(c *gin.Context) {
 		})
 	} else {
 		go utility.NewHistoryPoint("Settings was edited")
+		go utility.RestartInterval()
 		c.JSON(200, gin.H{
 			"status": 0,
 		})

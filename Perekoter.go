@@ -6,10 +6,6 @@ import (
 	"Perekoter/utility"
 	"fmt"
 	"os"
-
-	"time"
-
-	"github.com/aubm/interval"
 )
 
 func main() {
@@ -20,9 +16,8 @@ func main() {
 	config := utility.Config.Get()
 
 	utility.CurrentUsercode.PasscodeAuth()
-	// TODO через интервал
-	// utility.Cycle()
-	interval.Start(utility.Cycle, time.Duration(config.Period)*time.Minute)
+
+	utility.StartInterval()
 
 	router := core.GetRouter()
 

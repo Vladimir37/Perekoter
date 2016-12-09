@@ -1,8 +1,16 @@
 package utility
 
-import "Perekoter/models"
+import (
+	"time"
 
-func Cycle() {
+	"github.com/aubm/interval"
+
+	"Perekoter/models"
+)
+
+var stopCycle func()
+
+func CycleIteration() {
 	db := models.DB()
 	defer db.Close()
 
@@ -15,4 +23,17 @@ func Cycle() {
 		db.Model(&threads[i]).Related(&threads[i].Board)
 		go CheckThread(threads[i])
 	}
+}
+
+func StartInterval() {
+	config := Config.Get()
+	stopCycle = interval.Start(CycleIteration, time.Duration(config.Period)*time.Minute)
+}
+
+func RestartInterval() {
+	config := Config.Get()
+
+	stopCycle()
+
+	stopCycle = interval.Start(CycleIteration, time.Duration(config.Period)*time.Minute)
 }
