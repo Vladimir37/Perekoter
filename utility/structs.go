@@ -10,6 +10,8 @@ type ConfigStruct struct {
 	Botname          string
 	Notification     bool
 	NotificationText string
+	OldLink          bool
+	OldLinkText      string
 	SecretKey        string
 }
 
@@ -78,7 +80,9 @@ type ConfigRequest struct {
 	Base             string `json:"base" binding:"required"`
 	Botname          string `json:"botname" binding:"required"`
 	Notification     bool   `json:"notification"`
-	NotificationText string `json:"notification_text" binding:"required"`
+	NotificationText string `json:"notification_text"`
+	OldLink          bool   `json:"old_link"`
+	OldLinkText      string `json:"old_link_text"`
 	SecretKey        string `json:"secret_key" binding:"required"`
 }
 

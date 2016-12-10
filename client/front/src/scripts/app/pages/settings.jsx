@@ -67,6 +67,8 @@ export class Settings extends React.Component {
                         botname: response.body.Botname,
                         notification: response.body.Notification,
                         notification_text: response.body.NotificationText,
+                        old_link: response.body.OldLink,
+                        old_link_text: response.body.OldLinkText,
                         secret_key: response.body.SecretKey,
                         passcode: response.body.Passcode
                     });
@@ -152,6 +154,8 @@ export class Settings extends React.Component {
             botname: this.state.botname,
             notification: this.state.notification,
             notification_text: this.state.notification_text,
+            old_link: this.state.old_link,
+            old_link_text: this.state.old_link_text,
             secret_key: this.state.secret_key
         };
 
@@ -360,7 +364,29 @@ export class Settings extends React.Component {
                     />
                 </FormGroup>
                 <FormGroup
-                    controlId="notification-text-data"
+                    controlId="old-link-data"
+                >
+                    <ControlLabel>Ссылка на прошлый тред в новом</ControlLabel>
+                    <Checkbox
+                        value={true}
+                        checked={this.state.old_link}
+                        onChange={this.changeCheckbox("old_link")}
+                    >Включить отправку ссылки</Checkbox>
+                </FormGroup>
+                <FormGroup
+                    controlId="old-link-text-data"
+                >
+                    <ControlLabel>Текст поста о прошлом треде (после него ставится номер треда без ">>")</ControlLabel>
+                    <FormControl
+                        type="text"
+                        value={this.state.old_link_text}
+                        disabled={!this.state.old_link}
+                        placeholder="Текст уведомления"
+                        onChange={this.changeForm("old_link_text")}
+                    />
+                </FormGroup>
+                <FormGroup
+                    controlId="secret-key-data"
                 >
                     <ControlLabel>Ключ для шифрования (только 16, 24 или 32 символа)</ControlLabel>
                     <FormControl
@@ -525,6 +551,14 @@ export class Settings extends React.Component {
                     <tr>
                         <td>Текст уведомления (после текста идёт номер треда без ">>")</td>
                         <td>{this.state.settings.NotificationText}</td>
+                    </tr>
+                    <tr>
+                        <td>Ссылка на прошлый тред в новом</td>
+                        <td>{this.state.settings.OldLink ? "Yes" : "No"}</td>
+                    </tr>
+                    <tr>
+                        <td>Текст уведомления (после текста идёт номер треда без ">>")</td>
+                        <td>{this.state.settings.OldLinkText}</td>
                     </tr>
                     <tr>
                         <td>Секретный ключ (для шифрования)</td>

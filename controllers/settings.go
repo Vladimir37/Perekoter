@@ -40,6 +40,8 @@ func SetSetting(c *gin.Context) {
 	config.Botname = request.Botname
 	config.Notification = request.Notification
 	config.NotificationText = request.NotificationText
+	config.OldLink = request.OldLink
+	config.OldLinkText = request.OldLinkText
 	config.SecretKey = request.SecretKey
 
 	err := utility.Config.Write(config)

@@ -30,7 +30,7 @@ func Perekot(thread models.Thread) error {
 	file, errFile := ioutil.ReadFile(imgPath)
 
 	if (errTitle != nil) || (errPost != nil) || (errFile != nil) {
-		NewError("Failed to create header of thread " + threadID)
+		NewError("Failed to create content of thread " + threadID)
 		return errors.New("Not created")
 	}
 
@@ -89,6 +89,11 @@ func Perekot(thread models.Thread) error {
 		notification(thread, oldThread, targetNum)
 	}
 
+	if config.OldLink {
+		time.Sleep(60 * time.Second)
+		oldLink(thread, oldThread, targetNum)
+	}
+
 	return nil
 }
 
@@ -132,10 +137,16 @@ func generateNotification(newNum int) string {
 	return notification
 }
 
+func generateOldLink(newNum int) string {
+	notification := Config.Get().OldLinkText + strconv.Itoa(newNum)
+	return notification
+}
+
 func notification(thread models.Thread, oldNum int, newNum int) {
 	config := Config.Get()
 	path := config.Base + "/makaba/posting.fcgi"
 	notification := generateNotification(newNum)
+	threadID := strconv.Itoa(int(thread.ID))
 
 	cookie := http.Cookie{
 		Name:  "passcode_auth",
@@ -155,7 +166,6 @@ func notification(thread models.Thread, oldNum int, newNum int) {
 		End()
 
 	if errSend != nil {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to send notification (thread " + threadID + ")")
 		NewHistoryPoint("Failed to send notification (thread " + threadID + ")")
 		return
@@ -165,18 +175,62 @@ func notification(thread models.Thread, oldNum int, newNum int) {
 	errFormate := json.Unmarshal([]byte(body), &responseBody)
 
 	if errFormate != nil {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to convert server response to JSON (notification in thread " + threadID + ")")
 		NewHistoryPoint("Failed to convert server response to JSON (notification in thread " + threadID + ")")
 		return
 	}
 
 	if responseBody.Error != 0 {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to create notification (thread " + threadID + ") - error " + responseBody.Reason)
 		NewHistoryPoint("Failed to create notification (thread " + threadID + ") - error " + responseBody.Reason)
 	} else {
-		NewHistoryPoint("Notification in thread " + thread.Title + "was created")
+		NewHistoryPoint("Notification in thread \"" + thread.Title + "\" was created")
+	}
+}
+
+func oldLink(thread models.Thread, oldNum int, newNum int) {
+	config := Config.Get()
+	path := config.Base + "/makaba/posting.fcgi"
+	notification := generateOldLink(oldNum)
+	threadID := strconv.Itoa(int(thread.ID))
+
+	cookie := http.Cookie{
+		Name:  "passcode_auth",
+		Value: CurrentUsercode.Usercode,
+	}
+
+	request := gorequest.New()
+	_, body, errSend := request.Post(path).
+		Type("multipart").
+		Send("task=post").
+		Send("board=" + thread.Board.Addr).
+		Send("thread=" + strconv.Itoa(newNum)).
+		Send("name=" + config.Botname).
+		Send("subject=PEREKOT").
+		Send("comment=" + notification).
+		AddCookie(&cookie).
+		End()
+
+	if errSend != nil {
+		NewError("Failed to send old link (thread " + threadID + ")")
+		NewHistoryPoint("Failed to send old link (thread " + threadID + ")")
+		return
+	}
+
+	var responseBody PostResponse
+	errFormate := json.Unmarshal([]byte(body), &responseBody)
+
+	if errFormate != nil {
+		NewError("Failed to convert server response to JSON (old link notification in thread " + threadID + ")")
+		NewHistoryPoint("Failed to convert server response to JSON (old link notification in thread " + threadID + ")")
+		return
+	}
+
+	if responseBody.Error != 0 {
+		NewError("Failed to create old link notification (thread " + threadID + ") - error " + responseBody.Reason)
+		NewHistoryPoint("Failed to create old link notification (thread " + threadID + ") - error " + responseBody.Reason)
+	} else {
+		NewHistoryPoint("Old link notification in thread \"" + thread.Title + "\" was created")
 	}
 }
 
