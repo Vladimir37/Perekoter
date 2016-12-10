@@ -1,6 +1,6 @@
 {
-  "Login": "Use",
-  "Password": "Pas",
+  "Login": "User",
+  "Password": "Pass",
   "Period": 5,
   "Passcode": "passcode",
   "Port": "8000",
