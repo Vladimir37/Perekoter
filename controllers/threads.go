@@ -135,7 +135,7 @@ func EditThread(c *gin.Context) {
 
 	db.Save(&thread)
 
-	go utility.NewHistoryPoint("Thread \"" + request.Title + "\" was created")
+	go utility.NewHistoryPoint("Thread \"" + request.Title + "\" was edited")
 
 	c.JSON(200, gin.H{
 		"status": 0,
