@@ -20,6 +20,7 @@ func Perekot(thread models.Thread) error {
 	defer db.Close()
 
 	oldThread := thread.CurrentThread
+	threadID := strconv.Itoa(int(thread.ID))
 
 	urlPath := config.Base + "/makaba/posting.fcgi?json=1"
 	imgPath := "./covers/" + thread.Image
@@ -29,7 +30,6 @@ func Perekot(thread models.Thread) error {
 	file, errFile := ioutil.ReadFile(imgPath)
 
 	if (errTitle != nil) || (errPost != nil) || (errFile != nil) {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to create header of thread " + threadID)
 		return errors.New("Not created")
 	}
@@ -54,7 +54,6 @@ func Perekot(thread models.Thread) error {
 		End()
 
 	if errSend != nil {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to send Perekot (thread " + threadID + ")")
 		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ")")
 		return errors.New("Perekot not sended")
@@ -64,18 +63,18 @@ func Perekot(thread models.Thread) error {
 	errFormate := json.Unmarshal([]byte(body), &responseBody)
 
 	if errFormate != nil {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to send Perekot (thread " + threadID + ") - incorrect server response")
 		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ") - incorrect server response")
 		return errors.New("Perekot not sended")
 	}
 
 	if responseBody.Error != 0 {
-		threadID := strconv.Itoa(int(thread.ID))
 		NewError("Failed to send Perekot (thread " + threadID + ") - error " + responseBody.Reason)
 		NewHistoryPoint("Failed to send Perekot (thread " + threadID + ") - error " + responseBody.Reason)
 		return errors.New("Perekot not sended")
 	}
+
+	NewHistoryPoint("Perekot was created (thread " + threadID + ")")
 
 	targetNum := responseBody.Target
 
