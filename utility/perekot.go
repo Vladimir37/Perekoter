@@ -79,6 +79,7 @@ func Perekot(thread models.Thread) error {
 	targetNum := responseBody.Target
 
 	updateThreadAddr(thread, targetNum)
+	updateThreadLastData(thread)
 
 	if thread.Numbering {
 		threadIncrement(thread)
@@ -253,5 +254,17 @@ func updateThreadAddr(oldThread models.Thread, newThread int) {
 	db.First(&thread, oldThread.ID)
 
 	thread.CurrentThread = newThread
+	db.Save(&thread)
+}
+
+func updateThreadLastData(oldThread models.Thread) {
+	db := models.DB()
+	defer db.Close()
+
+	var thread models.Thread
+	db.First(&thread, oldThread.ID)
+
+	thread.LastPosts = 1
+	thread.LastPerekot = int(time.Now().Unix())
 	db.Save(&thread)
 }

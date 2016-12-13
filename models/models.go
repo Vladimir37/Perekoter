@@ -39,6 +39,8 @@ type Thread struct {
 	HeaderLink    bool
 	Header        string
 	Image         string
+	LastPerekot   int
+	LastPosts     int
 	Board         Board
 	BoardID       uint
 	Active        bool
@@ -46,9 +48,9 @@ type Thread struct {
 
 type Issue struct {
 	gorm.Model
-	Title string
-	Text string
-	Link string
+	Title  string
+	Text   string
+	Link   string
 	Active bool
 }
 

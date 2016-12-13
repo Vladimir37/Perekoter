@@ -43,6 +43,8 @@ export class Main extends React.Component {
                     editedHeaderLink: thread.HeaderLink,
                     editedHeader: thread.Header,
                     editedBoard: thread.Board,
+                    editedLastPosts: thread.LastPosts,
+                    editedLastPerekot: thread.LastPerekot,
                     currentImage: thread.Image
                 });
             }
@@ -119,6 +121,8 @@ export class Main extends React.Component {
 
     generateModal() {
         var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/res/' + this.state.editedCurrentThread + '.html';
+        var lastPerekotDate = new Date((this.state.editedLastPerekot * 1000));
+        lastPerekotDate = (lastPerekotDate.getHours()) + ':' + (lastPerekotDate.getMinutes()) + ' ' + (lastPerekotDate.getDate()) + '-' + (lastPerekotDate.getMonth() + 1) + '-' + (lastPerekotDate.getFullYear());
         var numberingBlock;
         var headerBlock;
         if (this.state.editedNumbering) {
@@ -149,6 +153,8 @@ export class Main extends React.Component {
                     <p><b>Нумерация:</b> {this.state.editedNumbering ? 'Да' : 'Нет'}</p>
                     {numberingBlock}
                     <p><b>Текущий тред:</b> <a target="_blank" href={currentThread}>{currentThread}</a></p>
+                    <p><b>Последний Перекот:</b> {lastPerekotDate}</p>
+                    <p><b>Число постов при последней проверке:</b> {this.state.editedLastPosts}</p>
                     <p><b>Тип шапки:</b> {this.state.editedHeaderLink ? 'Ссылка на шапку' : 'Текст шапки'}</p>
                     {headerBlock}
                 </Modal.Body>

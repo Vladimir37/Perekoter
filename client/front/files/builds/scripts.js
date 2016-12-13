@@ -27518,6 +27518,8 @@
 	                        editedHeaderLink: thread.HeaderLink,
 	                        editedHeader: thread.Header,
 	                        editedBoard: thread.Board,
+	                        editedLastPosts: thread.LastPosts,
+	                        editedLastPerekot: thread.LastPerekot,
 	                        currentImage: thread.Image
 	                    });
 	                }
@@ -27602,6 +27604,8 @@
 	        key: 'generateModal',
 	        value: function generateModal() {
 	            var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/res/' + this.state.editedCurrentThread + '.html';
+	            var lastPerekotDate = new Date(this.state.editedLastPerekot * 1000);
+	            lastPerekotDate = lastPerekotDate.getHours() + ':' + lastPerekotDate.getMinutes() + ' ' + lastPerekotDate.getDate() + '-' + (lastPerekotDate.getMonth() + 1) + '-' + lastPerekotDate.getFullYear();
 	            var numberingBlock;
 	            var headerBlock;
 	            if (this.state.editedNumbering) {
@@ -27731,6 +27735,28 @@
 	                                { target: '_blank', href: currentThread },
 	                                currentThread
 	                            )
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            React.createElement(
+	                                'b',
+	                                null,
+	                                '\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0439 \u041F\u0435\u0440\u0435\u043A\u043E\u0442:'
+	                            ),
+	                            ' ',
+	                            lastPerekotDate
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            React.createElement(
+	                                'b',
+	                                null,
+	                                '\u0427\u0438\u0441\u043B\u043E \u043F\u043E\u0441\u0442\u043E\u0432 \u043F\u0440\u0438 \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0439 \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0435:'
+	                            ),
+	                            ' ',
+	                            this.state.editedLastPosts
 	                        ),
 	                        React.createElement(
 	                            'p',
