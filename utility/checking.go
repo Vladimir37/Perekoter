@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func CheckThread(thread models.Thread) bool {
@@ -42,7 +41,6 @@ func CheckThread(thread models.Thread) bool {
 		go Perekot(thread)
 	} else {
 		thread.LastPosts = responseJSON.Posts_count
-		thread.LastPerekot = int(time.Now().Unix())
 		db.Save(&thread)
 	}
 

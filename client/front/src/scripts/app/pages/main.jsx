@@ -121,8 +121,7 @@ export class Main extends React.Component {
 
     generateModal() {
         var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/res/' + this.state.editedCurrentThread + '.html';
-        var lastPerekotDate = new Date((this.state.editedLastPerekot * 1000));
-        lastPerekotDate = (lastPerekotDate.getHours()) + ':' + (lastPerekotDate.getMinutes()) + ' ' + (lastPerekotDate.getDate()) + '-' + (lastPerekotDate.getMonth() + 1) + '-' + (lastPerekotDate.getFullYear());
+        var lastPerekotDate = this.state.editedLastPerekot * 1000;
         var numberingBlock;
         var headerBlock;
         if (this.state.editedNumbering) {
@@ -130,6 +129,12 @@ export class Main extends React.Component {
                 <p><b>Нумерация римскими цифрами:</b> {this.state.editedRoman ? 'Да' : 'Нет'} </p>
                 <p><b>Текущий номер:</b> {this.state.editedCurrentNum}</p>
             </div>;
+        }
+        if (lastPerekotDate > 0) {
+            lastPerekotDate = new Date(lastPerekotDate);
+            lastPerekotDate = (lastPerekotDate.getHours()) + ':' + (lastPerekotDate.getMinutes()) + ' ' + (lastPerekotDate.getDate()) + '-' + (lastPerekotDate.getMonth() + 1) + '-' + (lastPerekotDate.getFullYear());
+        } else {
+            lastPerekotDate = 'Не перекатывался';
         }
         if (this.state.editedHeaderLink) {
             headerBlock = <p><b>Ссылка на шапку:</b> <a target="_blank" href={this.state.editedHeader}>{this.state.editedHeader}</a></p>
