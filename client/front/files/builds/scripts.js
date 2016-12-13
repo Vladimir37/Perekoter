@@ -27604,8 +27604,7 @@
 	        key: 'generateModal',
 	        value: function generateModal() {
 	            var currentThread = 'https://2ch.hk/' + this.state.editedBoard.Addr + '/res/' + this.state.editedCurrentThread + '.html';
-	            var lastPerekotDate = new Date(this.state.editedLastPerekot * 1000);
-	            lastPerekotDate = lastPerekotDate.getHours() + ':' + lastPerekotDate.getMinutes() + ' ' + lastPerekotDate.getDate() + '-' + (lastPerekotDate.getMonth() + 1) + '-' + lastPerekotDate.getFullYear();
+	            var lastPerekotDate = this.state.editedLastPerekot * 1000;
 	            var numberingBlock;
 	            var headerBlock;
 	            if (this.state.editedNumbering) {
@@ -27636,6 +27635,12 @@
 	                        this.state.editedCurrentNum
 	                    )
 	                );
+	            }
+	            if (lastPerekotDate > 0) {
+	                lastPerekotDate = new Date(lastPerekotDate);
+	                lastPerekotDate = lastPerekotDate.getHours() + ':' + lastPerekotDate.getMinutes() + ' ' + lastPerekotDate.getDate() + '-' + (lastPerekotDate.getMonth() + 1) + '-' + lastPerekotDate.getFullYear();
+	            } else {
+	                lastPerekotDate = 'Не перекатывался';
 	            }
 	            if (this.state.editedHeaderLink) {
 	                headerBlock = React.createElement(
