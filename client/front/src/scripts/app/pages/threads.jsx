@@ -571,7 +571,7 @@ export class Threads extends React.Component {
                     <th>#</th>
                     <th>Имя</th>
                     <th>Доска</th>
-                    <th>Активность</th>
+                    <th className="switcher">Активность</th>
                     <th></th>
                     <th></th>
                     <th></th>

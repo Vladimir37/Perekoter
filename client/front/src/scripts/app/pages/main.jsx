@@ -188,6 +188,7 @@ export class Main extends React.Component {
             return <tr key={thread.ID}>
                 <td>{thread.ID}</td>
                 <td>{thread.Title}</td>
+                <td>{thread.LastPosts}</td>
                 <td>{thread.Board.Name}</td>
                 <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal(thread)}>Подробно</Button></td>
             </tr>;
@@ -214,6 +215,7 @@ export class Main extends React.Component {
                     <tr>
                         <th>#</th>
                         <th>Имя</th>
+                        <th>Посты</th>
                         <th>Доска</th>
                         <th></th>
                     </tr>
