@@ -27827,6 +27827,11 @@
 	                    React.createElement(
 	                        'td',
 	                        null,
+	                        thread.LastPosts
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
 	                        thread.Board.Name
 	                    ),
 	                    React.createElement(
@@ -27909,6 +27914,11 @@
 	                                    'th',
 	                                    null,
 	                                    '\u0418\u043C\u044F'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u041F\u043E\u0441\u0442\u044B'
 	                                ),
 	                                React.createElement(
 	                                    'th',
@@ -50520,7 +50530,7 @@
 	                            ),
 	                            React.createElement(
 	                                'th',
-	                                null,
+	                                { className: 'switcher' },
 	                                '\u0410\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C'
 	                            ),
 	                            React.createElement('th', null),

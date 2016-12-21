@@ -35,6 +35,9 @@ main {
 .thread-header {
   resize: vertical;
 }
+.switcher {
+  width: 130px;
+}
 .hidden {
   display: none;
 }
