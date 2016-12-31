@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"time"
 
@@ -125,9 +126,11 @@ func generatePost(thread models.Thread) (string, error) {
 			return "", errors.New("Not created")
 		}
 
+		body = strings.Replace(body, "${old_thread}", ">>"+strconv.Itoa(thread.CurrentThread), -1)
 		post = body
 	} else {
-		post = thread.Header
+		body := strings.Replace(thread.Header, "${old_thread}", ">>"+strconv.Itoa(thread.CurrentThread), -1)
+		post = body
 	}
 
 	return post, nil

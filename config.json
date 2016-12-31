@@ -8,7 +8,7 @@
   "Botname": "Anonimous",
   "Notification": true,
   "NotificationText": "Perekot to \u003e\u003e",
-  "OldLink": true,
+  "OldLink": false,
   "OldLinkText": "Тред \u003e\u003e",
   "SecretKey": "SecretKeyKeyKeyL"
 }
