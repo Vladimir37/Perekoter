@@ -104,9 +104,9 @@ func createTitle(thread models.Thread) (string, error) {
 
 	if thread.Numbering {
 		if thread.Roman {
-			title += " #" + roman.Roman(currentNum)
+			title += " " + thread.NumberingSymbol + roman.Roman(currentNum)
 		} else {
-			title += " #" + strconv.Itoa(currentNum)
+			title += " " + thread.NumberingSymbol + strconv.Itoa(currentNum)
 		}
 	}
 
