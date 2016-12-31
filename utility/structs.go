@@ -47,17 +47,18 @@ type BoardRequest struct {
 }
 
 type ThreadRequest struct {
-	ID            int    `json:"id"`
-	Numbering     bool   `json:"numbering"`
-	Roman         bool   `json:"roman"`
-	CurrentNum    int    `json:"current_num"`
-	CurrentThread int    `json:"current_thread"`
-	Title         string `json:"title" binding:"required"`
-	HeaderLink    bool   `json:"header_link"`
-	Header        string `json:"header" binding:"required"`
-	BoardNum      int    `json:"board_num" binding:"required"`
-	Active        bool   `json:"active"`
-	Redirect      bool   `json:"redirect"`
+	ID              int    `json:"id"`
+	Numbering       bool   `json:"numbering"`
+	NumberingSymbol string `json:"numbering_symbol"`
+	Roman           bool   `json:"roman"`
+	CurrentNum      int    `json:"current_num"`
+	CurrentThread   int    `json:"current_thread"`
+	Title           string `json:"title" binding:"required"`
+	HeaderLink      bool   `json:"header_link"`
+	Header          string `json:"header" binding:"required"`
+	BoardNum        int    `json:"board_num" binding:"required"`
+	Active          bool   `json:"active"`
+	Redirect        bool   `json:"redirect"`
 }
 
 type UserChangingRequest struct {

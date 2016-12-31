@@ -137,6 +137,7 @@ export class Threads extends React.Component {
                 this.setState({
                     editedID: thread.ID,
                     editedNumbering: thread.Numbering,
+                    editedNumberingSymbol: thread.NumberingSymbol,
                     editedRoman: thread.Roman,
                     editedCurrentNum: thread.CurrentNum,
                     editedCurrentThread: thread.CurrentThread,
@@ -229,6 +230,7 @@ export class Threads extends React.Component {
         var req_data = {
             id: this.state.editedID,
             numbering: this.state.editedNumbering,
+            numbering_symbol: this.state.editedNumberingSymbol,
             roman: this.state.editedRoman,
             current_num: Number(this.state.editedCurrentNum),
             current_thread: Number(this.state.editedCurrentThread),
@@ -344,6 +346,15 @@ export class Threads extends React.Component {
                     >Нумерация римскими цифрами</Checkbox>
                     <FormControl
                         type="text"
+                        value={this.state.numbering_symbol}
+                        name="numbering_symbol"
+                        placeholder="Символ перед номером треда"
+                        onChange={this.changeForm("numbering_symbol")}
+                        disabled={!this.state.numbering}
+                    />
+                    <br/>
+                    <FormControl
+                        type="text"
                         value={this.state.current_num}
                         name="current_num"
                         placeholder="Текущий номер треда"
@@ -432,6 +443,14 @@ export class Threads extends React.Component {
                         onChange={this.changeCheckbox("editedRoman")}
                         disabled={!this.state.editedNumbering}
                     >Нумерация римскими цифрами</Checkbox>
+                    <FormControl
+                        type="text"
+                        value={this.state.editedNumberingSymbol}
+                        placeholder="Символ перед номером треда"
+                        onChange={this.changeForm("editedNumberingSymbol")}
+                        disabled={!this.state.editedNumbering}
+                    />
+                    <br/>
                     <FormControl
                         type="text"
                         value={this.state.editedCurrentNum}

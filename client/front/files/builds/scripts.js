@@ -27557,6 +27557,10 @@
 	                response = response.data;
 	                if (response.status == 0) {
 	                    response.body = response.body.reverse();
+	                    response.body = response.body.filter(function (thread) {
+	                        return thread.Active;
+	                    });
+
 	                    _this4.setState({
 	                        threads: response.body,
 	                        threadsLoaded: true
@@ -27827,6 +27831,15 @@
 	                    React.createElement(
 	                        'td',
 	                        null,
+	                        React.createElement(
+	                            'a',
+	                            { target: '_blank', href: 'http://2ch.hk/' + thread.Board.Addr + '/res/' + thread.CurrentThread + '.html' },
+	                            '\u0421\u0441\u044B\u043B\u043A\u0430'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
 	                        thread.LastPosts
 	                    ),
 	                    React.createElement(
@@ -27866,6 +27879,17 @@
 	                        '/',
 	                        board.Addr,
 	                        '/'
+	                    ),
+	                    React.createElement(
+	                        'td',
+	                        null,
+	                        React.createElement(
+	                            'a',
+	                            { target: '_blank', href: 'http://2ch.hk/' + board.Addr },
+	                            'http://2ch.hk/',
+	                            board.Addr,
+	                            '/'
+	                        )
 	                    ),
 	                    React.createElement(
 	                        'td',
@@ -27918,6 +27942,11 @@
 	                                React.createElement(
 	                                    'th',
 	                                    null,
+	                                    '\u0422\u0435\u043A\u0443\u0449\u0438\u0439'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
 	                                    '\u041F\u043E\u0441\u0442\u044B'
 	                                ),
 	                                React.createElement(
@@ -27961,6 +27990,11 @@
 	                                    'th',
 	                                    null,
 	                                    '\u0410\u0434\u0440\u0435\u0441'
+	                                ),
+	                                React.createElement(
+	                                    'th',
+	                                    null,
+	                                    '\u0421\u0441\u044B\u043B\u043A\u0430'
 	                                ),
 	                                React.createElement(
 	                                    'th',
@@ -49866,6 +49900,7 @@
 	                    _this7.setState({
 	                        editedID: thread.ID,
 	                        editedNumbering: thread.Numbering,
+	                        editedNumberingSymbol: thread.NumberingSymbol,
 	                        editedRoman: thread.Roman,
 	                        editedCurrentNum: thread.CurrentNum,
 	                        editedCurrentThread: thread.CurrentThread,
@@ -49962,6 +49997,7 @@
 	            var req_data = {
 	                id: this.state.editedID,
 	                numbering: this.state.editedNumbering,
+	                numbering_symbol: this.state.editedNumberingSymbol,
 	                roman: this.state.editedRoman,
 	                current_num: Number(this.state.editedCurrentNum),
 	                current_thread: Number(this.state.editedCurrentThread),
@@ -50109,6 +50145,15 @@
 	                        ),
 	                        React.createElement(_reactBootstrap.FormControl, {
 	                            type: 'text',
+	                            value: this.state.numbering_symbol,
+	                            name: 'numbering_symbol',
+	                            placeholder: '\u0421\u0438\u043C\u0432\u043E\u043B \u043F\u0435\u0440\u0435\u0434 \u043D\u043E\u043C\u0435\u0440\u043E\u043C \u0442\u0440\u0435\u0434\u0430',
+	                            onChange: this.changeForm("numbering_symbol"),
+	                            disabled: !this.state.numbering
+	                        }),
+	                        React.createElement('br', null),
+	                        React.createElement(_reactBootstrap.FormControl, {
+	                            type: 'text',
 	                            value: this.state.current_num,
 	                            name: 'current_num',
 	                            placeholder: '\u0422\u0435\u043A\u0443\u0449\u0438\u0439 \u043D\u043E\u043C\u0435\u0440 \u0442\u0440\u0435\u0434\u0430',
@@ -50243,6 +50288,14 @@
 	                        },
 	                        '\u041D\u0443\u043C\u0435\u0440\u0430\u0446\u0438\u044F \u0440\u0438\u043C\u0441\u043A\u0438\u043C\u0438 \u0446\u0438\u0444\u0440\u0430\u043C\u0438'
 	                    ),
+	                    React.createElement(_reactBootstrap.FormControl, {
+	                        type: 'text',
+	                        value: this.state.editedNumberingSymbol,
+	                        placeholder: '\u0421\u0438\u043C\u0432\u043E\u043B \u043F\u0435\u0440\u0435\u0434 \u043D\u043E\u043C\u0435\u0440\u043E\u043C \u0442\u0440\u0435\u0434\u0430',
+	                        onChange: this.changeForm("editedNumberingSymbol"),
+	                        disabled: !this.state.editedNumbering
+	                    }),
+	                    React.createElement('br', null),
 	                    React.createElement(_reactBootstrap.FormControl, {
 	                        type: 'text',
 	                        value: this.state.editedCurrentNum,

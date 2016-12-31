@@ -45,6 +45,7 @@ func GetThread(c *gin.Context) {
 func AddThread(c *gin.Context) {
 	title := c.PostForm("title")
 	numbering := c.PostForm("numbering") != ""
+	numberingSymbol := c.PostForm("numbering_symbol")
 	roman := c.PostForm("roman") != ""
 	currentNum, _ := strconv.Atoi(c.PostForm("current_num"))
 	currentThread, _ := strconv.Atoi(c.PostForm("current_thread"))
@@ -87,16 +88,17 @@ func AddThread(c *gin.Context) {
 	}
 
 	db.Create(&models.Thread{
-		Numbering:     numbering,
-		Roman:         roman,
-		CurrentNum:    currentNum,
-		CurrentThread: currentThread,
-		Title:         title,
-		HeaderLink:    headerLink,
-		Header:        header,
-		Image:         imageName,
-		BoardID:       targetBoard.ID,
-		Active:        true,
+		Numbering:       numbering,
+		NumberingSymbol: numberingSymbol,
+		Roman:           roman,
+		CurrentNum:      currentNum,
+		CurrentThread:   currentThread,
+		Title:           title,
+		HeaderLink:      headerLink,
+		Header:          header,
+		Image:           imageName,
+		BoardID:         targetBoard.ID,
+		Active:          true,
 	})
 
 	go utility.NewHistoryPoint("Thread \"" + title + "\" was created")
@@ -124,6 +126,7 @@ func EditThread(c *gin.Context) {
 	db.First(&thread, request.ID)
 
 	thread.Numbering = request.Numbering
+	thread.NumberingSymbol = request.NumberingSymbol
 	thread.Roman = request.Roman
 	thread.CurrentNum = request.CurrentNum
 	thread.CurrentThread = request.CurrentThread

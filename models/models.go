@@ -31,19 +31,20 @@ type Board struct {
 
 type Thread struct {
 	gorm.Model
-	Numbering     bool
-	Roman         bool
-	CurrentNum    int
-	CurrentThread int
-	Title         string
-	HeaderLink    bool
-	Header        string
-	Image         string
-	LastPerekot   int
-	LastPosts     int
-	Board         Board
-	BoardID       uint
-	Active        bool
+	Numbering       bool
+	Roman           bool
+	NumberingSymbol string
+	CurrentNum      int
+	CurrentThread   int
+	Title           string
+	HeaderLink      bool
+	Header          string
+	Image           string
+	LastPerekot     int
+	LastPosts       int
+	Board           Board
+	BoardID         uint
+	Active          bool
 }
 
 type Issue struct {

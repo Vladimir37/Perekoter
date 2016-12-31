@@ -75,6 +75,10 @@ export class Main extends React.Component {
                 response = response.data;
                 if (response.status == 0) {
                     response.body = response.body.reverse();
+                    response.body = response.body.filter((thread) => {
+                        return thread.Active;
+                    });
+                    
                     this.setState({
                         threads: response.body,
                         threadsLoaded: true
@@ -188,6 +192,7 @@ export class Main extends React.Component {
             return <tr key={thread.ID}>
                 <td>{thread.ID}</td>
                 <td>{thread.Title}</td>
+                <td><a target="_blank" href={'http://2ch.hk/' + thread.Board.Addr + '/res/' + thread.CurrentThread + '.html'}>Ссылка</a></td>
                 <td>{thread.LastPosts}</td>
                 <td>{thread.Board.Name}</td>
                 <td><Button bsStyle="primary" bsSize="xsmall" onClick={this.openModal(thread)}>Подробно</Button></td>
@@ -199,6 +204,7 @@ export class Main extends React.Component {
                 <td>{board.ID}</td>
                 <td>{board.Name}</td>
                 <td>/{board.Addr}/</td>
+                <td><a target="_blank" href={'http://2ch.hk/' + board.Addr}>http://2ch.hk/{board.Addr}/</a></td>
                 <td>{board.Bumplimit}</td>
             </tr>;
         });
@@ -215,6 +221,7 @@ export class Main extends React.Component {
                     <tr>
                         <th>#</th>
                         <th>Имя</th>
+                        <th>Текущий</th>
                         <th>Посты</th>
                         <th>Доска</th>
                         <th></th>
@@ -232,6 +239,7 @@ export class Main extends React.Component {
                         <th>#</th>
                         <th>Название</th>
                         <th>Адрес</th>
+                        <th>Ссылка</th>
                         <th>Бамплимит</th>
                     </tr>
                     </thead>
